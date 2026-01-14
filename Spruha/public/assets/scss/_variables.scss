@@ -92,6 +92,10 @@
   --fleet-dark-bg-2: #0a0c0a;
   --fleet-dark-bg-3: #0f120f;
   --fleet-border: #1f291f;
+
+  /* FleetPulse Typography */
+  --fleet-font-display: "Rajdhani", sans-serif;
+  --fleet-font-body: "Inter", sans-serif;
 }
 
 /*Font Family*/
@@ -302,6 +306,10 @@ $black-9: var(--black-9);
   --fleet-dark-bg-2: #0a0c0a;
   --fleet-dark-bg-3: #0f120f;
   --fleet-border: #1f291f;
+
+  /* FleetPulse Typography - Same for both themes */
+  --fleet-font-display: "Rajdhani", sans-serif;
+  --fleet-font-body: "Inter", sans-serif;
 
   /* Override dark theme backgrounds when in dark mode */
   --default-body-bg-color: var(--fleet-dark-bg-2);

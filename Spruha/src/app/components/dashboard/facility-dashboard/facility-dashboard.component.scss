@@ -1,12 +1,48 @@
 // Facility Dashboard Styles
-// Minimal custom styles - reuses existing theme
+// Match facility-operations styling
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.card-title,
+.main-content-label {
+  font-family: var(--fleet-font-display, "Rajdhani", sans-serif);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.card-body,
+p,
+span,
+div,
+td,
+th {
+  font-family: var(--fleet-font-body, "Inter", sans-serif);
+}
+
+// Card consistency
+.card.custom-card {
+  background-color: var(--custom-white);
+  border: 1px solid var(--default-border);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--fleet-primary-green, #5ad85a);
+    box-shadow: 0 4px 12px rgba(90, 216, 90, 0.15);
+  }
+}
 
 .cursor-pointer {
   cursor: pointer;
   user-select: none;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: var(--list-hover-focus-bg);
   }
 }
 

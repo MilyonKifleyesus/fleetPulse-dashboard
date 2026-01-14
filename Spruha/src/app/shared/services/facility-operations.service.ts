@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, delay } from 'rxjs/operators';
+import { catchError, delay, map } from 'rxjs/operators';
 import {
   FacilityOperationsData,
   Unit,
@@ -35,9 +35,7 @@ export class FacilityOperationsService {
       );
 
       if (!mockData) {
-        return throwError(
-          () => new Error(`Facility ${facilityId} not found`)
-        );
+        return throwError(() => new Error(`Facility ${facilityId} not found`));
       }
 
       return of(mockData).pipe(
@@ -68,7 +66,8 @@ export class FacilityOperationsService {
   getFacilityUnits(facilityId: string): Observable<Unit[]> {
     return this.getFacilityOperations(facilityId).pipe(
       delay(100),
-      catchError(() => of([]))
+      map((data: FacilityOperationsData) => data.units),
+      catchError(() => of([] as Unit[]))
     );
   }
 
@@ -78,10 +77,9 @@ export class FacilityOperationsService {
   getFacilityResources(facilityId: string): Observable<FacilityResource> {
     return this.getFacilityOperations(facilityId).pipe(
       delay(100),
-      catchError(() =>
-        throwError(
-          () => new Error('Failed to load facility resources')
-        )
+      map((data: FacilityOperationsData) => data.resources),
+      catchError((error) =>
+        throwError(() => new Error('Failed to load facility resources'))
       )
     );
   }
@@ -92,10 +90,9 @@ export class FacilityOperationsService {
   getFacilityTelemetry(facilityId: string): Observable<FacilityTelemetry> {
     return this.getFacilityOperations(facilityId).pipe(
       delay(100),
-      catchError(() =>
-        throwError(
-          () => new Error('Failed to load facility telemetry')
-        )
+      map((data: FacilityOperationsData) => data.telemetry),
+      catchError((error) =>
+        throwError(() => new Error('Failed to load facility telemetry'))
       )
     );
   }
@@ -103,12 +100,11 @@ export class FacilityOperationsService {
   /**
    * Get facility activity log
    */
-  getFacilityActivityLog(
-    facilityId: string
-  ): Observable<FacilityActivity[]> {
+  getFacilityActivityLog(facilityId: string): Observable<FacilityActivity[]> {
     return this.getFacilityOperations(facilityId).pipe(
       delay(100),
-      catchError(() => of([]))
+      map((data: FacilityOperationsData) => data.activities),
+      catchError(() => of([] as FacilityActivity[]))
     );
   }
 
@@ -120,10 +116,9 @@ export class FacilityOperationsService {
   ): Observable<PerformanceMetrics> {
     return this.getFacilityOperations(facilityId).pipe(
       delay(100),
-      catchError(() =>
-        throwError(
-          () => new Error('Failed to load performance metrics')
-        )
+      map((data: FacilityOperationsData) => data.performanceMetrics),
+      catchError((error) =>
+        throwError(() => new Error('Failed to load performance metrics'))
       )
     );
   }

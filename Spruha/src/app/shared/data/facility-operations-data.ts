@@ -300,43 +300,62 @@ const kpis = {
 };
 
 // Create Facility Operations Data
-export const mockFacilityOperationsData: FacilityOperationsData[] = [
-  {
-    facility: northLogisticsHub,
-    ...kpis,
-    telemetry: mockTelemetry,
-    resources: mockResources,
-    performanceMetrics: generate24HourMetrics(),
-    units: mockUnits,
-    activities: mockActivities,
-    sector: 'SECTOR 7-G',
-    networkNode: 'FP-CHI-84',
-  },
-  // Add data for other facilities from mockFacilities if needed
-  ...mockFacilities.slice(0, 3).map((facility) => {
-    const facilityUnits = mockUnits.slice(0, 50).map((u) => ({
-      ...u,
-      facilityId: facility.facilityId,
-    }));
+// Generate operations data for ALL facilities in mockFacilities
+export const mockFacilityOperationsData: FacilityOperationsData[] =
+  mockFacilities.map((facility) => {
+    // Generate facility-specific units (28 units per facility for performance)
+    const facilityUnits = Array.from({ length: 28 }, (_, i) => {
+      const baseUnit = mockUnits[i % mockUnits.length];
+      return {
+        ...baseUnit,
+        id: `${facility.id}-unit-${i + 1}`,
+        unitId: `#${String(1000 + i + facility.id.charCodeAt(0)).padStart(
+          4,
+          '0'
+        )}`,
+        facilityId: facility.facilityId,
+      };
+    });
+
     const facilityKPIs = calculateKPIs(facilityUnits);
+
+    // Generate facility-specific activities
+    const facilityActivities = mockActivities.slice(0, 6).map((a, index) => ({
+      ...a,
+      id: `${facility.id}-act-${index + 1}`,
+      facilityId: facility.facilityId,
+      facilityName: facility.name,
+      timestamp: new Date(
+        Date.now() - (index + 1) * 15 * 60 * 1000
+      ).toISOString(),
+    }));
+
     return {
       facility,
       ...facilityKPIs,
       telemetry: {
         ...mockTelemetry,
-        uptime: facility.kpis.uptimePercentage,
+        uptime: facility.kpis.uptimePercentage || 98.4,
+        demand: facility.capacity.spaceUtilization > 85 ? 'HIGH' : 'NORMAL',
+        demandTrend:
+          facility.capacity.spaceUtilization > 80 ? 'increasing' : 'stable',
       },
       resources: {
         ...mockResources,
-        availableBays: 12 + (facility.id.charCodeAt(0) % 8), // Deterministic instead of random
+        availableBays: Math.max(
+          5,
+          Math.floor(facility.capacity.maxOccupancy / 10)
+        ),
+        totalBays: Math.floor(facility.capacity.maxOccupancy / 10),
+        energyConsumption: Math.round(
+          ((facility.capacity.electricalConsumed || 0) /
+            (facility.capacity.electricalCapacity || 1)) *
+            100
+        ),
       },
       performanceMetrics: generate24HourMetrics(),
       units: facilityUnits,
-      activities: mockActivities.slice(0, 4).map((a) => ({
-        ...a,
-        facilityId: facility.facilityId,
-        facilityName: facility.name,
-      })),
+      activities: facilityActivities,
       sector: `SECTOR ${facility.id.charCodeAt(0) % 10}-${String.fromCharCode(
         65 + (facility.id.charCodeAt(0) % 26)
       )}`,
@@ -344,5 +363,4 @@ export const mockFacilityOperationsData: FacilityOperationsData[] = [
         .substring(0, 3)
         .toUpperCase()}-${facility.id.charCodeAt(0) % 100}`,
     };
-  }),
-];
+  });

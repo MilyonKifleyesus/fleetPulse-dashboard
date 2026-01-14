@@ -308,7 +308,9 @@ export class FacilityOperationsComponent implements OnInit, OnDestroy {
 
   loadData(): void {
     const id = this.facilityId();
-    if (!id) {
+    
+    // Validate facilityId - check for empty, undefined, or literal route parameter
+    if (!id || id.trim() === '' || id === ':facilityId') {
       this.errorMessage.set('Facility ID is required');
       this.isLoading.set(false);
       return;
@@ -322,8 +324,11 @@ export class FacilityOperationsComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
+    // Clean the facilityId (remove any whitespace)
+    const cleanId = id.trim();
+
     this.facilityOperationsService
-      .getFacilityOperations(id)
+      .getFacilityOperations(cleanId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
@@ -443,6 +448,36 @@ export class FacilityOperationsComponent implements OnInit, OnDestroy {
     console.log('Navigate to node configuration');
   }
 
+  navigateToVehicleDetail(unitId: string, event?: Event): void {
+    // Prevent default if event is provided (for button clicks)
+    if (event) {
+      event.stopPropagation();
+    }
+
+    const facilityId = this.facilityId();
+    
+    // Ensure we have a valid facilityId before navigating
+    if (!facilityId || facilityId.trim() === '' || facilityId === ':facilityId') {
+      console.error('Invalid facilityId:', facilityId);
+      // Fallback to standalone route if facilityId is invalid
+      const cleanUnitId = unitId.replace('#', '');
+      this.router.navigate(['/dashboard', 'vehicle', cleanUnitId]);
+      return;
+    }
+
+    // Clean the unitId (remove # if present)
+    const cleanUnitId = unitId.replace('#', '');
+    
+    // Navigate to nested route: facility-operations/:facilityId/vehicle/:vehicleId
+    this.router.navigate([
+      '/dashboard',
+      'facility-operations',
+      facilityId.trim(),
+      'vehicle',
+      cleanUnitId,
+    ]);
+  }
+
   // Expose Math and String for template
   Math = Math;
   String = String;
@@ -487,8 +522,8 @@ export class FacilityOperationsComponent implements OnInit, OnDestroy {
     });
   }
 
-  formatTime(timestamp: string): string {
-    const date = new Date(timestamp);
+  formatTime(timestamp: string | Date): string {
+    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',

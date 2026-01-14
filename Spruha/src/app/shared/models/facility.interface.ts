@@ -32,7 +32,10 @@ export type FacilityCriticalityLevel = 'Critical' | 'Important' | 'Standard';
 export type SecurityClassification = 'High' | 'Medium' | 'Low';
 
 // Environmental Requirements
-export type EnvironmentalRequirement = 'Climate-controlled' | 'Standard' | 'Industrial';
+export type EnvironmentalRequirement =
+  | 'Climate-controlled'
+  | 'Standard'
+  | 'Industrial';
 
 // Ownership Types
 export type OwnershipType = 'Owned' | 'Leased' | 'Managed';

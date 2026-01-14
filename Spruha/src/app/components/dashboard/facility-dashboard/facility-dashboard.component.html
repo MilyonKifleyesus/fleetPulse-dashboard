@@ -1,5 +1,8 @@
-<app-page-header [title]="'Welcome To Facility Management Dashboard'" [title1]="['Dashboard']"
-  [activeitem]="'Facility Management'"></app-page-header>
+<app-page-header
+  [title]="'Welcome To Facility Management Dashboard'"
+  [title1]="['Dashboard']"
+  [activeitem]="'Facility Management'"
+></app-page-header>
 
 <!-- Summary Cards -->
 <div class="row row-sm">
@@ -14,14 +17,23 @@
 <!-- row opened -->
 <!-- Facility Carousel -->
 <div class="col-lg-12 col-md-12">
-  <swiper-container #swiperContainer class="swiper mySwiper" space-between="10" slides-per-view="5" slides-per-group="1"
-    autoplay-delay="2000" autoplay-disable-on-interaction="false">
+  <swiper-container
+    #swiperContainer
+    class="swiper mySwiper"
+    space-between="10"
+    slides-per-view="5"
+    slides-per-group="1"
+    autoplay-delay="2000"
+    autoplay-disable-on-interaction="false"
+  >
     @for (item of carouselItems(); track item.id) {
     <swiper-slide>
       <div class="swiper-slide">
         <div class="card custom-card">
           <div class="card-body">
-            <div class="d-flex no-block align-items-center justify-content-between">
+            <div
+              class="d-flex no-block align-items-center justify-content-between"
+            >
               <div>
                 <span class="text-muted fs-13 mb-3">{{ item.name }}</span>
                 <h3 class="m-0 mt-2">{{ item.utilization }}%</h3>
@@ -44,14 +56,20 @@
   <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-xxl-4">
     <div class="card custom-card wallet-1">
       <div class="card-header border-bottom-0">
-        <label class="main-content-label my-auto pt-2 mb-1">Resource Allocation</label>
-        <span class="d-block fs-12 mb-0 mt-1 text-muted">Resource allocation shows the distribution of facilities across
-          different categories and operational statuses</span>
+        <label class="main-content-label my-auto pt-2 mb-1"
+          >Resource Allocation</label
+        >
+        <span class="d-block fs-12 mb-0 mt-1 text-muted"
+          >Resource allocation shows the distribution of facilities across
+          different categories and operational statuses</span
+        >
       </div>
       <div class="card-body crypto-wallet">
         <div class="">
           <div id="crypto-donut">
-            <spk-apex-charts [chartOptions]="resourceAllocationChart"></spk-apex-charts>
+            <spk-apex-charts
+              [chartOptions]="resourceAllocationChart"
+            ></spk-apex-charts>
           </div>
         </div>
         <div class="chart-circle-value circle-style">
@@ -62,7 +80,9 @@
       </div>
 
       <div class="table-responsive border-0 br-10 pb-3">
-        <spk-reusable-tables [tableClass]="'border-0 mg-b-0 text-nowrap text-md-nowrap'">
+        <spk-reusable-tables
+          [tableClass]="'border-0 mg-b-0 text-nowrap text-md-nowrap'"
+        >
           @for (facility of facilities().slice(0, 3); track facility.id) {
           <tr>
             <td class="d-flex">
@@ -73,20 +93,24 @@
                 <p class="mb-1 text-muted fw-normal fs-15">
                   {{ facility.name }}
                 </p>
-                <span class="fs-15 fw-medium my-auto">{{ facility.capacity.spaceUtilization }}%</span>
+                <span class="fs-15 fw-medium my-auto"
+                  >{{ facility.capacity.spaceUtilization }}%</span
+                >
               </div>
             </td>
             <td>{{ facility.capacity.totalArea.toLocaleString() }} sq ft</td>
             <td>
               {{ facility.capacity.spaceUtilization >= 85 ? "+" : "-" }}
               {{
-              Math.abs(facility.capacity.spaceUtilization - 85).toFixed(1)
+                Math.abs(facility.capacity.spaceUtilization - 85).toFixed(1)
               }}%
-              <i [ngClass]="
+              <i
+                [ngClass]="
                   facility.capacity.spaceUtilization >= 85
                     ? 'fa fa-arrow-up text-success ms-1'
                     : 'fa fa-arrow-down text-danger ms-1'
-                "></i>
+                "
+              ></i>
             </td>
           </tr>
           }
@@ -98,11 +122,14 @@
     <div class="card card-bitcoin custom-card">
       <div class="card-header border-bottom-0 pb-0">
         <div>
-          <label class="main-content-label my-auto pt-2 fs-15-f">Facility Performance</label>
-          <span class="d-block fs-12 mb-0 mt-1 text-muted">Facility performance metrics track utilization rates,
-            operational
+          <label class="main-content-label my-auto pt-2 fs-15-f"
+            >Facility Performance</label
+          >
+          <span class="d-block fs-12 mb-0 mt-1 text-muted"
+            >Facility performance metrics track utilization rates, operational
             efficiency, and capacity utilization over time for optimal resource
-            management.</span>
+            management.</span
+          >
         </div>
       </div>
       <div class="card-body pt-0">
@@ -156,14 +183,20 @@
               <div>
                 <span class="fs-18 mb-3">Top Facility</span>
                 <h2 class="mb-2 mt-2">
-                  {{ carouselItems()[0]?.utilization || 0 }}%
+                  {{
+                    carouselItems().length > 0
+                      ? carouselItems()[0].utilization
+                      : 0
+                  }}%
                 </h2>
                 <span class="m-0 fs-15 mt-4 text-muted">Utilization Rate</span>
               </div>
             </div>
             <div class="col-sm-7 my-auto">
               <div id="bitcoin">
-                <spk-apex-charts [chartOptions]="capacityLineChart"></spk-apex-charts>
+                <spk-apex-charts
+                  [chartOptions]="capacityLineChart"
+                ></spk-apex-charts>
               </div>
             </div>
           </div>
@@ -175,22 +208,26 @@
           <div class="card-body">
             <span class="fs-18">Status Breakdown</span>
             <div class="row mt-3">
-              <div class="col-sm-6 my-auto border-end text-centerd-flex no-block align-items-center">
+              <div
+                class="col-sm-6 my-auto border-end text-centerd-flex no-block align-items-center"
+              >
                 <div class="d-flex">
                   <div id="yourprofile">
-                    <spk-apex-charts [chartOptions]="operationalStatusChart"></spk-apex-charts>
+                    <spk-apex-charts
+                      [chartOptions]="operationalStatusChart"
+                    ></spk-apex-charts>
                   </div>
                   <div class="my-auto d-block ms-3">
                     <h6 class="mb-2 fs-16">
                       {{
-                      dashboardStats()
-                      ? (
-                      (dashboardStats()!.statusDistribution
-                      .fullyOperational /
-                      totalFacilities()) *
-                      100
-                      ).toFixed(0)
-                      : 0
+                        dashboardStats()
+                          ? (
+                              (dashboardStats()!.statusDistribution
+                                .fullyOperational /
+                                totalFacilities()) *
+                              100
+                            ).toFixed(0)
+                          : 0
                       }}%
                     </h6>
                     <span class="m-0 fs-14 text-muted">Operational</span>
@@ -200,14 +237,14 @@
               <div class="col-sm-6 my-auto text-sm-center">
                 <h2 class="mb-2 mt-3 mt-sm-0">
                   {{
-                  dashboardStats()
-                  ? (
-                  (dashboardStats()!.statusDistribution
-                  .underMaintenance /
-                  totalFacilities()) *
-                  100
-                  ).toFixed(0)
-                  : 0
+                    dashboardStats()
+                      ? (
+                          (dashboardStats()!.statusDistribution
+                            .underMaintenance /
+                            totalFacilities()) *
+                          100
+                        ).toFixed(0)
+                      : 0
                   }}%
                 </h2>
                 <span class="m-0 fs-14 mt-3 text-muted">In Maintenance</span>
@@ -219,17 +256,29 @@
     </div>
     <div class="card custom-card">
       <div class="card-header border-bottom-0">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div
+          class="d-flex justify-content-between align-items-center flex-wrap"
+        >
           <div>
             <div class="card-title">FACILITY OPERATIONS LOG</div>
-            <span class="d-block fs-12 mb-0 text-muted">Facility operations log tracks maintenance activities, status
-              changes, and operational milestones for all facilities</span>
+            <span class="d-block fs-12 mb-0 text-muted"
+              >Facility operations log tracks maintenance activities, status
+              changes, and operational milestones for all facilities</span
+            >
           </div>
           <div class="d-flex gap-2 mt-2 mt-md-0">
-            <button class="btn btn-sm btn-primary" (click)="exportToExcel()" title="Export to Excel">
+            <button
+              class="btn btn-sm btn-primary"
+              (click)="exportToExcel()"
+              title="Export to Excel"
+            >
               <i class="fe fe-download me-1"></i>Export
             </button>
-            <button class="btn btn-sm btn-success" (click)="initializeNewFacility()" title="Initialize New Facility">
+            <button
+              class="btn btn-sm btn-success"
+              (click)="initializeNewFacility()"
+              title="Initialize New Facility"
+            >
               <i class="fe fe-plus me-1"></i>Add Facility
             </button>
           </div>
@@ -240,35 +289,62 @@
         <div class="row mb-3 g-2">
           <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label fs-12 mb-1">Facility</label>
-            <spk-ng-select [options]="facilityFilterOptions()" [defaultValue]="selectedFacility() || null"
-              [placeholder]="'All Facilities'" [clearable]="true" [searchable]="true"
-              (selectedChange)="onFacilityFilterChange($event)"></spk-ng-select>
+            <spk-ng-select
+              [options]="facilityFilterOptions()"
+              [defaultValue]="selectedFacility() || null"
+              [placeholder]="'All Facilities'"
+              [clearable]="true"
+              [searchable]="true"
+              (selectedChange)="onFacilityFilterChange($event)"
+            ></spk-ng-select>
           </div>
           <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label fs-12 mb-1">Location</label>
-            <spk-ng-select [options]="locationFilterOptions()" [defaultValue]="
+            <spk-ng-select
+              [options]="locationFilterOptions()"
+              [defaultValue]="
                 selectedLocations().length > 0 ? selectedLocations() : []
-              " [placeholder]="'All Locations'" [clearable]="true" [multiple]="true" [searchable]="true"
-              (selectedChange)="onLocationFilterChange($event)"></spk-ng-select>
+              "
+              [placeholder]="'All Locations'"
+              [clearable]="true"
+              [multiple]="true"
+              [searchable]="true"
+              (selectedChange)="onLocationFilterChange($event)"
+            ></spk-ng-select>
           </div>
           <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label fs-12 mb-1">Status</label>
-            <spk-ng-select [options]="statusFilterOptions()" [defaultValue]="
+            <spk-ng-select
+              [options]="statusFilterOptions()"
+              [defaultValue]="
                 selectedStatuses().length > 0 ? selectedStatuses() : []
-              " [placeholder]="'All Statuses'" [clearable]="true" [multiple]="true" [searchable]="true"
-              (selectedChange)="onStatusFilterChange($event)"></spk-ng-select>
+              "
+              [placeholder]="'All Statuses'"
+              [clearable]="true"
+              [multiple]="true"
+              [searchable]="true"
+              (selectedChange)="onStatusFilterChange($event)"
+            ></spk-ng-select>
           </div>
           <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label fs-12 mb-1">Efficiency</label>
-            <spk-ng-select [options]="efficiencyFilterOptions" [defaultValue]="selectedEfficiencyRange() || null"
-              [placeholder]="'All Efficiency'" [clearable]="true"
-              (selectedChange)="onEfficiencyFilterChange($event)"></spk-ng-select>
+            <spk-ng-select
+              [options]="efficiencyFilterOptions"
+              [defaultValue]="selectedEfficiencyRange() || null"
+              [placeholder]="'All Efficiency'"
+              [clearable]="true"
+              (selectedChange)="onEfficiencyFilterChange($event)"
+            ></spk-ng-select>
           </div>
           <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label fs-12 mb-1">Repair Queue</label>
-            <spk-ng-select [options]="repairQueueFilterOptions" [defaultValue]="selectedRepairQueue() || null"
-              [placeholder]="'All Repair Queues'" [clearable]="true"
-              (selectedChange)="onRepairQueueFilterChange($event)"></spk-ng-select>
+            <spk-ng-select
+              [options]="repairQueueFilterOptions"
+              [defaultValue]="selectedRepairQueue() || null"
+              [placeholder]="'All Repair Queues'"
+              [clearable]="true"
+              (selectedChange)="onRepairQueueFilterChange($event)"
+            ></spk-ng-select>
           </div>
           <div class="col-12 col-md-6 col-lg-4">
             <label class="form-label fs-12 mb-1">Search</label>
@@ -276,13 +352,21 @@
               <span class="input-group-text">
                 <i class="fe fe-search"></i>
               </span>
-              <input type="text" class="form-control" placeholder="SEARCH FACILITY, LOCATION, OR ID..."
-                [value]="searchTerm()" (input)="onSearchChange($event)" />
+              <input
+                type="text"
+                class="form-control"
+                placeholder="SEARCH FACILITY, LOCATION, OR ID..."
+                [value]="searchTerm()"
+                (input)="onSearchChange($event)"
+              />
             </div>
           </div>
           <div class="col-12 col-md-6 col-lg-2 d-flex align-items-end">
             @if (activeFilterCount() > 0) {
-            <button class="btn btn-sm btn-outline-secondary w-100" (click)="clearAllFilters()">
+            <button
+              class="btn btn-sm btn-outline-secondary w-100"
+              (click)="clearAllFilters()"
+            >
               Clear Filters ({{ activeFilterCount() }})
             </button>
             }
@@ -294,10 +378,10 @@
           <span class="fs-13 text-muted">
             @if (sortedFacilityTableData().length > 0) { Showing
             {{ (currentPage() - 1) * pageSize() + 1 }}-{{
-            Math.min(
-            currentPage() * pageSize(),
-            sortedFacilityTableData().length
-            )
+              Math.min(
+                currentPage() * pageSize(),
+                sortedFacilityTableData().length
+              )
             }}
             of {{ sortedFacilityTableData().length }} facilities } @else { No
             facilities found. Total facilities loaded:
@@ -312,15 +396,23 @@
             <thead>
               <tr>
                 @for (column of facilityTableColumns; track column.field) {
-                <th [class]="column.tableHeadColumn" [class.cursor-pointer]="column.sortable"
-                  (click)="column.sortable && sortTable(column.field)">
+                <th
+                  [class]="column.tableHeadColumn"
+                  [class.cursor-pointer]="column.sortable"
+                  (click)="column.sortable && sortTable(column.field)"
+                >
                   <div class="d-flex align-items-center">
                     <span>{{ column.header }}</span>
                     @if (column.sortable && sortColumn() === column.field) {
-                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'"
-                      [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    <i
+                      class="fe ms-1"
+                      [class.fe-arrow-up]="sortDirection() === 'asc'"
+                      [class.fe-arrow-down]="sortDirection() === 'desc'"
+                    ></i>
                     } @else if (column.sortable) {
-                    <i class="fe fe-arrow-up-down ms-1 text-muted opacity-50"></i>
+                    <i
+                      class="fe fe-arrow-up-down ms-1 text-muted opacity-50"
+                    ></i>
                     }
                   </div>
                 </th>
@@ -338,13 +430,22 @@
                       <i class="fe fe-building"></i>
                     </div>
                     <div class="d-flex flex-column">
-                      <a [routerLink]="['facility-operations', facility.facilityId]" class="text-decoration-none facility-link">
-                        <span class="my-auto">{{ facility.name }} <b>{{ facility.type }}</b></span>
+                      <a
+                        [routerLink]="[
+                          '/dashboard',
+                          'facility-operations',
+                          facility.facilityId
+                        ]"
+                        class="text-decoration-none facility-link"
+                      >
+                        <span class="my-auto"
+                          >{{ facility.name }} <b>{{ facility.type }}</b></span
+                        >
                       </a>
                       @if (facility.hasAlerts) {
                       <span class="badge bg-danger badge-sm mt-1">
                         {{ facility.alertCount }} Alert{{
-                        facility.alertCount > 1 ? "s" : ""
+                          facility.alertCount > 1 ? "s" : ""
                         }}
                       </span>
                       }
@@ -355,7 +456,7 @@
                 <td>
                   <span [ngClass]="facility.efficiencyClass">{{
                     facility.efficiencyDisplay
-                    }}</span>
+                  }}</span>
                 </td>
                 <td>{{ facility.utilizationDisplay }}</td>
                 <td>{{ facility.totalUnits }}</td>
@@ -374,24 +475,36 @@
                 <td>
                   <span [ngClass]="facility.changeClass">{{
                     facility.change
-                    }}</span>
+                  }}</span>
                 </td>
                 <td>
                   <span [id]="facility.chartId">
-                    <spk-apex-charts [chartOptions]="sparklineChart"></spk-apex-charts>
+                    <spk-apex-charts
+                      [chartOptions]="sparklineChart"
+                    ></spk-apex-charts>
                   </span>
                 </td>
                 <td class="text-start">
-                  <a href="javascript:void(0);" [ngClass]="facility.statusClass">{{ facility.status }}</a>
+                  <a
+                    href="javascript:void(0);"
+                    [ngClass]="facility.statusClass"
+                    >{{ facility.status }}</a
+                  >
                 </td>
               </tr>
               } @empty {
               <tr>
-                <td [attr.colspan]="facilityTableColumns.length" class="text-center py-4">
+                <td
+                  [attr.colspan]="facilityTableColumns.length"
+                  class="text-center py-4"
+                >
                   <p class="text-muted mb-0">
                     No facilities match your filters.
                   </p>
-                  <button class="btn btn-sm btn-outline-primary mt-2" (click)="clearAllFilters()">
+                  <button
+                    class="btn btn-sm btn-outline-primary mt-2"
+                    (click)="clearAllFilters()"
+                  >
                     Clear All Filters
                   </button>
                 </td>
@@ -405,62 +518,110 @@
         @if (totalPages() > 1) {
         <div class="d-flex justify-content-between align-items-center mt-3">
           <div>
-            <span class="fs-13 text-muted">Page {{ currentPage() }} of {{ totalPages() }}</span>
+            <span class="fs-13 text-muted"
+              >Page {{ currentPage() }} of {{ totalPages() }}</span
+            >
           </div>
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="currentPage() === 1"
-              (click)="goToPage(currentPage() - 1)">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              [disabled]="currentPage() === 1"
+              (click)="goToPage(currentPage() - 1)"
+            >
               <i class="fe fe-chevron-left"></i> Previous
             </button>
-            @if (totalPages() <= 7) { @for (page of [].constructor(totalPages()); track $index) { <button type="button"
-              class="btn btn-sm" [class.btn-primary]="currentPage() === ($index + 1)"
-              [class.btn-outline-primary]="currentPage() !== ($index + 1)" (click)="goToPage($index + 1)">
+            @if (totalPages() <= 7) { @for (page of
+            [].constructor(totalPages()); track $index) {
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="currentPage() === $index + 1"
+              [class.btn-outline-primary]="currentPage() !== $index + 1"
+              (click)="goToPage($index + 1)"
+            >
               {{ $index + 1 }}
-              </button>
-              } } @else { @if (currentPage() <= 3) { @for (page of [].constructor(5); track $index) { <button
-                type="button" class="btn btn-sm" [class.btn-primary]="currentPage() === ($index + 1)"
-                [class.btn-outline-primary]="currentPage() !== ($index + 1)" (click)="goToPage($index + 1)">
-                {{ $index + 1 }}
-                </button>
-                }
-                <span class="btn btn-sm btn-outline-primary disabled">...</span>
-                <button type="button" class="btn btn-sm btn-outline-primary" (click)="goToPage(totalPages())">
-                  {{ totalPages() }}
-                </button>
-                } @else if (currentPage() >= totalPages() - 2) {
-                <button type="button" class="btn btn-sm btn-outline-primary" (click)="goToPage(1)">
-                  1
-                </button>
-                <span class="btn btn-sm btn-outline-primary disabled">...</span>
-                @for (page of [].constructor(5); track $index) {
-                <button type="button" class="btn btn-sm"
-                  [class.btn-primary]="currentPage() === (totalPages() - 4 + $index)"
-                  [class.btn-outline-primary]="currentPage() !== (totalPages() - 4 + $index)"
-                  (click)="goToPage(totalPages() - 4 + $index)">
-                  {{ totalPages() - 4 + $index }}
-                </button>
-                } } @else {
-                <button type="button" class="btn btn-sm btn-outline-primary" (click)="goToPage(1)">
-                  1
-                </button>
-                <span class="btn btn-sm btn-outline-primary disabled">...</span>
-                @for (page of [].constructor(3); track $index) {
-                <button type="button" class="btn btn-sm"
-                  [class.btn-primary]="currentPage() === (currentPage() - 1 + $index)"
-                  [class.btn-outline-primary]="currentPage() !== (currentPage() - 1 + $index)"
-                  (click)="goToPage(currentPage() - 1 + $index)">
-                  {{ currentPage() - 1 + $index }}
-                </button>
-                }
-                <span class="btn btn-sm btn-outline-primary disabled">...</span>
-                <button type="button" class="btn btn-sm btn-outline-primary" (click)="goToPage(totalPages())">
-                  {{ totalPages() }}
-                </button>
-                } }
-                <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="currentPage() === totalPages()"
-                  (click)="goToPage(currentPage() + 1)">
-                  Next <i class="fe fe-chevron-right"></i>
-                </button>
+            </button>
+            } } @else { @if (currentPage() <= 3) { @for (page of
+            [].constructor(5); track $index) {
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="currentPage() === $index + 1"
+              [class.btn-outline-primary]="currentPage() !== $index + 1"
+              (click)="goToPage($index + 1)"
+            >
+              {{ $index + 1 }}
+            </button>
+            }
+            <span class="btn btn-sm btn-outline-primary disabled">...</span>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="goToPage(totalPages())"
+            >
+              {{ totalPages() }}
+            </button>
+            } @else if (currentPage() >= totalPages() - 2) {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="goToPage(1)"
+            >
+              1
+            </button>
+            <span class="btn btn-sm btn-outline-primary disabled">...</span>
+            @for (page of [].constructor(5); track $index) {
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="currentPage() === totalPages() - 4 + $index"
+              [class.btn-outline-primary]="
+                currentPage() !== totalPages() - 4 + $index
+              "
+              (click)="goToPage(totalPages() - 4 + $index)"
+            >
+              {{ totalPages() - 4 + $index }}
+            </button>
+            } } @else {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="goToPage(1)"
+            >
+              1
+            </button>
+            <span class="btn btn-sm btn-outline-primary disabled">...</span>
+            @for (page of [].constructor(3); track $index) {
+            <button
+              type="button"
+              class="btn btn-sm"
+              [class.btn-primary]="currentPage() === currentPage() - 1 + $index"
+              [class.btn-outline-primary]="
+                currentPage() !== currentPage() - 1 + $index
+              "
+              (click)="goToPage(currentPage() - 1 + $index)"
+            >
+              {{ currentPage() - 1 + $index }}
+            </button>
+            }
+            <span class="btn btn-sm btn-outline-primary disabled">...</span>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="goToPage(totalPages())"
+            >
+              {{ totalPages() }}
+            </button>
+            } }
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              [disabled]="currentPage() === totalPages()"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              Next <i class="fe fe-chevron-right"></i>
+            </button>
           </div>
         </div>
         }
@@ -472,8 +633,10 @@
       <div class="card-header border-bottom-0">
         <div>
           <div class="card-title">Activity</div>
-          <span class="d-block fs-12 mb-0 mt-1 text-muted">Facility activity timeline showing maintenance events, status
-            changes, and operational updates</span>
+          <span class="d-block fs-12 mb-0 mt-1 text-muted"
+            >Facility activity timeline showing maintenance events, status
+            changes, and operational updates</span
+          >
         </div>
       </div>
       <ul class="crypto-transcation list-unstyled mg-b-0 mt-3">
@@ -481,10 +644,12 @@
         <li class="list-item px-3 pb-3 {{ $last ? 'mb-0' : '' }}">
           <div class="media align-items-center">
             <div class="crypto-icon bg-primary-transparent text-primary">
-              <i [class]="
+              <i
+                [class]="
                   (activity.icon || 'fe fe-activity') +
                   ' wd-20 ht-20 text-center fs-18'
-                "></i>
+                "
+              ></i>
             </div>
             <div class="media-body ms-3">
               <p class="fw-medium mg-b-3 fs-15">{{ activity.title }}</p>
@@ -493,13 +658,15 @@
           </div>
           <div class="text-end ms-auto my-auto">
             <h5 class="fw-medium fs-16 mb-0">
-              <span [ngClass]="
+              <span
+                [ngClass]="
                   activity.impactLevel === 'Critical'
                     ? 'text-danger'
                     : activity.impactLevel === 'High'
                     ? 'text-warning'
                     : 'text-success'
-                ">
+                "
+              >
                 {{ activity.impactLevel }}
               </span>
             </h5>

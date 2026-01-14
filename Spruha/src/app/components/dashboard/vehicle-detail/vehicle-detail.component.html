@@ -1,0 +1,591 @@
+@if (isLoading()) {
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="min-height: 400px"
+>
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+} @else if (errorMessage()) {
+<div class="alert alert-danger" role="alert">
+  {{ errorMessage() }}
+  <button class="btn btn-sm btn-primary mt-2" (click)="loadData()">Retry</button>
+</div>
+} @else if (vehicle()) {
+<div class="vehicle-detail-dashboard">
+  <!-- Main Content Grid -->
+  <div class="row row-sm">
+    <!-- Left Column (8/12) -->
+    <div class="col-lg-8 mb-4">
+      <!-- Vehicle Identification Card -->
+      <div class="card custom-card vehicle-identification-card mb-4">
+        <div class="card-body p-0">
+          <div class="row g-0">
+            <!-- Vehicle Image Gallery -->
+            <div class="col-sm-5 vehicle-image-container">
+              @if (vehicleImages().length > 0) {
+              <div class="vehicle-image-gallery">
+                <!-- Single Image Box with Navigation -->
+                <div class="main-image-wrapper">
+                  @if (currentImage()) {
+                  <img
+                    [src]="currentImage()"
+                    [alt]="vehicle()?.make + ' ' + vehicle()?.model + ' - Image ' + (selectedImageIndex() + 1)"
+                    class="vehicle-image-main"
+                  />
+                  }
+                  @if (vehicle()?.status === 'Maintenance') {
+                  <span class="maintenance-badge">
+                    <span class="badge-dot"></span>
+                    MAINTENANCE MODE
+                  </span>
+                  }
+                  <!-- Navigation Arrows - Left -->
+                  @if (vehicleImages().length > 1) {
+                  <button
+                    class="image-nav-btn image-nav-prev"
+                    (click)="previousImage()"
+                    aria-label="Previous image"
+                    type="button"
+                  >
+                    <i class="fe fe-chevron-left"></i>
+                  </button>
+                  <!-- Navigation Arrows - Right -->
+                  <button
+                    class="image-nav-btn image-nav-next"
+                    (click)="nextImage()"
+                    aria-label="Next image"
+                    type="button"
+                  >
+                    <i class="fe fe-chevron-right"></i>
+                  </button>
+                  <!-- Image Counter -->
+                  <div class="image-counter">
+                    {{ selectedImageIndex() + 1 }} / {{ vehicleImages().length }}
+                  </div>
+                  }
+                </div>
+              </div>
+              } @else {
+              <div class="vehicle-image-placeholder">
+                <i class="fe fe-truck fs-48 text-muted"></i>
+              </div>
+              }
+            </div>
+            <!-- Vehicle Info -->
+            <div class="col-sm-7 p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h1 class="vehicle-name mb-0">
+                  {{ vehicle()?.make }} {{ vehicle()?.model }}
+                  <span class="text-primary">{{ vehicle()?.year }}</span>
+                </h1>
+                @if (vehicle()?.qrCode) {
+                <i class="fe fe-qr-code fs-20 text-muted cursor-pointer"></i>
+                }
+              </div>
+              <p class="vehicle-specs mb-4">
+                <span>ID: {{ vehicle()?.vehicleId }}</span>
+                <span class="text-muted">//</span>
+                @for (spec of vehicle()?.specifications; track $index) {
+                <span>{{ spec }}</span>
+                @if (!$last) {
+                <span class="text-muted">//</span>
+                }
+                }
+              </p>
+              <div class="row g-3 mb-4">
+                <div class="col-6">
+                  <div class="vehicle-info-field">
+                    <div class="field-label">VIN Code</div>
+                    <div class="field-value">
+                      {{ vehicle()?.vinCode }}
+                      <i class="fe fe-copy ms-2 cursor-pointer"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="vehicle-info-field">
+                    <div class="field-label">License Plate</div>
+                    <div class="field-value">{{ vehicle()?.licensePlate }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button
+                  class="btn btn-primary flex-fill"
+                  (click)="scheduleService()"
+                >
+                  <i class="fe fe-calendar me-2"></i>
+                  Schedule Service
+                </button>
+                <button class="btn btn-outline-secondary">
+                  <i class="fe fe-more-horizontal"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabbed Content -->
+      <div class="card custom-card">
+        <div class="card-header border-bottom-0 bg-slate-50">
+          <ul class="nav nav-tabs card-header-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                [class.active]="selectedTab() === 'timeline'"
+                (click)="selectTab('timeline')"
+                type="button"
+              >
+                <i class="fe fe-activity me-2"></i>
+                Status Sequence
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                [class.active]="selectedTab() === 'history'"
+                (click)="selectTab('history')"
+                type="button"
+              >
+                <i class="fe fe-file-text me-2"></i>
+                Maint. Log
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                [class.active]="selectedTab() === 'efficiency'"
+                (click)="selectTab('efficiency')"
+                type="button"
+              >
+                <i class="fe fe-trending-up me-2"></i>
+                Efficiency
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <!-- Status Sequence Tab -->
+          @if (selectedTab() === 'timeline') {
+          <div class="status-sequence-container">
+            @if (maintenanceWorkflow()) {
+            <div class="workflow-timeline">
+              <div class="timeline-progress-bar">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="maintenanceWorkflow()?.overallProgress || 0"
+                ></div>
+              </div>
+              <div class="timeline-phases">
+                @for (
+                  phase of maintenanceWorkflow()?.phases;
+                  track phase.phase
+                ) {
+                <div
+                  class="phase-item"
+                  [ngClass]="getPhaseStatusClass(phase.status)"
+                >
+                  <div class="phase-icon">
+                    @if (phase.status === 'COMPLETE') {
+                    <i class="fe fe-check"></i>
+                    } @else if (phase.status === 'IN_PROGRESS') {
+                    <i class="fe fe-settings animate-spin"></i>
+                    } @else if (phase.phase === 'QC_CHECK') {
+                    <i class="fe fe-check-circle"></i>
+                    } @else if (phase.phase === 'RELEASE') {
+                    <i class="fe fe-flag"></i>
+                    } @else {
+                    <i class="fe fe-circle"></i>
+                    }
+                  </div>
+                  <div class="phase-info">
+                    <div class="phase-name">{{ phase.phase }}</div>
+                    <div class="phase-status">{{ phase.status }}</div>
+                  </div>
+                </div>
+                }
+              </div>
+            </div>
+            } @else {
+            <div class="text-center text-muted py-5">
+              No active maintenance workflow
+            </div>
+            }
+          </div>
+          }
+
+          <!-- Maintenance History Tab -->
+          @if (selectedTab() === 'history') {
+          <div class="maintenance-history-container">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Operation</th>
+                    <th>Operator</th>
+                    <th class="text-end">Cost</th>
+                    <th>State</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (entry of maintenanceHistory(); track entry.id) {
+                  <tr>
+                    <td class="text-muted">{{ formatDate(entry.date) }}</td>
+                    <td>{{ entry.operation }}</td>
+                    <td>
+                      <div class="d-flex align-items-center gap-2">
+                        @if (entry.operator.avatarUrl) {
+                        <img
+                          [src]="entry.operator.avatarUrl"
+                          [alt]="entry.operator.name"
+                          class="operator-avatar"
+                        />
+                        }
+                        <span>{{ entry.operator.name }}</span>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      ${{ entry.cost.toFixed(2) }}
+                    </td>
+                    <td>
+                      <span
+                        class="badge"
+                        [ngClass]="getStateClass(entry.state)"
+                      >
+                        {{ entry.state }}
+                      </span>
+                    </td>
+                  </tr>
+                  } @empty {
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                      No maintenance history available
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          }
+
+          <!-- Efficiency Tab -->
+          @if (selectedTab() === 'efficiency') {
+          <div class="efficiency-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0">Consumption Analysis</h5>
+              <div class="btn-group" role="group">
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-primary]="efficiencyPeriod() === '30D'"
+                  [class.btn-outline-primary]="efficiencyPeriod() !== '30D'"
+                  (click)="selectEfficiencyPeriod('30D')"
+                >
+                  30 Days
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-primary]="efficiencyPeriod() === '6M'"
+                  [class.btn-outline-primary]="efficiencyPeriod() !== '6M'"
+                  (click)="selectEfficiencyPeriod('6M')"
+                >
+                  6 Months
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-primary]="efficiencyPeriod() === '1Y'"
+                  [class.btn-outline-primary]="efficiencyPeriod() !== '1Y'"
+                  (click)="selectEfficiencyPeriod('1Y')"
+                >
+                  1 Year
+                </button>
+              </div>
+            </div>
+            @if (efficiencyData()) {
+            <spk-apex-charts
+              [chartOptions]="efficiencyChartOptions()"
+            ></spk-apex-charts>
+            } @else {
+            <div class="text-center text-muted py-5">Loading chart data...</div>
+            }
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Live Feed Section -->
+      @if (liveFeed()?.isLive) {
+      <div class="card custom-card live-feed-card mt-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+              <div class="live-feed-icon">
+                <i class="fe fe-video"></i>
+              </div>
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <h6 class="mb-0">Live Feed: {{ liveFeed()?.bayNumber }}</h6>
+                  <span class="live-indicator-dot"></span>
+                </div>
+                <p class="text-muted mb-0 small">
+                  {{ liveFeed()?.currentActivity }}
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-4">
+              <div class="text-end">
+                <div class="text-muted small">Session Time</div>
+                <div class="fw-bold">{{ sessionDuration() }}</div>
+              </div>
+              <button
+                class="btn btn-primary"
+                (click)="viewFeed()"
+              >
+                <i class="fe fe-video me-2"></i>
+                View Feed
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Right Column (4/12) -->
+    <div class="col-lg-4">
+      <!-- Metric Cards Grid -->
+      <div class="row g-3 mb-4">
+        <div class="col-6">
+          <div class="card custom-card metric-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="metric-label">Odometer</div>
+                <i class="fe fe-speed text-muted"></i>
+              </div>
+              <div class="metric-value">
+                {{ metrics()?.odometer?.toLocaleString() }}
+                <span class="metric-unit">mi</span>
+              </div>
+              @if (metrics()?.odometerChange) {
+              <div class="metric-change text-primary small">
+                <i class="fe fe-trending-up"></i>
+                +{{ metrics()?.odometerChange }} THIS CYCLE
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card custom-card metric-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="metric-label">Fuel Cell</div>
+                <i class="fe fe-droplet text-muted"></i>
+              </div>
+              <div class="metric-value">
+                {{ metrics()?.fuelLevel }}
+                <span class="metric-unit">%</span>
+              </div>
+              <div class="progress mt-2" style="height: 4px">
+                <div
+                  class="progress-bar bg-primary"
+                  [style.width.%]="metrics()?.fuelLevel || 0"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card custom-card metric-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="metric-label">Power Unit</div>
+                <i class="fe fe-battery text-muted"></i>
+              </div>
+              <div class="metric-value-small">
+                {{ metrics()?.powerUnitStatus }}
+              </div>
+              <div class="metric-subtext">
+                {{ metrics()?.powerUnitVoltage }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card custom-card metric-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="metric-label">Last Service</div>
+                <i class="fe fe-clock text-muted"></i>
+              </div>
+              <div class="metric-value">
+                {{ metrics()?.daysSinceLastService }}
+                <span class="metric-unit">DAYS</span>
+              </div>
+              <div class="metric-subtext">
+                {{ metrics()?.lastServiceType }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Protocol Card -->
+      @if (activeProtocol()) {
+      <div class="card custom-card mb-4">
+        <div class="card-header border-bottom-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Active Protocol</h6>
+            <i class="fe fe-alert-triangle text-warning"></i>
+          </div>
+        </div>
+        <div class="card-body text-center">
+          <div class="protocol-progress-circle mb-4">
+            <svg viewBox="0 0 36 36" class="circular-progress">
+              <circle
+                class="progress-bg"
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              ></circle>
+              <circle
+                class="progress-fill"
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="var(--fleet-warning, #eab308)"
+                stroke-width="2"
+                [attr.stroke-dasharray]="
+                  activeProtocol()?.progress + ', 100'
+                "
+                transform="rotate(-90 18 18)"
+              ></circle>
+            </svg>
+            <div class="progress-text">
+              <div class="progress-percentage">
+                {{ activeProtocol()?.progress }}%
+              </div>
+              <div class="progress-label">IN PROGRESS</div>
+            </div>
+          </div>
+          <div class="protocol-details">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">Initiated</span>
+              <span class="fw-bold">{{
+                formatDate(activeProtocol()?.initiatedDate)
+              }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">Target Completion</span>
+              <span class="fw-bold">{{
+                formatDate(activeProtocol()?.targetCompletionDate)
+              }}</span>
+            </div>
+            <div class="d-flex justify-content-between pt-2 border-top">
+              <span class="text-muted small">Est. Cost</span>
+              <span class="fw-bold text-primary fs-5">
+                ${{ activeProtocol()?.estimatedCost?.toFixed(2) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Assigned Team Card -->
+      @if (assignedTeam()?.teamMembers?.length) {
+      <div class="card custom-card mb-4">
+        <div class="card-header border-bottom-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Assigned Team</h6>
+            <button class="btn btn-sm btn-outline-primary">
+              <i class="fe fe-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          @for (member of assignedTeam()?.teamMembers; track member.id) {
+          <div class="team-member-item mb-3">
+            <div class="d-flex align-items-center gap-3">
+              @if (member.avatarUrl) {
+              <img
+                [src]="member.avatarUrl"
+                [alt]="member.name"
+                class="team-member-avatar"
+              />
+              } @else {
+              <div class="team-member-avatar-placeholder">
+                {{ member.name.charAt(0) }}
+              </div>
+              }
+              <div class="flex-grow-1">
+                <div class="fw-bold">{{ member.name }}</div>
+                <div class="text-muted small">{{ member.role }}</div>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary">
+                <i class="fe fe-message-circle"></i>
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Secure Logs Card -->
+      <div class="card custom-card">
+        <div class="card-header border-bottom-0">
+          <h6 class="mb-0">Secure Logs</h6>
+        </div>
+        <div class="card-body">
+          <div class="secure-logs-container mb-3">
+            @for (log of secureLogs(); track log.id) {
+            <div class="log-entry mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold small">{{ log.author }}</span>
+                <span class="text-muted small">{{ formatTime(log.timestamp) }}</span>
+              </div>
+              <p class="mb-0 small">{{ log.message }}</p>
+            </div>
+            } @empty {
+            <div class="text-center text-muted small py-3">
+              No log entries
+            </div>
+            }
+          </div>
+          <div class="secure-log-input">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="ENCRYPTED ENTRY..."
+                [value]="newLogMessage()"
+                (input)="newLogMessage.set($any($event.target).value)"
+                (keyup.enter)="addSecureLog()"
+              />
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                (click)="addSecureLog()"
+              >
+                <i class="fe fe-send"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}

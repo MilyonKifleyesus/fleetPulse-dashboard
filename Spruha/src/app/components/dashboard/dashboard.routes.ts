@@ -59,6 +59,20 @@ export const admin: Routes = [
       ),
   },
   {
+    path: 'vehicle/:vehicleId',
+    loadComponent: () =>
+      import('./vehicle-detail/vehicle-detail.component').then(
+        (m) => m.VehicleDetailComponent
+      ),
+  },
+  {
+    path: 'facility-operations/:facilityId/vehicle/:vehicleId',
+    loadComponent: () =>
+      import('./vehicle-detail/vehicle-detail.component').then(
+        (m) => m.VehicleDetailComponent
+      ),
+  },
+  {
     path: 'facility-management',
     loadComponent: () => {
       // #region agent log
