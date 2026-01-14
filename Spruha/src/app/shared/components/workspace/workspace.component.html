@@ -1,0 +1,25 @@
+<div
+  #workspaceContainer
+  class="workspace-grid"
+  [class.edit-mode]="isEditMode"
+  [style.grid-template-columns]="gridTemplateColumns"
+  [style.gap]="gridGap"
+  cdkDropList
+  (cdkDropListDropped)="onWidgetDrop($event)"
+>
+  @for (widget of displayedWidgets; track widget.id) {
+  <app-widget-frame
+    [widget]="widget"
+    [gridColumns]="currentLayout.columns"
+    (resize)="onWidgetResize($event)"
+    (delete)="onWidgetDelete($event)"
+    (minimize)="onWidgetMinimize($event)"
+    (maximize)="onWidgetMaximize($event)"
+    (settings)="onWidgetSettings($event)"
+    cdkDrag
+    [cdkDragDisabled]="!isEditMode"
+  >
+    <ng-content></ng-content>
+  </app-widget-frame>
+  }
+</div>

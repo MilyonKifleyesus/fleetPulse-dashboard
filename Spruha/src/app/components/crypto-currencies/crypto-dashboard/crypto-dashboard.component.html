@@ -1,0 +1,252 @@
+<app-page-header [title]="'Welcome To Dashboard'" [title1]="['Facilities Management']" [activeitem]="'Dashboard'"></app-page-header>
+
+<!-- row opened -->
+
+<!-- owl Carousel -->
+<div class="col-lg-12 col-md-12">
+    
+    <swiper-container #swiperContainer class="swiper mySwiper" space-between="10"
+    slides-per-view="5" slides-per-group="1" autoplay-delay="2000"
+    autoplay-disable-on-interaction="false">
+    @for(owlData of owlCarouselData;track $index){
+    <swiper-slide>
+        <div class="swiper-slide">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <div class="d-flex no-block align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted fs-13 mb-3">{{owlData.name}}</span>
+                            <h3 class="m-0 mt-2">{{owlData.value}}%</h3>
+                        </div>
+                        <div class="mt-auto">
+                            <img [src]="owlData.src" alt="" class="wd-30 hd-30">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </swiper-slide>
+    }
+</swiper-container>
+
+</div>
+
+<!--/ row closed -->
+
+<!-- row opened -->
+<div class="row row-sm">
+    <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-xxl-4">
+        <div class="card custom-card wallet-1">
+            <div class="card-header border-bottom-0">
+                <label class="main-content-label my-auto pt-2 mb-1">Resource Allocation</label>
+                <span class="d-block fs-12 mb-0 mt-1 text-muted">Resource allocation shows the distribution of facilities across different categories and operational statuses</span>
+            </div>
+            <div class="card-body crypto-wallet">
+                <div class="">
+                    <div id="crypto-donut">
+                        <spk-apex-charts [chartOptions]="donutApexData"></spk-apex-charts>
+                    </div></div>
+                    <div class="chart-circle-value circle-style"><div class="fs-20 fw-semibold">85%</div>
+                </div>
+            </div>
+
+            <div class="table-responsive border-0 br-10 pb-3">
+                <spk-reusable-tables [tableClass]="'border-0 mg-b-0 text-nowrap text-md-nowrap'">
+                    @for(facility of facilityPrices;track $index){
+                        <tr>
+                            <td class="d-flex">
+                              <div class="cryp-icon bg-primary my-auto me-2">
+                                <i class="cf cf-btc"></i>
+                              </div>
+                              <div class="media-body ms-3">
+                                <p class="mb-1 text-muted fw-normal fs-15">{{ facility.name }}</p>
+                                <span class="fs-15 fw-medium my-auto">{{ facility.utilization }}</span>
+                              </div>
+                            </td>
+                            <td>{{ facility.capacity }}</td>
+                            <td>
+                              {{ facility.change }}
+                              <i class="fa {{ facility.arrowClass }} {{ facility.changeClass }} ms-1"></i>
+                            </td>
+                          </tr>
+                    }
+                </spk-reusable-tables>
+            
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 col-xxl-8 col-lg-12 col-md-12">
+        <div class="card card-bitcoin custom-card">
+            <div class="card-header border-bottom-0 pb-0">
+               <div>
+                    <label class="main-content-label my-auto pt-2 fs-15-f">Facility Performance</label>
+                    <span class="d-block fs-12 mb-0 mt-1 text-muted">Facility performance metrics track utilization rates, operational efficiency, and capacity utilization over time for optimal resource management.</span>
+               </div>
+            </div>
+            <div class="card-body pt-0">
+                <div id="btc-chart"> 
+                    <spk-apex-charts [chartOptions]="apexData"></spk-apex-charts>
+                  
+            </div>
+            </div>
+            <div class="media d-sm-flex d-block px-4 pb-3 pt-1">
+                <div class="media-icon bg-primary crypto-icon me-2">
+                    <i class="cf cf-btc fs-20"></i>
+                </div>
+                <div class="media-body ms-2">
+                    <div class="row row-sm">
+                        <div class="col"><label>Facility Name</label>
+                            <p>Plant A</p>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <label>Utilization Benchmark</label>
+                            <p>85.00%</p>
+                        </div>
+                        <div class="col">
+                            <label>Current Utilization</label>
+                            <p>87.5%</p>
+                        </div>
+                        <div class="col">
+                            <label>Change (24H)</label>
+                            <p>+2.3%</p>
+                        </div>
+                        <div class="col">
+                            <label>Total Capacity</label>
+                            <p>95,000 sq ft</p>
+                        </div>
+                    </div><!-- row -->
+                </div>
+            </div>
+        </div>
+    </div>
+  
+
+</div>
+<!-- row closed -->
+
+<!-- row opened -->
+<div class="row row-sm">
+    <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-xxl-8">
+        <div class="row row-sm">
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="card custom-card">
+                    <div class="card-body row">
+                        <div class="col-sm-5 d-flex no-block align-items-center">
+                            <div>
+                                <span class="fs-18 mb-3">Plant A</span>
+                                <h2 class="mb-2 mt-2">87.5%</h2>
+                                <span class="m-0 fs-15 mt-4 text-muted">Utilization Rate</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-7 my-auto">
+                            <div id="bitcoin">
+                                <spk-apex-charts [chartOptions]="lineApexChart"></spk-apex-charts>
+                             
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <span class="fs-18">Status Breakdown</span>
+                        <div class="row mt-3">
+                            <div class="col-sm-6 my-auto border-end text-centerd-flex no-block align-items-center">
+                                <div class="d-flex">
+                                    <div id="yourprofile">
+                                        <spk-apex-charts [chartOptions]="donutApexProfile"></spk-apex-charts>
+                                    
+                                    </div>
+                                    <div class="my-auto d-block ms-3">
+                                        <h6 class="mb-2 fs-16">60%</h6>
+                                        <span class="m-0 fs-14 text-muted">Operational</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 my-auto text-sm-center">
+                                <h2 class="mb-2  mt-3 mt-sm-0">25%</h2>
+                                <span class="m-0 fs-14 mt-3 text-muted">In Maintenance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="card custom-card">
+            <div class="card-header border-bottom-0">
+                <div>
+                    <div class="card-title">FACILITY OPERATIONS LOG</div>
+                    <span class="d-block fs-12 mb-0 text-muted">Facility operations log tracks maintenance activities, status changes, and operational milestones for all facilities</span>
+                </div>
+            </div>
+            <div class="card-body pt-3">
+                <div class="table-responsive tasks">
+                    <spk-reusable-tables [columns]="activityColumns"  [tableClass]="'table card-table table-vcenter text-nowrap mb-0 border'"
+                    [showCheckbox]="false" >
+                    @for(facility of facilityData;track $index){
+                        <tr>
+                            <td>{{ facility.id }}</td>
+                            <td class="coin_icon mt-2">
+                              <div class="d-flex">
+                                <div class="cryp-icon bg-primary me-2">
+                                  <i class="cf {{ facility.icon }}"></i>
+                                </div>
+                                <span class="my-auto">{{ facility.name }} <b>{{ facility.type }}</b></span>
+                              </div>
+                            </td>
+                            <td>{{ facility.utilization }}</td>
+                            <td>
+                              <span [ngClass]="facility.changeClass">{{ facility.change }}</span>
+                            </td>
+                            <td>
+                              <span [id]="facility.chartId">
+                                <spk-apex-charts [chartOptions]="apexSparkline"></spk-apex-charts>
+                              </span>
+                            </td>
+                            <td class="text-start">
+                              <a href="javascript:void(0);" [ngClass]="facility.actionClass">{{ facility.action }}</a>
+                            </td>
+                          </tr>
+                    }
+                    </spk-reusable-tables>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+    <div class="col-md-12 col-sm-12 col-lg-12  col-xl-12 col-xxl-4">
+        <div class="card custom-card overflow-hidden">
+            <div class="card-header border-bottom-0">
+                <div>
+                    <div class="card-title">Activity</div>
+                    <span class="d-block fs-12 mb-0 mt-1 text-muted">Facility activity timeline showing maintenance events, status changes, and operational updates</span>
+                </div>
+            </div>
+            <ul class="crypto-transcation list-unstyled mg-b-0 mt-3">
+                @for(activity of facilityActivities;track $index){
+
+                    <li  class="list-item  px-3 pb-3 {{activity.liClass}}">
+                        <div class="media align-items-center">
+                          <div class="crypto-icon bg-primary-transparent text-primary">
+                            <i class="cf {{ activity.icon }} wd-20 ht-20 text-center fs-18"></i>
+                          </div>
+                          <div class="media-body ms-3">
+                            <p class="fw-medium mg-b-3 fs-15">{{ activity.title }}</p>
+                            <p class="fs-11 mg-b-0 text-gray-3">{{ activity.description }}</p>
+                          </div>
+                        </div>
+                        <div class="text-end ms-auto my-auto">
+                          <h5 class="fw-medium fs-16 mb-0">
+                            {{ activity.amount }}
+                            <i [class]="activity.amountClass + ' fs-16 ' + activity.arrowClass"></i>
+                          </h5>
+                        </div>
+                      </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

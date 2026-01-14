@@ -1,0 +1,80 @@
+<div class="modal-header">
+  <h5 class="modal-title">Configure Widget Size</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="cancel()"
+  ></button>
+</div>
+<div class="modal-body">
+  <div class="mb-3">
+    <label class="form-label">Preset Sizes</label>
+    <div class="btn-group w-100" role="group">
+      <button
+        type="button"
+        class="btn btn-outline-primary btn-sm"
+        *ngFor="let size of presetSizes"
+        (click)="applyPresetSize(size)"
+      >
+        {{ size.name }}
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Start Column</label>
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="config.gridColumnStart"
+        min="1"
+        max="12"
+      />
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">End Column</label>
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="config.gridColumnEnd"
+        min="1"
+        max="13"
+      />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Start Row</label>
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="config.gridRowStart"
+        min="1"
+      />
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">End Row</label>
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="config.gridRowEnd"
+        min="1"
+      />
+    </div>
+  </div>
+
+  <div class="alert alert-info mb-0">
+    <small>
+      Column Span: {{ columnSpan }} | Row Span: {{ rowSpan }}
+    </small>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="cancel()">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+</div>

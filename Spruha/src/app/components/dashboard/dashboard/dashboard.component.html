@@ -1,0 +1,696 @@
+<app-page-header
+  [title]="'Welcome To FleetPulse Dashboard'"
+  [title1]="['Home']"
+  [activeitem]="'Fleet Management Dashboard'"
+  [showSaveButton]="showSaveButton"
+  [isUploading]="isUploading"
+  (fileSelected)="processExcelFile($event)"
+  (saveClick)="onSaveClick()"
+></app-page-header>
+
+<!-- Loading State -->
+@if (isLoading) {
+<div class="row row-sm">
+  <div class="col-12">
+    <div class="card custom-card">
+      <div class="card-body text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading dashboard data...</p>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Error State -->
+@if (errorMessage && !isLoading) {
+<div class="row row-sm">
+  <div class="col-12">
+    <div class="alert alert-danger" role="alert">
+      <h4 class="alert-heading">Error Loading Data</h4>
+      <p>{{ errorMessage }}</p>
+      <hr />
+      <button class="btn btn-primary" (click)="loadData()">Retry</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Empty State -->
+@if (!hasData && !isLoading && !errorMessage) {
+<div class="row row-sm">
+  <div class="col-12">
+    <div class="card custom-card">
+      <div class="card-body text-center p-5">
+        <i class="fe fe-alert-circle fs-48 text-muted mb-3"></i>
+        <h4>No Fleet Data Available</h4>
+        <p class="text-muted">
+          Please import an Excel file to begin viewing your fleet data.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Main Dashboard Content -->
+@if (hasData && !isLoading && !errorMessage) {
+<!--Row-->
+<div class="row row-sm">
+  <div class="col-sm-12 col-lg-12 col-xl-8">
+    <!--Row-->
+    <div class="row row-sm banner-img">
+      <div class="col-sm-12 col-lg-12 col-xl-12">
+        <div class="card bg-primary custom-card card-box">
+          <div class="card-body p-4">
+            <div class="row align-items-center justify-content-end">
+              <div
+                class="offset-xl-3 offset-sm-6 col-xxl-9 col-xl-6 col-sm-6 col-12 img-bg"
+              >
+                <h4 class="d-flex mb-3">
+                  <span class="fw-bold text-fixed-white">Fleet Manager!</span>
+                </h4>
+                <p class="tx-white-7 mb-1">
+                  You have
+                  <b class="text-warning">{{ activeVehiclesCount }}</b>
+                  active vehicles with
+                  <b class="text-warning"
+                    >{{
+                      dashboardStats
+                        ? (dashboardStats.utilization | number : "1.0-0")
+                        : 0
+                    }}%</b
+                  >
+                  utilization rate. Keep optimizing your fleet operations!
+                </p>
+              </div>
+              <img
+                src="./assets/images/pngs/29.png"
+                alt="user-img"
+                class="wd-200"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Row -->
+
+    <!--Row-->
+    <div class="row row-sm">
+      @for(card of cards;track $index){
+      <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+        <spk-dashboard [card]="card"></spk-dashboard>
+      </div>
+      }
+    </div>
+    <!--End row-->
+
+    <!--row-->
+    <div class="row row-sm">
+      <div class="col-sm-12 col-lg-12 col-xl-12">
+        <div class="card custom-card overflow-hidden">
+          <div
+            class="card-header border-bottom-0 d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <label class="main-content-label mb-2">Fleet Utilization</label>
+              <span class="d-block fs-12 mb-0 text-muted"
+                >Track active vehicles and vehicles in service over time to
+                monitor fleet deployment efficiency</span
+              >
+            </div>
+            <div class="btn-group btn-group-sm" role="group">
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                [class.active]="selectedPeriod === '30d'"
+                (click)="onPeriodChange('30d')"
+              >
+                Last 30 Days
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                [class.active]="selectedPeriod === 'quarter'"
+                (click)="onPeriodChange('quarter')"
+              >
+                Last Quarter
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                [class.active]="selectedPeriod === 'year'"
+                (click)="onPeriodChange('year')"
+              >
+                Last Year
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="project">
+              <spk-apex-charts [chartOptions]="ChartOptions"></spk-apex-charts>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- col end -->
+      <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="card custom-card overflow-hidden">
+          <div class="card-header d-block border-bottom-0 pb-0">
+            <div>
+              <div class="d-md-flex">
+                <label class="main-content-label my-auto pt-2"
+                  >Fleet Status</label
+                >
+                <div class="ms-auto mt-3 d-flex">
+                  <div class="me-3 d-flex text-muted fs-13">
+                    <span class="legend bg-primary rounded-circle"></span>Active
+                  </div>
+                  <div class="d-flex text-muted fs-13">
+                    <span class="legend bg-light rounded-circle"></span>In
+                    Service
+                  </div>
+                </div>
+              </div>
+              <span class="d-block fs-12 mt-2 mb-0 text-muted">
+                Real-time fleet deployment and operational status tracking.
+              </span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-6 my-auto">
+                <h6 class="mb-3 fs-14 fw-normal">Fleet Utilization</h6>
+                <div class="text-start">
+                  <h3 class="fw-bold me-3 mb-2 text-primary">
+                    {{
+                      dashboardStats
+                        ? (dashboardStats.utilization | number : "1.0-0")
+                        : 0
+                    }}%
+                  </h3>
+                  <p class="fs-13 my-auto text-muted">
+                    {{ lastSync ? formatDate(lastSync) : "No data" }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6 my-auto">
+                <div id="todaytask">
+                  <spk-apex-charts
+                    [chartOptions]="ChartOptions1"
+                  ></spk-apex-charts>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- col end -->
+
+      <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="card custom-card">
+          <div class="card-header border-bottom-0 pb-0">
+            <div>
+              <div class="d-flex">
+                <label class="main-content-label my-auto pt-2"
+                  >Fleet Performance Metrics</label
+                >
+              </div>
+              <span class="d-block fs-12 mt-2 mb-0 text-muted">
+                Key performance indicators for fleet operations and efficiency.
+              </span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row mt-1">
+              <div class="col-5">
+                <span class="">Vehicle Health Score</span>
+              </div>
+              <div class="col-3 my-auto">
+                <div class="progress ht-6 my-auto progress-animate">
+                  <div
+                    class="progress-bar fleet-progress-bar"
+                    role="progressbar"
+                    [attr.aria-valuenow]="healthScore"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    [style.width.%]="healthScore"
+                    style="
+                      background: linear-gradient(to right, #5ad85a, #6ee755);
+                    "
+                  ></div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="d-flex">
+                  <span class="fs-13"
+                    ><i
+                      [class]="
+                        healthScoreTrend >= 0
+                          ? 'text-success fe fe-arrow-up'
+                          : 'text-danger fe fe-arrow-down'
+                      "
+                    ></i
+                    ><b>{{ Math.abs(healthScoreTrend).toFixed(2) }}%</b></span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- col end -->
+      <div class="col-lg-12">
+        <div class="card custom-card mg-b-20 tasks">
+          <div class="card-body">
+            <div class="card-header border-bottom-0 pt-0 ps-0 pe-0 pb-2 d-flex">
+              <div>
+                <div class="card-title">Vehicles Requiring Maintenance</div>
+                <p class="mb-0 fs-12 mb-3 text-muted">
+                  Vehicles currently in maintenance queue or requiring urgent
+                  attention with priority and status tracking.
+                </p>
+              </div>
+              <div class="ms-auto d-flex flex-wrap gap-2">
+                <div class="contact-search3 me-3">
+                  <button type="button" class="btn border-0">
+                    <i
+                      class="fe fe-search fw-semibold text-muted"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                  <input
+                    type="text"
+                    class="form-control h-6"
+                    id="typehead1"
+                    placeholder="Search here..."
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="ms-auto d-flex dropdown" ngbDropdown>
+                  <a
+                    href="javascript:void(0);"
+                    ngbDropdownToggle
+                    class="btn dropdown-toggle btn-sm btn-wave waves-effect waves-light btn-primary d-inline-flex align-items-center"
+                    id="dropdownMenuButton1"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    ><i class="ri-equalizer-line me-1"></i>Sort by</a
+                  >
+                  <ul
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton1"
+                    ngbDropdownMenu
+                  >
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        ngbDropdownItem
+                        href="javascript:void(0);"
+                        >Work Order</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        ngbDropdownItem
+                        href="javascript:void(0);"
+                        >Technician</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        ngbDropdownItem
+                        href="javascript:void(0);"
+                        >Status</a
+                      >
+                    </li>
+                    <li class="dropdown-divider"></li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        ngbDropdownItem
+                        href="javascript:void(0);"
+                        ><i class="fa fa-cog me-2"></i>Settings</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive tasks">
+              <spk-reusable-tables
+                [columns]="taskColumns"
+                [tableClass]="
+                  'table card-table table-vcenter text-nowrap mb-0 border'
+                "
+                [showCheckbox]="false"
+              >
+                @for(task of tasks;track $index){
+                <tr>
+                  <td class="fw-medium">{{ task.vehicleId }}</td>
+                  <td class="text-center">{{ task.location }}</td>
+                  <td class="text-center">{{ task.workOrderCount }}</td>
+                  <td class="text-center">{{ task.daysBetweenWorkOrders }}</td>
+                  <td [class]="task.priorityClass">{{ task.priority }}</td>
+                  <td>
+                    <span
+                      class="badge bg-pill rounded-pill"
+                      [class]="task.statusClass"
+                      >{{ task.status }}</span
+                    >
+                  </td>
+                </tr>
+                }
+              </spk-reusable-tables>
+            </div>
+            <div class="float-end mt-3">
+              <nav aria-label="Page navigation" class="pagination-style-3">
+                <ul class="pagination mb-0 flex-wrap">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="javascript:void(0);"> Prev </a>
+                  </li>
+                  <li class="page-item active">
+                    <a class="page-link" href="javascript:void(0);">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);">2</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);">
+                      <i class="bi bi-three-dots"></i>
+                    </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);">16</a>
+                  </li>
+                  <li class="page-item">
+                    <a
+                      class="page-link text-primary"
+                      href="javascript:void(0);"
+                    >
+                      next
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- col end -->
+    </div>
+    <!-- Row end -->
+  </div>
+  <!-- col end -->
+  <div class="col-sm-12 col-lg-12 col-xl-4 mt-xl-4">
+    <div class="card custom-card card-dashboard-calendar">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+          <label class="main-content-label mb-2 pt-1"
+            >Recent System Activities</label
+          >
+          <span class="d-block fs-12 mb-2 text-muted"
+            >Latest system activities including vehicle status changes, new
+            vehicles, imports, and health score alerts</span
+          >
+        </div>
+        <button
+          class="btn btn-sm btn-outline-primary"
+          (click)="refreshData()"
+          [disabled]="isLoading"
+          title="Refresh data"
+        >
+          <i class="fe fe-refresh-cw" [class.spin]="isLoading"></i>
+        </button>
+      </div>
+      @if (lastSync) {
+      <p class="fs-11 text-muted mb-2">Last sync: {{ formatDate(lastSync) }}</p>
+      }
+      <spk-reusable-tables
+        [tableClass]="'table  m-b-0 transcations mt-2'"
+        [showCheckbox]="false"
+      >
+        @for (activity of transactions; track activity.id) {
+        <tr>
+          <td class="wd-5p">
+            <div class="main-img-user avatar-md">
+              <img
+                alt="activity"
+                class="rounded-circle me-3"
+                [src]="activity.icon || './assets/images/faces/4.jpg'"
+              />
+            </div>
+          </td>
+          <td>
+            <div class="d-flex align-middle ms-3">
+              <div class="d-inline-block">
+                <h6 class="mb-1">{{ activity.title }}</h6>
+                <p class="mb-0 fs-13 text-muted">
+                  {{ activity.description }}
+                </p>
+              </div>
+            </div>
+          </td>
+          <td class="text-end">
+            <div class="d-inline-block">
+              <p class="mb-0 tx-11 text-muted">
+                {{ formatDate(activity.timestamp) }}
+              </p>
+            </div>
+          </td>
+        </tr>
+        } @if (transactions.length === 0) {
+        <tr>
+          <td colspan="3" class="text-center text-muted p-4">
+            No recent activities
+          </td>
+        </tr>
+        }
+      </spk-reusable-tables>
+    </div>
+    <div class="card custom-card">
+      <div class="card-body">
+        <div class="row row-sm">
+          <div class="col-6">
+            <div class="card-item-title">
+              <label class="main-content-label fs-13 font-weight-bold mb-2"
+                >Next Major Fleet Event</label
+              >
+              <span class="d-block fs-12 mb-0 text-muted"
+                >Annual fleet maintenance review and optimization</span
+              >
+            </div>
+            <p class="mb-0 fs-24 mt-2"><b class="text-primary">45 days</b></p>
+            <a href="javascript:;" class="text-muted">15 Monday, Mar 2024 </a>
+          </div>
+          <div class="col-6">
+            <img
+              src="./assets/images/pngs/28.png"
+              alt="image"
+              class="best-emp"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card custom-card">
+      <div class="card-header border-bottom-0 pb-0 d-flex ps-3 ms-1">
+        <div>
+          <label class="main-content-label mb-2 pt-2"
+            >Active Fleet Status</label
+          >
+          <span class="d-block fs-12 mb-2 text-muted"
+            >Real-time tracking of active vehicles and maintenance status</span
+          >
+        </div>
+      </div>
+      <div class="card-body pt-2 mt-0">
+        <div class="list-card">
+          <div class="d-flex">
+            <div class="avatar-list-stacked d-flex align-items-center">
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/1.jpg"
+                />
+              </div>
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/2.jpg"
+                />
+              </div>
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/3.jpg"
+                />
+              </div>
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/4.jpg"
+                />
+              </div>
+              <div class="ms-3">Fleet Operations</div>
+            </div>
+            <div class="ms-auto float-end">
+              <div ngbDropdown class="file-drop">
+                <a
+                  href="javascript:;"
+                  class="option-dots"
+                  ngbDropdownToggle
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  ><i class="fe fe-more-horizontal"></i
+                ></a>
+                <div ngbDropdownMenu class="dropdown-menu-end">
+                  <a ngbDropdownItem href="javascript:;">Today</a>
+                  <a ngbDropdownItem href="javascript:;">Last Week</a>
+                  <a ngbDropdownItem href="javascript:;">Last Month</a>
+                  <a ngbDropdownItem href="javascript:;">Last Year</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-item mt-2">
+            <div class="card-item-body">
+              <div class="card-item-stat">
+                <small class="fs-10 text-primary fw-semibold">{{
+                  lastSync ? formatDate(lastSync) : "No data"
+                }}</small>
+                <h6 class="mt-2">Active Vehicles: {{ activeVehiclesCount }}</h6>
+              </div>
+              <div id="ongoingprojects">
+                <spk-apex-charts
+                  [chartOptions]="circleOptions"
+                ></spk-apex-charts>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="list-card mb-0">
+          <div class="d-flex">
+            <div class="avatar-list-stacked d-flex align-items-center">
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/5.jpg"
+                />
+              </div>
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/6.jpg"
+                />
+              </div>
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/7.jpg"
+                />
+              </div>
+              <div class="avatar avatar-rounded avatar-xs">
+                <img
+                  alt="avatar"
+                  class="rounded-circle"
+                  src="./assets/images/faces/8.jpg"
+                />
+              </div>
+              <div class="ms-3">Fleet Operations</div>
+            </div>
+            <div class="ms-auto float-end">
+              <div ngbDropdown class="file-drop">
+                <a
+                  href="javascript:;"
+                  class="option-dots"
+                  ngbDropdownToggle
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  ><i class="fe fe-more-horizontal"></i
+                ></a>
+                <div ngbDropdownMenu class="dropdown-menu-end">
+                  <a ngbDropdownItem href="javascript:;">Today</a>
+                  <a ngbDropdownItem href="javascript:;">Last Week</a>
+                  <a ngbDropdownItem href="javascript:;">Last Month</a>
+                  <a ngbDropdownItem href="javascript:;">Last Year</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-item mt-2">
+            <div class="card-item-body">
+              <div class="card-item-stat">
+                <small class="fs-10 text-primary fw-semibold">{{
+                  lastSync ? formatDate(lastSync) : "No data"
+                }}</small>
+                <h6 class="mt-2">
+                  Maintenance Vehicles: {{ maintenanceVehiclesCount }}
+                </h6>
+              </div>
+              <div id="ongoingprojects2">
+                <spk-apex-charts
+                  [chartOptions]="circleOptions1"
+                ></spk-apex-charts>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card custom-card">
+      <div class="card-body">
+        <div class="d-flex">
+          <label class="main-content-label my-auto">Website Design</label>
+          <div class="ms-auto d-flex">
+            <div class="me-3 d-flex text-muted fs-13">Running</div>
+          </div>
+        </div>
+        <div class="mt-1">
+          <div>
+            <span class="fs-15 text-muted">Task completed : 7/10</span>
+          </div>
+          <div id="websitedesign">
+            <spk-apex-charts [chartOptions]="ChartOptions2"></spk-apex-charts>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="mt-3">
+              <div class="d-flex mb-2">
+                <h5 class="fs-15 my-auto text-muted fw-normal">Client :</h5>
+                <h5 class="fs-15 my-auto ms-3">John Deo</h5>
+              </div>
+              <div class="d-flex mb-0">
+                <h5 class="fs-13 my-auto text-muted fw-normal">Deadline :</h5>
+                <h5 class="fs-13 my-auto text-muted ms-2">25 Dec 2020</h5>
+              </div>
+            </div>
+          </div>
+          <div class="col col-auto">
+            <div class="mt-2">
+              <div class="">
+                <img alt="" class="ht-50" src="./assets/images/pngs/21.png" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- col end -->
+</div>
+<!-- Row end -->
+}

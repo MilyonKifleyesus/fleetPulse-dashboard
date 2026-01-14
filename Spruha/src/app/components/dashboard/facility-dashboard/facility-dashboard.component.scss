@@ -1,0 +1,26 @@
+// Facility Dashboard Styles
+// Minimal custom styles - reuses existing theme
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.badge-sm {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.facility-link {
+  color: inherit;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--fleet-primary-green, #5ad85a);
+    text-decoration: underline !important;
+  }
+}

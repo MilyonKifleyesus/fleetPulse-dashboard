@@ -1,0 +1,99 @@
+<div 
+  #frameElement
+  class="widget-frame"
+  [class.edit-mode]="isEditMode"
+  [class.minimized]="widget.isMinimized"
+  [class.maximized]="widget.isMaximized"
+  [style.grid-area]="gridArea"
+>
+  <!-- Widget Header -->
+  <div class="widget-header" *ngIf="!widget.isMinimized">
+    <div class="widget-header-left">
+      <i [class]="widget.icon || 'fe fe-box'" class="widget-icon"></i>
+      <span class="widget-title">{{ widget.title }}</span>
+    </div>
+    <div class="widget-header-right" *ngIf="isEditMode">
+      <button 
+        type="button" 
+        class="widget-action-btn"
+        (click)="onSettings()"
+        title="Settings"
+      >
+        <i class="fe fe-settings"></i>
+      </button>
+      <button 
+        type="button" 
+        class="widget-action-btn"
+        (click)="onMinimize()"
+        [title]="widget.isMinimized ? 'Restore' : 'Minimize'"
+      >
+        <i class="fe" [class.fe-minimize-2]="!widget.isMinimized" [class.fe-maximize-2]="widget.isMinimized"></i>
+      </button>
+      <button 
+        type="button" 
+        class="widget-action-btn"
+        (click)="onMaximize()"
+        [title]="widget.isMaximized ? 'Restore' : 'Maximize'"
+      >
+        <i class="fe" [class.fe-maximize-2]="!widget.isMaximized" [class.fe-minimize-2]="widget.isMaximized"></i>
+      </button>
+      <button 
+        type="button" 
+        class="widget-action-btn widget-action-delete"
+        (click)="onDelete()"
+        title="Delete"
+      >
+        <i class="fe fe-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Widget Body -->
+  <div class="widget-body" *ngIf="!widget.isMinimized">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Resize Handles (only in edit mode) -->
+  <div class="widget-resize-handles" *ngIf="isEditMode && !widget.isMinimized">
+    <!-- Corner handles -->
+    <div 
+      class="resize-handle resize-handle-nw"
+      (mousedown)="onResizeStart($event, 'nw')"
+    ></div>
+    <div 
+      class="resize-handle resize-handle-ne"
+      (mousedown)="onResizeStart($event, 'ne')"
+    ></div>
+    <div 
+      class="resize-handle resize-handle-sw"
+      (mousedown)="onResizeStart($event, 'sw')"
+    ></div>
+    <div 
+      class="resize-handle resize-handle-se"
+      (mousedown)="onResizeStart($event, 'se')"
+    ></div>
+    
+    <!-- Edge handles -->
+    <div 
+      class="resize-handle resize-handle-n"
+      (mousedown)="onResizeStart($event, 'n')"
+    ></div>
+    <div 
+      class="resize-handle resize-handle-s"
+      (mousedown)="onResizeStart($event, 's')"
+    ></div>
+    <div 
+      class="resize-handle resize-handle-w"
+      (mousedown)="onResizeStart($event, 'w')"
+    ></div>
+    <div 
+      class="resize-handle resize-handle-e"
+      (mousedown)="onResizeStart($event, 'e')"
+    ></div>
+  </div>
+
+  <!-- Drag Handle (only in edit mode) -->
+  <div class="widget-drag-handle" *ngIf="isEditMode && !widget.isMinimized">
+    <i class="fe fe-move"></i>
+  </div>
+</div>

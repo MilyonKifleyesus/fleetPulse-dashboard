@@ -1,0 +1,107 @@
+
+Project Name: Spruha Angular Admin & Dashboard Template
+
+Version : V.7
+
+Updated-date:  19-February-2025
+ 
+Updates :-     
+	1) Angular version updated.
+	2) Updated Plugins And Added the Plugins.
+        3) Added Reusable Components & UI Improvements.
+	4) Updated Documentation.
+	
+
+
+***********************************************************************************************************************************************************************************************		
+ ------------------------------------
+   1) Angular version updated:
+ ------------------------------------
+ Angular version had been Updated to @19.1.5
+
+        Previous Angular version was @17.0.2  had been updated to @19.1.5
+
+       Run the following command to update the Angular CLI.
+
+      * Open your terminal or command prompt.
+        Run the following command to install the Angular CLI.
+
+           npm install -g @angular/cli@19.1.5
+
+      * Once the installation is complete, you can check the version of Angular CLI installed by running the following command:
+
+          ng version 
+         
+        To Update the package.json we need to run the following command
+
+         ng update
+
+           Or
+
+        Replace the package.json with version @19.1.5
+
+ ------------------------------------------------
+   2)  Updated Plugins And Added the Plugins
+ ------------------------------------------------
+ 
+      Please go through the Updated package.json.
+		
+
+ -----------------------------------------------------------------------------------------
+  3) Added Reusable Components and imporved ui of all Components from old to latest .
+ -----------------------------------------------------------------------------------------
+       * Added Reusable Components & UI Improvements:
+       ===============================================
+            => Introduced reusable components such as cards, plugins, alerts, tables, charts, ratings, and more.
+            => Improved the UI of all components, upgrading from the old design to the latest styles.
+        
+       * Benefits:
+       ===========
+            => Reduced code duplication across different parts of the application.
+            => Enhanced maintainability and flexibility for UI elements.
+            => Each component is modular and easily customizable for various use cases.
+ ---------------------------------------
+   4) Updated Documentation
+ ---------------------------------------
+
+  Documentation is updated
+
+ ----------------------------------------
+
+  Thanking you,
+  @spruko.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

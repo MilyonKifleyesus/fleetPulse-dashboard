@@ -1,0 +1,27 @@
+# FleetPulse Dashboard Rules
+
+## Data Binding (CRITICAL - NEVER FORGET)
+
+- ALWAYS use `@Input()` with explicit types: `@Input() data!: DataType`
+- ALWAYS provide defaults: `@Input() title: string = ''`
+- NEVER use `any` - always type inputs properly
+- Import `Input` from `@angular/core`
+
+## FleetPulse Theme
+
+- Colors: Primary #5ad85a, Accent #6ee755, Dark bg #050505/#0a0c0a
+- Status: Optimal #6ee755, Warning #eab308, Critical #ef4444
+- Support dark/light theme toggle
+
+## Component Pattern
+
+- Standalone components: `standalone: true`
+- Fleet metrics: vehicles, routes, maintenance, costs
+- Green gradient charts, fleet-specific data visualizations
+- Transform generic dashboard to fleet management context
+
+## Files Context
+
+- Dashboard: `Spruha/src/app/components/dashboard/dashboard/`
+- Colors: `Spruha/public/assets/scss/_variables.scss`
+- Charts: `Spruha/src/app/shared/data/dashboard.ts`

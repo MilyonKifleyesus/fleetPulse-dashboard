@@ -1,0 +1,19 @@
+.workspace-dashboard-container {
+  padding: 1rem;
+}
+
+.workspace-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+// Ensure widgets have proper spacing
+:host ::ng-deep {
+  .widget-frame {
+    .card {
+      height: 100%;
+      margin: 0;
+    }
+  }
+}

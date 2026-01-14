@@ -1,0 +1,333 @@
+@if (isLoading()) {
+<div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+} @else if (errorMessage()) {
+<div class="alert alert-danger" role="alert">
+  {{ errorMessage() }}
+</div>
+} @else if (operationsData()) {
+<div class="facility-operations-dashboard">
+  <!-- Header Section -->
+  <div class="facility-header mb-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap">
+      <div class="facility-info">
+        <h1 class="facility-name mb-2">{{ facility()?.name?.toUpperCase() || 'FACILITY' }}</h1>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span class="live-text">LIVE STREAM</span>
+          </div>
+        </div>
+        <div class="facility-location">
+          @if (operationsData()?.sector) {
+          <span>{{ operationsData()?.sector }}</span>
+          }
+          @if (facility()?.location?.city && facility()?.location?.state) {
+          <span>| {{ facility()?.location?.city }}, {{ facility()?.location?.state }}</span>
+          }
+          @if (operationsData()?.networkNode) {
+          <span>| NETWORK NODE: {{ operationsData()?.networkNode }}</span>
+          }
+        </div>
+      </div>
+      <div class="header-actions d-flex gap-2">
+        <button class="btn btn-report" (click)="generateReport()">
+          GENERATE REPORT
+        </button>
+        <button class="btn btn-config" (click)="navigateToNodeConfig()">
+          MANAGE NODE CONFIGURATION
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row row-sm mb-4">
+    <div class="col-sm-12 col-md-6 col-lg-3 mb-3 mb-lg-0">
+      <div class="kpi-card">
+        <div class="kpi-label">TOTAL UNITS</div>
+        <div class="kpi-value">{{ totalUnits() }}</div>
+        <div class="kpi-icon">
+          <i class="fe fe-building"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3 mb-3 mb-lg-0">
+      <div class="kpi-card">
+        <div class="kpi-label">ACTIVE VS IDLE</div>
+        <div class="kpi-value-ratio">
+          <span class="active-value">{{ activeUnits() }}</span>
+          <span class="separator">/</span>
+          <span class="idle-value">{{ idleUnits() }}</span>
+        </div>
+        <div class="kpi-icon">
+          <i class="fe fe-activity"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3 mb-3 mb-lg-0">
+      <div class="kpi-card kpi-card-alert">
+        <div class="kpi-label">CRITICAL ALERTS</div>
+        <div class="kpi-value kpi-value-alert">{{ formattedCriticalAlerts() }}</div>
+        <div class="kpi-icon">
+          <i class="fe fe-alert-triangle"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <div class="kpi-card">
+        <div class="kpi-label">HEALTH SCORE</div>
+        <div class="kpi-value kpi-value-health">{{ healthScore() }}%</div>
+        <div class="kpi-icon">
+          <div class="health-circle">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+              <path class="circle" [attr.stroke-dasharray]="healthScore() + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="row row-sm">
+    <!-- Left Side - Performance Chart -->
+    <div class="col-lg-8 col-xl-8 mb-4">
+      <div class="card custom-card performance-chart-card">
+        <div class="card-header border-bottom-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <label class="main-content-label my-auto pt-2 mb-1">FACILITY PERFORMANCE METRICS (24H)</label>
+            </div>
+            <!-- Live Telemetry Box -->
+            <div class="telemetry-box">
+              <div class="telemetry-item">
+                <span class="telemetry-label">UPTIME:</span>
+                <span class="telemetry-value telemetry-uptime">{{ telemetry()?.uptime?.toFixed(1) }}%</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">DEMAND:</span>
+                <span class="telemetry-value telemetry-demand" [class.demand-high]="telemetry()?.demand === 'HIGH'" [class.demand-normal]="telemetry()?.demand === 'NORMAL'" [class.demand-low]="telemetry()?.demand === 'LOW'">{{ telemetry()?.demand }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0">
+          <div id="performance-chart">
+            <spk-apex-charts [chartOptions]="performanceChartOptions()"></spk-apex-charts>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Resources and Activity -->
+    <div class="col-lg-4 col-xl-4 mb-4">
+      <!-- Facility Resources -->
+      <div class="card custom-card mb-4">
+        <div class="card-header border-bottom-0">
+          <label class="main-content-label my-auto pt-2 mb-1">FACILITY RESOURCES</label>
+        </div>
+        <div class="card-body">
+          <!-- Available Bays -->
+          <div class="resource-item mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="resource-label">Available Bays</span>
+              <span class="resource-value">{{ resources()?.availableBays }} / {{ resources()?.totalBays }}</span>
+            </div>
+            <div class="progress resource-progress">
+              <div class="progress-bar bg-success" role="progressbar" [style.width.%]="(resources()?.availableBays! / resources()?.totalBays!) * 100"></div>
+            </div>
+          </div>
+
+          <!-- Energy Consumption -->
+          <div class="resource-item mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="resource-label">Energy Consumption</span>
+              <span class="resource-value">{{ resources()?.energyConsumption }}%</span>
+            </div>
+            <div class="progress resource-progress">
+              <div class="progress-bar" [class.bg-warning]="resources()?.energyConsumption! >= 80" [class.bg-success]="resources()?.energyConsumption! < 80" role="progressbar" [style.width.%]="resources()?.energyConsumption"></div>
+            </div>
+          </div>
+
+          <!-- Critical Parts Inventory -->
+          <div class="resource-item">
+            <div class="resource-label mb-2">Critical Parts Inventory</div>
+            <div class="parts-list">
+              @for (part of resources()?.criticalParts?.slice(0, 5); track part.name) {
+              <div class="part-item" [ngClass]="getPartStatusClass(part.status)">
+                <span class="part-name">{{ part.name }}:</span>
+                @if (part.status !== 'Normal') {
+                <span class="part-status">{{ part.status }}:</span>
+                }
+                <span class="part-quantity">{{ part.quantity }}</span>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="card custom-card">
+        <div class="card-header border-bottom-0">
+          <label class="main-content-label my-auto pt-2 mb-1">ACTIVITY LOG</label>
+        </div>
+        <div class="card-body">
+          <ul class="activity-list">
+            @for (activity of activities().slice(0, 10); track activity.id) {
+            <li class="activity-item">
+              <div class="activity-time">{{ formatTime(activity.timestamp) }}</div>
+              <div class="activity-description">{{ activity.title }}</div>
+              @if (activity.location) {
+              <div class="activity-location">- {{ activity.location }}</div>
+              }
+            </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unit Status Grid -->
+  <div class="row row-sm">
+    <div class="col-12">
+      <div class="card custom-card">
+        <div class="card-header border-bottom-0">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+              <label class="main-content-label my-auto pt-2 mb-1">UNIT STATUS GRID</label>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <div class="search-box">
+                <input type="text" class="form-control" placeholder="Q FILTER UNITS..." [value]="searchTerm()" (input)="onSearchChange($event)" />
+              </div>
+              <button class="btn btn-sm btn-primary" (click)="exportToCSV()">
+                <i class="fe fe-download me-1"></i>EXPORT
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-vcenter text-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th [class.cursor-pointer]="true" (click)="sortTable('unitId')">
+                    UNIT ID
+                    @if (sortColumn() === 'unitId') {
+                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'" [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    }
+                  </th>
+                  <th [class.cursor-pointer]="true" (click)="sortTable('model')">
+                    MODEL
+                    @if (sortColumn() === 'model') {
+                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'" [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    }
+                  </th>
+                  <th [class.cursor-pointer]="true" (click)="sortTable('status')">
+                    STATUS
+                    @if (sortColumn() === 'status') {
+                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'" [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    }
+                  </th>
+                  <th [class.cursor-pointer]="true" (click)="sortTable('battery')">
+                    BATTERY
+                    @if (sortColumn() === 'battery') {
+                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'" [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    }
+                  </th>
+                  <th [class.cursor-pointer]="true" (click)="sortTable('assignedStaff')">
+                    ASSIGNED STAFF
+                    @if (sortColumn() === 'assignedStaff') {
+                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'" [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    }
+                  </th>
+                  <th [class.cursor-pointer]="true" (click)="sortTable('lastMaintenance')">
+                    LAST MAINT
+                    @if (sortColumn() === 'lastMaintenance') {
+                    <i class="fe ms-1" [class.fe-arrow-up]="sortDirection() === 'asc'" [class.fe-arrow-down]="sortDirection() === 'desc'"></i>
+                    }
+                  </th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (unit of paginatedUnits(); track unit.id) {
+                <tr>
+                  <td class="unit-id">{{ unit.unitId }}</td>
+                  <td>{{ unit.model }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(unit.status)">{{ unit.status }}</span>
+                  </td>
+                  <td>
+                    <div class="battery-display">
+                      <span class="battery-value">{{ unit.battery }}%</span>
+                      <div class="progress battery-progress">
+                        <div class="progress-bar" [ngClass]="getBatteryClass(unit.battery)" role="progressbar" [style.width.%]="unit.battery"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ unit.assignedStaff }}</td>
+                  <td>{{ formatDate(unit.lastMaintenance) }}</td>
+                  <td>
+                    @if (unit.status === 'REPAIR') {
+                    <button class="btn btn-sm btn-danger" (click)="navigateToNodeConfig()">
+                      OVERRIDE
+                    </button>
+                    } @else {
+                    <button class="btn btn-sm btn-success" (click)="navigateToNodeConfig()">
+                      TELEMETRY
+                    </button>
+                    }
+                  </td>
+                </tr>
+                } @empty {
+                <tr>
+                  <td colspan="7" class="text-center py-4">
+                    <p class="text-muted mb-0">No units found</p>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          @if (totalPages() > 1) {
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <span class="fs-13 text-muted">
+                Showing {{ (currentPage() - 1) * pageSize() + 1 }}-{{ Math.min(currentPage() * pageSize(), sortedUnits().length) }} of {{ sortedUnits().length }} units
+              </span>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+                <i class="fe fe-chevron-left"></i> Previous
+              </button>
+              @for (page of [].constructor(totalPages()); track $index) {
+              @if ($index < 5 || $index >= totalPages() - 2 || ($index >= currentPage() - 2 && $index <= currentPage() + 2)) {
+              <button type="button" class="btn btn-sm" [class.btn-primary]="currentPage() === ($index + 1)" [class.btn-outline-primary]="currentPage() !== ($index + 1)" (click)="goToPage($index + 1)">
+                {{ $index + 1 }}
+              </button>
+              } @else if ($index === 5 || $index === totalPages() - 3) {
+              <span class="btn btn-sm btn-outline-primary disabled">...</span>
+              }
+              }
+              <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+                Next <i class="fe fe-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}

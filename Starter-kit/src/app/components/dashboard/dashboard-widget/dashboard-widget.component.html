@@ -1,0 +1,31 @@
+<div
+  cdkDrag
+  [cdkDragDisabled]="!editMode"
+  class="dashboard-widget-wrapper"
+  [class.edit-mode]="editMode"
+  [ngStyle]="gridStyles"
+>
+  <div class="widget-content" *ngIf="widgetConfig.visible">
+    <div class="widget-header" *ngIf="editMode">
+      <button
+        type="button"
+        class="btn btn-sm btn-icon widget-config-btn"
+        (click)="onConfigClick(); $event.stopPropagation()"
+        title="Configure widget"
+      >
+        <i class="fe fe-settings"></i>
+      </button>
+    </div>
+    <div class="widget-resize-handles" *ngIf="editMode">
+      <div class="resize-handle resize-handle-top"></div>
+      <div class="resize-handle resize-handle-right"></div>
+      <div class="resize-handle resize-handle-bottom"></div>
+      <div class="resize-handle resize-handle-left"></div>
+      <div class="resize-handle resize-handle-top-left"></div>
+      <div class="resize-handle resize-handle-top-right"></div>
+      <div class="resize-handle resize-handle-bottom-left"></div>
+      <div class="resize-handle resize-handle-bottom-right"></div>
+    </div>
+    <ng-content></ng-content>
+  </div>
+</div>
