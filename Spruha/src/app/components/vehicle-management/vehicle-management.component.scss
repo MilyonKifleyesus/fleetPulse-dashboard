@@ -1,0 +1,546 @@
+.page {
+  min-height: 100vh;
+  padding: clamp(16px, 3vw, 40px) clamp(12px, 4vw, 50px) clamp(20px, 5vw, 60px);
+  background: #ffffff;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.header {
+  margin-bottom: 18px;
+}
+
+.title {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 900;
+  color: #0b0b0b;
+}
+
+.subtitle {
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #2b2b2b;
+}
+
+/* -------- Shared width wrapper (Facilities + Board) -------- */
+.content-wrap {
+  width: min(1600px, 100%);
+  margin: 0 auto;
+}
+
+.layout--vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* -------- Facilities row -------- */
+.facilities-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; // space between facilities card and search card
+}
+
+/* -------- Facilities sidebar -------- */
+.sidebar-card {
+  border-radius: 22px;
+  padding: 16px;
+  background: rgb(74, 79, 73);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45);
+}
+
+.sidebar-card--search {
+  /* inherits background, border-radius, etc. from .sidebar-card */
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.sidebar-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.fac-item {
+  flex: 0 0 auto;
+  min-width: 220px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+
+  /* CENTER CONTENT */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fac-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.fac-item.active {
+  background: rgba(31, 139, 58, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(0, 255, 64, 0.6);
+  color: rgba(0, 255, 64, 0.8);
+}
+
+.fac-item .name {
+  font-weight: 900;
+}
+
+.fac-item .count {
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sidebar-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* -------- Board wrapper (shell + title) -------- */
+.board-row {
+  width: 100%;
+}
+
+.board-shell {
+  border-radius: 22px;
+  padding: 18px 18px 22px;
+  background: rgba(74, 79, 73);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45);
+}
+
+.board-title {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 6px 0 14px 6px;
+}
+
+/* =========================================================
+   BUS (image silhouette) — used in SEARCH PANEL
+========================================================= */
+
+.bus {
+  user-select: none;
+}
+
+.bus--img {
+  position: relative;
+  height: 72px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  cursor: grab;
+  user-select: none;
+
+  background-image: var(--busImg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  overflow: hidden;
+}
+
+.bus--img:active {
+  cursor: grabbing;
+}
+
+.bus--img.cdk-drag-dragging {
+  opacity: 1 !important;
+  cursor: grabbing;
+}
+
+/* overlay for readability (kept as empty hook) */
+.bus--img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* Badge (bus number) */
+.bus-badge {
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+/* Preview in drag image */
+.bus--preview {
+  margin: 0;
+  transform: scale(1.03);
+}
+
+/* Placeholder while dragging */
+.bus--placeholder {
+  height: 72px;
+  border-radius: 14px;
+  background: rgba(0, 255, 64, 0.18);
+}
+
+/* ===== Search results panel inside the board ===== */
+.search-panel {
+  margin: 0 0 14px;
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(122, 122, 122, 0.5);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 18px 30px rgba(0, 0, 0, 0.25);
+}
+
+.search-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.search-title {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.search-sub {
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-dropzone {
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  min-height: 96px;
+
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.search-empty {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 10px 6px;
+}
+
+/* Slightly smaller bus card in search panel */
+.bus--search {
+  width: 220px;
+  margin-bottom: 0;
+}
+
+.search-item {
+  width: 220px; /* same width as bus--search */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Text line below search bus */
+.search-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 900;
+  font-size: 13px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-meta-label {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.search-meta-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Top row inside the bus image card (label + location) */
+.bus-top {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 20px);
+}
+
+/* Label pill */
+.bus-top .bus-badge {
+  position: static;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-weight: 900;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Bay pill (to the right) */
+.bus-loc {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 900;
+  font-size: 13px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+/* -------- Facilities horizontal scrollbar styling -------- */
+
+/* Firefox */
+.fac-items {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+/* Chrome, Edge, Safari */
+.fac-items::-webkit-scrollbar {
+  height: 10px;
+}
+
+.fac-items::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.fac-items::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  border: 2px solid rgba(74, 79, 73);
+}
+
+.fac-items::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* Layout for All Facilities + list */
+.fac-items {
+  display: grid;
+  grid-template-columns: 210px 1fr; /* left fixed, right flexible */
+  align-items: start;
+}
+
+.fac-col-all { }
+
+.fac-col-list {
+  min-width: 0; /* IMPORTANT: allows the scroll container to shrink */
+}
+
+.fac-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+
+  scroll-snap-type: x mandatory;
+}
+
+.fac-scroll .fac-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* make the All button visually “special” */
+.fac-item--all {
+  width: 100%;
+}
+
+/* -------- Responsive layout (page + facilities) -------- */
+@media (max-width: 650px) {
+  .page {
+    padding: 26px 18px 40px;
+  }
+
+  /* Facilities smaller cards */
+  .fac-item {
+    min-width: clamp(170px, 18vw, 220px);
+  }
+}
+
+@media (max-width: 720px) {
+  .fac-items {
+    grid-template-columns: 1fr;
+  }
+
+  .fac-item--all {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   Drag Preview Fixes (prevents giant / cropped preview)
+========================================================= */
+
+.cdk-drag-preview {
+  border-radius: 14px;
+  overflow: hidden;
+  height: 72px;         /* match .bus--img */
+  width: 220px;         /* match your card width (search bus) */
+  box-sizing: border-box;
+}
+
+.cdk-drag-preview .bus--preview {
+  height: 72px;
+  width: 220px;
+  margin: 0;
+  transform: none;
+  background-size: cover;
+  background-position: center;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.6;
+}
+
+/* ===== Bay Modal (same vibe as Bus Snapshot) ===== */
+.bay-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: 1000;
+}
+
+.bay-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bay-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.98);
+  width: min(720px, calc(100vw - 40px));
+  border-radius: 18px;
+
+  background: rgba(12, 12, 12, 0.92);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.bay-modal.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.bay-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+  color: #fff;
+}
+
+.bay-modal-title {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.bay-x {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+}
+
+.bay-modal-body {
+  padding: 0 16px 14px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.bay-help {
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 12px;
+}
+
+.bay-label {
+  display: grid;
+  gap: 8px;
+  font-weight: 900;
+}
+
+.bay-select {
+  height: 44px;
+  border-radius: 12px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgb(255, 255, 255);
+  color: #000000;
+  outline: none;
+  font-weight: 900;
+}
+
+.bay-error {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 60, 60, 0.12);
+  border: 1px solid rgba(255, 60, 60, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 900;
+}
+
+.bay-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 16px 16px;
+}

@@ -1,0 +1,92 @@
+<div class="page">
+  <header class="header">
+    <h1 class="title">{{ title }}</h1>
+    <div class="subtitle">{{ subtitle }}</div>
+  </header>
+
+  <div class="content-wrap">
+    <div class="layout layout--vertical">
+      <section class="facilities-row">
+        <div class="sidebar-card">
+          <div class="sidebar-title">Facilities</div>
+
+          <app-facility-buttons
+            [facilities]="facilities"
+            [selectedFacilityId]="selectedFacilityId"
+            [allFacilitiesId]="ALL_FACILITIES_ID"
+            [allFacilitiesTotal]="allFacilitiesTotal()"
+            [facilityTotals]="facilityTotalsById"
+            (selectAllFacilities)="onSelectAllFacilities()"
+            (selectFacility)="onSelectFacility($event)"
+          ></app-facility-buttons>
+
+
+          <app-facility-strips
+            [facilities]="facilities"
+            [selectedFacilityId]="selectedFacilityId"
+            [allFacilitiesId]="ALL_FACILITIES_ID"
+          ></app-facility-strips>
+        </div>
+      </section>
+
+      <section class="board-row">
+        <div class="sidebar-card sidebar-card--search">
+
+          <app-facility-search
+            [query]="searchQuery"
+            [showClear]="showSearchRow"
+            (queryChange)="onSearchChange($event)"
+            (clear)="clearSearch()"
+          ></app-facility-search>
+
+          <div class="sidebar-hint">
+            Tip: Drag buses between columns to change status.
+          </div>
+        </div>
+      </section>
+
+      <section class="board-row">
+        <section class="board-shell">
+          <div class="board-title">{{ selectedFacilityLabel }}</div>
+
+          <app-facility-search-result
+            *ngIf="showSearchRow"
+            [selectedFacilityLabel]="selectedFacilityLabel"
+            [searchDropListId]="searchDropListId"
+            [searchResults]="searchResults"
+            [searchMetaById]="searchMetaById"
+            [searchQuery]="searchQuery"
+            [connectedDropListIds]="connectedDropListIds"
+            [busImageUrl]="getFacilityBusImageUrl()"
+          ></app-facility-search-result>
+
+          <app-facility-columns
+            [columns]="columnsView"
+            [connectedDropListIds]="connectedDropListIds"
+            [busImageUrl]="getFacilityBusImageUrl()"
+            (columnDrop)="onDrop($event.toCategory, $event.event)"
+            (snapshotRequested)="openBusSnapshot($event.bus, $event.statusLabel)"
+          ></app-facility-columns>
+        </section>
+      </section>
+    </div>
+  </div>
+
+  <app-facility-bay
+    *ngIf="isBayModalOpen"
+    [isVisible]="isBayModalVisible"
+    [bayOptions]="bayOptions"
+    [baySelected]="baySelected"
+    [bayErrorMsg]="bayErrorMsg"
+    (baySelectedChange)="baySelected = $event"
+    (cancel)="cancelBayModal()"
+    (confirm)="confirmBayModal()"
+  ></app-facility-bay>
+
+  <app-bus-snapshot
+    *ngIf="isSnapshotOpen && selectedBus"
+    [bus]="selectedBus"
+    (close)="closeBusSnapshot()"
+    (viewFull)="closeBusSnapshot()"
+  ></app-bus-snapshot>
+</div>
