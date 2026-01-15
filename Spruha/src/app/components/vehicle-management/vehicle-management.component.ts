@@ -128,11 +128,20 @@ export class VehicleManagementComponent {
     const facId = this.resolvedFacilityId;
     const fac = this.facilities.find((f) => f.id === facId);
 
-    return (
+    const imageUrl =
       fac?.image ??
       this.facilities[0]?.image ??
-      '/assets/york-region-transit_Miller-brt.png'
-    );
+      '/assets/york-region-transit_Miller-brt.png';
+
+    // Debug logging to verify image paths
+    console.log('[VehicleManagement] Image URL Debug:', {
+      selectedFacilityId: this.selectedFacilityId,
+      resolvedFacilityId: facId,
+      foundFacility: fac,
+      imageUrl: imageUrl,
+    });
+
+    return imageUrl;
   }
 
   get board(): Board {

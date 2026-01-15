@@ -9,7 +9,7 @@
       </div>
 
       <div class="dropzone" cdkDropList [id]="col.dropListId" [cdkDropListData]="col.buses" [cdkDropListConnectedTo]="connectedDropListIds" (cdkDropListDropped)="onDrop(col.id, $event)">
-        <div class="bus bus--img" *ngFor="let bus of col.buses; trackBy: trackByBusId" cdkDrag [cdkDragData]="bus" cdkDragPreviewContainer="global" (dblclick)="onOpenSnapshot(bus, col.label)" [style.--busImg]="'url(' + busImageUrl + ')'">
+        <div class="bus bus--img" *ngFor="let bus of col.buses; trackBy: trackByBusId" cdkDrag [cdkDragData]="bus" cdkDragPreviewContainer="global" (dblclick)="onOpenSnapshot(bus, col.label)" [style.background-image]="'url(' + busImageUrl + ')'" style="background-size: cover; background-position: center;">
           <div class="bus-top">
             <div class="bus-badge">{{ bus.label }}</div>
 

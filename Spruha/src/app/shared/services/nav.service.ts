@@ -118,10 +118,10 @@ export class NavService implements OnDestroy {
       ],
     },
 
-    { headTitle: 'Landing' },
+    { headTitle: 'Vehicle Management' },
     {
-      path: '/landing-page',
-      title: 'Landing Page',
+      path: '/vehicle-management',
+      title: 'Vehicle Management',
       type: 'link',
       icon: 'ti-layout',
       active: false,

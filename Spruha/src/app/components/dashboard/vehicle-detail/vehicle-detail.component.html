@@ -10,7 +10,9 @@
 } @else if (errorMessage()) {
 <div class="alert alert-danger" role="alert">
   {{ errorMessage() }}
-  <button class="btn btn-sm btn-primary mt-2" (click)="loadData()">Retry</button>
+  <button class="btn btn-sm btn-primary mt-2" (click)="loadData()">
+    Retry
+  </button>
 </div>
 } @else if (vehicle()) {
 <div class="vehicle-detail-dashboard">
@@ -31,11 +33,16 @@
                   @if (currentImage()) {
                   <img
                     [src]="currentImage()"
-                    [alt]="vehicle()?.make + ' ' + vehicle()?.model + ' - Image ' + (selectedImageIndex() + 1)"
+                    [alt]="
+                      vehicle()?.make +
+                      ' ' +
+                      vehicle()?.model +
+                      ' - Image ' +
+                      (selectedImageIndex() + 1)
+                    "
                     class="vehicle-image-main"
                   />
-                  }
-                  @if (vehicle()?.status === 'Maintenance') {
+                  } @if (vehicle()?.status === 'Maintenance') {
                   <span class="maintenance-badge">
                     <span class="badge-dot"></span>
                     MAINTENANCE MODE
@@ -62,7 +69,8 @@
                   </button>
                   <!-- Image Counter -->
                   <div class="image-counter">
-                    {{ selectedImageIndex() + 1 }} / {{ vehicleImages().length }}
+                    {{ selectedImageIndex() + 1 }} /
+                    {{ vehicleImages().length }}
                   </div>
                   }
                 </div>
@@ -75,7 +83,9 @@
             </div>
             <!-- Vehicle Info -->
             <div class="col-sm-7 p-4">
-              <div class="d-flex justify-content-between align-items-start mb-3">
+              <div
+                class="d-flex justify-content-between align-items-start mb-3"
+              >
                 <h1 class="vehicle-name mb-0">
                   {{ vehicle()?.make }} {{ vehicle()?.model }}
                   <span class="text-primary">{{ vehicle()?.year }}</span>
@@ -91,8 +101,7 @@
                 <span>{{ spec }}</span>
                 @if (!$last) {
                 <span class="text-muted">//</span>
-                }
-                }
+                } }
               </p>
               <div class="row g-3 mb-4">
                 <div class="col-6">
@@ -180,9 +189,7 @@
                 ></div>
               </div>
               <div class="timeline-phases">
-                @for (
-                  phase of maintenanceWorkflow()?.phases;
-                  track phase.phase
+                @for ( phase of maintenanceWorkflow()?.phases; track phase.phase
                 ) {
                 <div
                   class="phase-item"
@@ -248,9 +255,7 @@
                         <span>{{ entry.operator.name }}</span>
                       </div>
                     </td>
-                    <td class="text-end">
-                      ${{ entry.cost.toFixed(2) }}
-                    </td>
+                    <td class="text-end">${{ entry.cost.toFixed(2) }}</td>
                     <td>
                       <span
                         class="badge"
@@ -344,10 +349,7 @@
                 <div class="text-muted small">Session Time</div>
                 <div class="fw-bold">{{ sessionDuration() }}</div>
               </div>
-              <button
-                class="btn btn-primary"
-                (click)="viewFeed()"
-              >
+              <button class="btn btn-primary" (click)="viewFeed()">
                 <i class="fe fe-video me-2"></i>
                 View Feed
               </button>
@@ -365,7 +367,9 @@
         <div class="col-6">
           <div class="card custom-card metric-card">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
                 <div class="metric-label">Odometer</div>
                 <i class="fe fe-speed text-muted"></i>
               </div>
@@ -385,7 +389,9 @@
         <div class="col-6">
           <div class="card custom-card metric-card">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
                 <div class="metric-label">Fuel Cell</div>
                 <i class="fe fe-droplet text-muted"></i>
               </div>
@@ -405,7 +411,9 @@
         <div class="col-6">
           <div class="card custom-card metric-card">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
                 <div class="metric-label">Power Unit</div>
                 <i class="fe fe-battery text-muted"></i>
               </div>
@@ -421,7 +429,9 @@
         <div class="col-6">
           <div class="card custom-card metric-card">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
                 <div class="metric-label">Last Service</div>
                 <i class="fe fe-clock text-muted"></i>
               </div>
@@ -466,9 +476,7 @@
                 fill="none"
                 stroke="var(--fleet-warning, #eab308)"
                 stroke-width="2"
-                [attr.stroke-dasharray]="
-                  activeProtocol()?.progress + ', 100'
-                "
+                [attr.stroke-dasharray]="activeProtocol()?.progress + ', 100'"
                 transform="rotate(-90 18 18)"
               ></circle>
             </svg>
@@ -554,14 +562,14 @@
             <div class="log-entry mb-3">
               <div class="d-flex justify-content-between mb-1">
                 <span class="fw-bold small">{{ log.author }}</span>
-                <span class="text-muted small">{{ formatTime(log.timestamp) }}</span>
+                <span class="text-muted small">{{
+                  formatTime(log.timestamp)
+                }}</span>
               </div>
               <p class="mb-0 small">{{ log.message }}</p>
             </div>
             } @empty {
-            <div class="text-center text-muted small py-3">
-              No log entries
-            </div>
+            <div class="text-center text-muted small py-3">No log entries</div>
             }
           </div>
           <div class="secure-log-input">

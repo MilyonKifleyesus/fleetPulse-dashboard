@@ -34,7 +34,6 @@
         "@schematics/angularervice": {
           "skipTests": true
         }
-
       },
       "root": "",
       "sourceRoot": "src",
@@ -46,23 +45,49 @@
             "outputPath": "dist/spruha",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js","@angular/localize/init"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/",
+                "ignore": [
+                  "**/icon-fonts/**/*.svg",
+                  "**/icon-fonts/**/*.js",
+                  "**/icon-fonts/**/*.json",
+                  "**/icon-fonts/**/*.md",
+                  "**/icon-fonts/**/*.html",
+                  "**/icon-fonts/**/*.yaml",
+                  "**/icon-fonts/**/*.yml",
+                  "**/icon-fonts/**/package.json",
+                  "**/icon-fonts/**/package-lock.json",
+                  "**/icon-fonts/**/bower.json",
+                  "**/icon-fonts/**/webpack.config.js",
+                  "**/icon-fonts/**/svgo.config.js",
+                  "**/icon-fonts/**/README.md",
+                  "**/icon-fonts/**/LICENSE",
+                  "**/icon-fonts/**/npm",
+                  "**/icon-fonts/**/iconjar/**",
+                  "**/icon-fonts/**/src/**",
+                  "**/icon-fonts/**/dist/**",
+                  "**/icon-fonts/**/collection/**",
+                  "**/icon-fonts/boxicons/svg/**",
+                  "**/icon-fonts/tabler-icons/**/*.js",
+                  "**/icon-fonts/tabler-icons/**/*.png"
+                ]
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               },
               "src/.htaccess"
             ],
-            "styles": [
-              "src/styles.scss",
-              "node_modules/swiper/swiper.css"
 
-            ],
+            "styles": ["src/styles.scss", "node_modules/swiper/swiper.css"],
             "scripts": []
           },
           "configurations": {
@@ -100,7 +125,28 @@
             }
           },
           "options": {
-            "hmr": false
+            "hmr": true,
+            "poll": 2000,
+            "watchOptions": {
+              "ignored": [
+                "**/public/assets/icon-fonts/**/*.svg",
+                "**/public/assets/icon-fonts/**/*.js",
+                "**/public/assets/icon-fonts/**/*.json",
+                "**/public/assets/icon-fonts/**/*.md",
+                "**/public/assets/icon-fonts/**/*.html",
+                "**/public/assets/icon-fonts/**/package.json",
+                "**/public/assets/icon-fonts/**/package-lock.json",
+                "**/public/assets/icon-fonts/**/src/**",
+                "**/public/assets/icon-fonts/**/dist/**",
+                "**/public/assets/icon-fonts/**/collection/**",
+                "**/public/assets/icon-fonts/boxicons/svg/**",
+                "**/public/assets/icon-fonts/tabler-icons/**/*.js",
+                "**/public/assets/icon-fonts/tabler-icons/**/*.png",
+                "**/node_modules/**",
+                "**/dist/**",
+                "**/.git/**"
+              ]
+            }
           },
           "defaultConfiguration": "development"
         },
@@ -110,24 +156,23 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               },
               "src/.htaccess"
             ],
-            "styles": [
-              "src/styles.scss",
-              "node_modules/swiper/swiper.css"
-
-            ],
+            "styles": ["src/styles.scss", "node_modules/swiper/swiper.css"],
             "scripts": []
           }
         }

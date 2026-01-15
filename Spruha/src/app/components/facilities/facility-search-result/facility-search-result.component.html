@@ -27,7 +27,8 @@
         cdkDrag
         [cdkDragData]="bus"
         cdkDragPreviewContainer="global"
-        [style.--busImg]="'url(' + busImageUrl + ')'"
+        [style.background-image]="'url(' + busImageUrl + ')'"
+        style="background-size: cover; background-position: center;"
       >
         <div class="bus-top">
           <div class="bus-badge">{{ bus.label }}</div>
