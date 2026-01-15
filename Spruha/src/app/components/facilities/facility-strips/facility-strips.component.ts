@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
@@ -24,6 +24,7 @@ type StatusSegment = { label: StatusLabel; pct: number };
   imports: [CommonModule, FormsModule, SpkChartjs2Component],
   templateUrl: './facility-strips.component.html',
   styleUrl: './facility-strips.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacilityStripsComponent {
   @Input({ required: true }) facilities: readonly FacilityConfig[] = [];
@@ -34,6 +35,15 @@ export class FacilityStripsComponent {
 
   // which field is currently in "edit" mode
   editing: { facilityId: FacilityId; field: EditableFieldKey } | null = null;
+
+  // ---- Chart data caching per facility ----
+  private busModelChartCache = new Map<FacilityId, ChartConfiguration['data']>();
+  private statusChartCache = new Map<FacilityId, ChartConfiguration['data']>();
+  private lastBusModelBreakdown = new Map<FacilityId, string>();
+  private lastStatusBreakdown = new Map<FacilityId, string>();
+  
+  // Track when to clear cache
+  private boardUpdateCounter = 0;
 
   // ---- chart config for the doughnut charts ----
   readonly doughnutType: ChartType = 'doughnut';
@@ -99,8 +109,20 @@ export class FacilityStripsComponent {
 
   constructor(
     private fleet: FleetService,
-    private facilityMeta: FacilityMetaService
+    private facilityMeta: FacilityMetaService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  /** Public method for parent component to call when board data changes */
+  onBoardDataChanged(): void {
+    // Clear cache when board data changes
+    this.busModelChartCache.clear();
+    this.statusChartCache.clear();
+    this.lastBusModelBreakdown.clear();
+    this.lastStatusBreakdown.clear();
+    // Trigger change detection so templates re-evaluate
+    this.cdr.markForCheck();
+  }
 
   get isAllView(): boolean {
     return this.selectedFacilityId === this.allFacilitiesId;
@@ -151,10 +173,17 @@ export class FacilityStripsComponent {
 
   // ---- chart data builders ----
 
-  // Bus Models doughnut
+  // Bus Models doughnut - MEMOIZED to prevent unnecessary re-renders
   busModelChartData(fid: FacilityId): ChartConfiguration['data'] {
     const breakdown = this.dummyModelBreakdown(fid);
-    return {
+    const breakdownHash = JSON.stringify(breakdown);
+    
+    // Return cached data if breakdown hasn't changed
+    if (this.lastBusModelBreakdown.get(fid) === breakdownHash && this.busModelChartCache.has(fid)) {
+      return this.busModelChartCache.get(fid)!;
+    }
+
+    const chartData: ChartConfiguration['data'] = {
       labels: breakdown.map((m) => m.label),
       datasets: [
         {
@@ -167,12 +196,25 @@ export class FacilityStripsComponent {
         },
       ],
     };
+
+    // Cache the result
+    this.busModelChartCache.set(fid, chartData);
+    this.lastBusModelBreakdown.set(fid, breakdownHash);
+    
+    return chartData;
   }
 
-  // Status of Buses doughnut
+  // Status of Buses doughnut - MEMOIZED to prevent unnecessary re-renders
   statusChartData(fid: FacilityId): ChartConfiguration['data'] {
     const breakdown = this.statusBreakdown(fid);
-    return {
+    const breakdownHash = JSON.stringify(breakdown);
+    
+    // Return cached data if breakdown hasn't changed
+    if (this.lastStatusBreakdown.get(fid) === breakdownHash && this.statusChartCache.has(fid)) {
+      return this.statusChartCache.get(fid)!;
+    }
+
+    const chartData: ChartConfiguration['data'] = {
       labels: breakdown.map((s) => s.label),
       datasets: [
         {
@@ -185,6 +227,12 @@ export class FacilityStripsComponent {
         },
       ],
     };
+
+    // Cache the result
+    this.statusChartCache.set(fid, chartData);
+    this.lastStatusBreakdown.set(fid, breakdownHash);
+    
+    return chartData;
   }
 
   // ---- editing helpers ----
