@@ -14,6 +14,7 @@ import { FacilityButtonsComponent } from '../facilities/facility-buttons/facilit
 import { FacilitySearchResultComponent } from '../facilities/facility-search-result/facility-search-result.component';
 import { FacilityColumnsComponent, FacilityColumnVm } from '../facilities/facility-columns/facility-columns.component';
 import { FacilityBayComponent } from '../facilities/facility-bay/facility-bay.component';
+import { SharedModule } from '../../shared/shared.module';
 
 type Facility = FacilityConfig;
 type BayModalMode = 'internal_select';
@@ -28,6 +29,7 @@ type SelectedId = FacilityId | '__ALL__';
     CommonModule,
     DragDropModule,
     FormsModule,
+    SharedModule,
     BusSnapshotComponent,
     FacilityStripsComponent,
     FacilitySearchComponent,

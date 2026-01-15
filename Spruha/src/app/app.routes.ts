@@ -7,7 +7,6 @@ import { Authen_Routes, Message_Routes } from './shared/routes/content.routes';
 import { ContentLayoutComponent } from './shared/layouts/content-layout/content-layout.component';
 import { LandingpageLayoutComponent } from './shared/layouts/landingpage-layout/landingpage-layout.component';
 import { landing } from './shared/routes/landingpage';
-import { VehicleManagementComponent } from './components/vehicle-management/vehicle-management.component';
 
 export const App_Route: Route[] = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -23,5 +22,4 @@ export const App_Route: Route[] = [
 
   { path: '', component: ContentLayoutComponent, children: Authen_Routes },
   { path: '', component: LandingpageLayoutComponent, children: landing },
-  { path: 'vehicle-management', component: VehicleManagementComponent },
 ];

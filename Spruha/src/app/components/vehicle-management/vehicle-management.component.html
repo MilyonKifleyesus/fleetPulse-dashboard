@@ -1,9 +1,10 @@
-<div class="page">
-  <header class="header">
-    <h1 class="title">{{ title }}</h1>
-    <div class="subtitle">{{ subtitle }}</div>
-  </header>
+<app-page-header
+  [title]="'Fleet Pulse'"
+  [title1]="['Vehicle Management']"
+  [activeitem]="'Vehicle Management Dashboard'"
+></app-page-header>
 
+<div class="page">
   <div class="content-wrap">
     <div class="layout layout--vertical">
       <section class="facilities-row">

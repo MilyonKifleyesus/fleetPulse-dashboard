@@ -166,6 +166,13 @@ export const content: Routes = [
             '../../../app/components/Forms/form-editor/form-editor.routes'
           ).then((r) => r.formeditorRoutingModule),
       },
+      {
+        path: 'vehicle-management',
+        loadComponent: () =>
+          import('../../../app/components/vehicle-management/vehicle-management.component').then(
+            (m) => m.VehicleManagementComponent
+          ),
+      },
 
       //    {
       //     path: '',
