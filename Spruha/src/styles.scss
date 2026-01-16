@@ -444,3 +444,17 @@ ul.productdetails {
 .spin {
   animation: spin 1s linear infinite;
 }
+
+/* Ensure drag preview has transparent background for PNG buses */
+.cdk-drag-preview {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.cdk-drag-preview .bus--img {
+  background-color: transparent !important;
+}
+
+.cdk-drag-preview .bus-image {
+  background-color: transparent !important;
+}
