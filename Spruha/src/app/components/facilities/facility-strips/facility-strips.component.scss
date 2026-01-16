@@ -1,3 +1,13 @@
+:host {
+  --fs-text: #0b0b0b;
+  --fs-text-muted: rgba(0, 0, 0, 0.7);
+  --fs-card-bg: #ffffff;
+  --fs-card-bg-strong: #f1f3f7;
+  --fs-border: rgba(0, 0, 0, 0.12);
+  --fs-accent-bg: rgba(0, 0, 0, 0.06);
+  --fs-input-bg: rgba(0, 0, 0, 0.05);
+}
+
 .facility-strips {
   margin: 10px 0 16px;
   display: flex;
@@ -6,10 +16,11 @@
 }
 
 .strip-card {
-  background: #3b403d;
+  background: var(--fs-card-bg);
   border-radius: 12px;
   padding: 10px 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: background-color 220ms ease, box-shadow 220ms ease;
 }
 
 .strip-header {
@@ -21,7 +32,8 @@
 .strip-title {
   font-weight: 800;
   font-size: 14px;
-  color: #fff;
+  color: var(--fs-text);
+  transition: color 220ms ease;
 }
 
 .strip-tag {
@@ -29,14 +41,17 @@
   font-size: 11px;
   padding: 2px 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--fs-accent-bg);
+  color: var(--fs-text-muted);
+  transition: color 220ms ease, background-color 220ms ease;
 }
 
 .strip-sub {
   margin-top: 2px;
   font-size: 12px;
   opacity: 0.85;
-  color: #fff;
+  color: var(--fs-text-muted);
+  transition: color 220ms ease;
 }
 
 .strip-grid {
@@ -73,7 +88,8 @@
 
 .label {
   font-weight: 600;
-  color: #fff;
+  color: var(--fs-text);
+  transition: color 220ms ease;
 }
 
 .value {
@@ -81,7 +97,8 @@
   flex-wrap: wrap;
   gap: 4px 8px;
   opacity: 0.9;
-  color: #fff;
+  color: var(--fs-text-muted);
+  transition: color 220ms ease;
 }
 
 .value--edit {
@@ -90,10 +107,11 @@
     max-width: 220px;
     padding: 4px 6px;
     border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(0, 0, 0, 0.3);
-    color: #fff;
+    border: 1px solid var(--fs-border);
+    background: var(--fs-input-bg);
+    color: var(--fs-text);
     font-size: 12px;
+    transition: color 220ms ease, background-color 220ms ease, border-color 220ms ease;
 
     &:not(:last-child) {
       margin-bottom: 4px;
@@ -103,16 +121,17 @@
 
 .mini-btn {
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--fs-border);
   background: transparent;
-  color: #fff;
+  color: var(--fs-text);
   font-size: 11px;
   padding: 3px 8px;
   cursor: pointer;
   white-space: nowrap;
+  transition: color 220ms ease, background-color 220ms ease, border-color 220ms ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--fs-accent-bg);
   }
 }
 
@@ -135,21 +154,23 @@
 .metrics-row {
   margin-top: 12px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--fs-border);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  transition: border-color 220ms ease;
 }
 
 .metric-card {
-  background: #2c3236;
+  background: var(--fs-card-bg-strong);
   border-radius: 10px;
   padding: 12px 14px 10px;
   font-size: 11px;
-  color: #fff;
+  color: var(--fs-text);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: color 220ms ease, background-color 220ms ease;
 }
 
 .metric-label {
@@ -175,7 +196,8 @@
   flex-direction: column;
   gap: 2px;
   opacity: 0.85;
-  color: #fff;
+  color: var(--fs-text-muted);
+  transition: color 220ms ease;
 }
 
 @media (max-width: 900px) {
@@ -190,4 +212,14 @@
   .metrics-row {
     grid-template-columns: 1fr;
   }
+}
+
+:host-context([data-theme-mode="dark"]) {
+  --fs-text: #f3f5f7;
+  --fs-text-muted: rgba(255, 255, 255, 0.75);
+  --fs-card-bg: #323256;
+  --fs-card-bg-strong: #2a2f4a;
+  --fs-border: rgba(255, 255, 255, 0.18);
+  --fs-accent-bg: rgba(255, 255, 255, 0.08);
+  --fs-input-bg: rgba(0, 0, 0, 0.35);
 }

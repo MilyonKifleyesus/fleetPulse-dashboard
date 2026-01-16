@@ -1,8 +1,41 @@
+:host {
+  --vm-text: #0b0b0b;
+  --vm-text-muted: rgba(0, 0, 0, 0.6);
+  --vm-text-subtle: rgba(0, 0, 0, 0.65);
+  --vm-text-strong: rgba(0, 0, 0, 0.9);
+  --vm-text-on-dark: #ffffff;
+  --vm-card-bg: var(--custom-white);
+}
+
+// Typography (match facility dashboard)
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.card-title,
+.main-content-label,
+.sidebar-title,
+.board-title {
+  font-family: var(--fleet-font-display, "Rajdhani", sans-serif);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+p,
+span,
+div,
+td,
+th {
+  font-family: var(--fleet-font-body, "Inter", sans-serif);
+}
+
 .page {
   min-height: 100vh;
   padding: clamp(16px, 3vw, 40px) clamp(12px, 4vw, 50px) clamp(20px, 5vw, 60px);
   background: #ffffff;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: var(--fleet-font-body, "Inter", sans-serif);
 }
 
 .header {
@@ -13,14 +46,46 @@
   margin: 0;
   font-size: 48px;
   font-weight: 900;
-  color: #0b0b0b;
+  color: var(--vm-text);
 }
 
 .subtitle {
   margin-top: 10px;
   font-size: 20px;
   font-weight: 800;
-  color: #2b2b2b;
+  color: var(--vm-text-subtle);
+}
+
+.page,
+.sidebar-card,
+.board-shell,
+.search-panel,
+.fac-item,
+.search-meta,
+.bus-badge,
+.bus-top .bus-badge,
+.bus-loc,
+.bay-modal,
+.bay-x,
+.bay-select {
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.sidebar-title,
+.board-title,
+.title,
+.subtitle,
+.search-panel-header,
+.search-sub,
+.search-meta-label,
+.search-empty,
+.sidebar-hint,
+.fac-item .count,
+.bay-modal-header,
+.bay-modal-body,
+.bay-help,
+.bay-error {
+  transition: color 220ms ease;
 }
 
 /* -------- Shared width wrapper (Facilities + Board) -------- */
@@ -44,10 +109,10 @@
 
 /* -------- Facilities sidebar -------- */
 .sidebar-card {
-  border-radius: 22px;
+  border-radius: 10px;
   padding: 16px;
-  background: rgb(74, 79, 73);
-  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45);
+  background: var(--vm-card-bg);
+  box-shadow: var(--bs-box-shadow-sm);
 }
 
 .sidebar-card--search {
@@ -57,7 +122,7 @@
 }
 
 .sidebar-title {
-  color: #fff;
+  color: var(--vm-text);
   font-size: 20px;
   font-weight: 900;
   margin-bottom: 12px;
@@ -66,14 +131,14 @@
 .fac-item {
   flex: 0 0 auto;
   min-width: 220px;
-  border-radius: 14px;
+  /*border-radius: 14px;*/
   padding: 12px 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.25);
   cursor: pointer;
 
   /* CENTER CONTENT */
-  color: #fff;
+  color: var(--vm-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,9 +149,9 @@
 }
 
 .fac-item.active {
-  background: rgba(31, 139, 58, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(0, 255, 64, 0.6);
-  color: rgba(0, 255, 64, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  /*box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);*/
+  color: var(--vm-text);
 }
 
 .fac-item .name {
@@ -95,13 +160,13 @@
 
 .fac-item .count {
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--vm-text-subtle);
 }
 
 .sidebar-hint {
   margin-top: 12px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--vm-text-muted);
 }
 
 /* -------- Board wrapper (shell + title) -------- */
@@ -110,14 +175,14 @@
 }
 
 .board-shell {
-  border-radius: 22px;
+  border-radius: 10px;
   padding: 18px 18px 22px;
-  background: rgba(74, 79, 73);
-  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45);
+  /*background: rgba(74, 79, 73);*/
+  box-shadow: var(--bs-box-shadow-sm);
 }
 
 .board-title {
-  color: #ffffff;
+  color: var(--vm-text);
   font-size: 28px;
   font-weight: 900;
   margin: 6px 0 14px 6px;
@@ -169,7 +234,7 @@
   padding: 6px 10px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  color: var(--vm-text-on-dark);
   font-weight: 900;
   font-size: 14px;
 }
@@ -184,7 +249,7 @@
 .bus--placeholder {
   height: 72px;
   border-radius: 14px;
-  background: rgba(0, 255, 64, 0.18);
+  background: rgba(var(--primary-rgb), 0.18);
 }
 
 /* ===== Search results panel inside the board ===== */
@@ -195,7 +260,7 @@
   background: rgba(122, 122, 122, 0.5);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 18px 30px rgba(0, 0, 0, 0.25);
+    var(--bs-box-shadow-sm);
 }
 
 .search-panel-header {
@@ -204,7 +269,7 @@
   gap: 12px;
   align-items: baseline;
   margin-bottom: 10px;
-  color: #fff;
+  color: var(--vm-text);
 }
 
 .search-title {
@@ -215,7 +280,7 @@
 .search-sub {
   font-size: 13px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--vm-text-muted);
 }
 
 .search-dropzone {
@@ -232,7 +297,7 @@
 }
 
 .search-empty {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--vm-text-muted);
   font-weight: 800;
   font-size: 14px;
   padding: 10px 6px;
@@ -263,7 +328,7 @@
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
 
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--vm-text-strong);
   font-weight: 900;
   font-size: 13px;
 
@@ -273,7 +338,7 @@
 }
 
 .search-meta-label {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--vm-text-muted);
 }
 
 .search-meta-value {
@@ -299,7 +364,7 @@
   padding: 6px 10px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  color: var(--vm-text-on-dark);
   font-weight: 900;
   font-size: 13px;
   white-space: nowrap;
@@ -310,7 +375,7 @@
   padding: 6px 10px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.8);
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--vm-text-on-dark);
   font-weight: 900;
   font-size: 13px;
 
@@ -461,7 +526,7 @@
   border-radius: 18px;
 
   background: rgba(12, 12, 12, 0.92);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--bs-box-shadow-sm);
   border: 1px solid rgba(255, 255, 255, 0.08);
 
   opacity: 0;
@@ -482,7 +547,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 16px 12px;
-  color: #fff;
+  color: var(--vm-text);
 }
 
 .bay-modal-title {
@@ -496,18 +561,18 @@
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  color: var(--vm-text);
   cursor: pointer;
 }
 
 .bay-modal-body {
   padding: 0 16px 14px;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--vm-text-strong);
 }
 
 .bay-help {
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--vm-text-muted);
   margin-bottom: 12px;
 }
 
@@ -534,7 +599,7 @@
   border-radius: 12px;
   background: rgba(255, 60, 60, 0.12);
   border: 1px solid rgba(255, 60, 60, 0.25);
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--vm-text-strong);
   font-weight: 900;
 }
 
@@ -543,4 +608,114 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 14px 16px 16px;
+}
+
+:host-context([data-theme-mode="dark"]) {
+  --vm-text: #f3f5f7;
+  --vm-text-muted: rgba(255, 255, 255, 0.65);
+  --vm-text-subtle: rgba(255, 255, 255, 0.75);
+  --vm-text-strong: rgba(255, 255, 255, 0.92);
+  --vm-text-on-dark: #ffffff;
+  --vm-card-bg: #323256;
+
+  .sidebar-title {
+    color: #ffffff;
+  }
+  
+  .page {
+    background: #323256;
+  }
+
+  .title {
+    color: #f3f5f7;
+  }
+
+  .subtitle {
+    color: #cdd2d6;
+  }
+
+  .sidebar-card,
+  .board-shell {
+    background: var(--vm-card-bg);
+    box-shadow: var(--bs-box-shadow-sm);
+  }
+
+  .search-panel {
+    background: rgba(50, 50, 86, 0.6);
+  }
+
+  .fac-item {
+    color: #ffffff;
+  }
+
+  .fac-item.active {
+    color: #ffffff;
+  }
+
+  .fac-item .count {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .sidebar-hint {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .board-title {
+    color: #ffffff;
+  }
+
+  .search-panel-header,
+  .search-empty {
+    color: #eef1f3;
+  }
+
+  .search-sub,
+  .search-meta-label {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .search-meta {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .bus-badge,
+  .bus-top .bus-badge {
+    color: #ffffff;
+  }
+
+  .bus-loc {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .bay-modal-header {
+    color: #ffffff;
+  }
+
+  .bay-x {
+    color: #ffffff;
+  }
+
+  .bay-modal {
+    background: rgba(20, 20, 20, 0.95);
+  }
+
+  .bay-modal-body {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .bay-help {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .bay-error {
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .bay-select {
+    background: #121414;
+    color: #f2f4f5;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
 }

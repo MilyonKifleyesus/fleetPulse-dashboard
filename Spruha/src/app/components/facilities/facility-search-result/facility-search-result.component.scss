@@ -1,3 +1,16 @@
+:host {
+  --fsr-text: #0b0b0b;
+  --fsr-text-muted: rgba(0, 0, 0, 0.6);
+  --fsr-text-strong: rgba(0, 0, 0, 0.9);
+  --fsr-panel-bg: #ffffff;
+  --fsr-panel-shadow: var(--bs-box-shadow-sm);
+  --fsr-accent-bg: rgba(0, 0, 0, 0.06);
+  --fsr-accent-border: rgba(0, 0, 0, 0.12);
+  --fsr-dropzone-bg: rgba(0, 0, 0, 0.04);
+  --fsr-badge-bg: rgba(0, 0, 0, 0.8);
+  --fsr-on-dark: #ffffff;
+}
+
 .bus {
   user-select: none;
 }
@@ -48,8 +61,8 @@
   z-index: 2;
   padding: 6px 10px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  background: var(--fsr-badge-bg);
+  color: var(--fsr-on-dark);
   font-weight: 900;
   font-size: 14px;
 }
@@ -67,7 +80,7 @@
   width: 100%;
   height: 72px;
   border-radius: 14px;
-  background: rgba(0, 255, 64, 0.18);
+  background: rgba(var(--primary-rgb), 0.18);
 }
 
 
@@ -76,10 +89,10 @@
   margin: 0 0 14px;
   border-radius: 18px;
   padding: 14px;
-  background: rgba(122, 122, 122, 0.5);
+  background: var(--fsr-panel-bg);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 18px 30px rgba(0, 0, 0, 0.25);
+    inset 0 0 0 1px var(--fsr-accent-border),
+    var(--fsr-panel-shadow);
 }
 
 .search-panel-header {
@@ -88,7 +101,7 @@
   gap: 12px;
   align-items: baseline;
   margin-bottom: 10px;
-  color: #fff;
+  color: var(--fsr-text);
 }
 
 .search-title {
@@ -99,14 +112,14 @@
 .search-sub {
   font-size: 13px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--fsr-text-muted);
 }
 
 .search-dropzone {
   border-radius: 16px;
   padding: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed var(--fsr-accent-border);
+  background: var(--fsr-dropzone-bg);
   min-height: 96px;
 
   display: flex;
@@ -116,7 +129,7 @@
 }
 
 .search-empty {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--fsr-text-muted);
   font-weight: 800;
   font-size: 14px;
   padding: 10px 6px;
@@ -145,10 +158,10 @@
   padding: 6px 10px;
   border-radius: 10px;
 
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--fsr-accent-bg);
+  border: 1px solid var(--fsr-accent-border);
 
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--fsr-text-strong);
   font-weight: 900;
   font-size: 13px;
 
@@ -158,7 +171,7 @@
 }
 
 .search-meta-label {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--fsr-text-muted);
 }
 
 .search-meta-value {
@@ -183,8 +196,8 @@
   position: static;
   padding: 6px 10px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  background: var(--fsr-badge-bg);
+  color: var(--fsr-on-dark);
   font-weight: 900;
   font-size: 13px;
   white-space: nowrap;
@@ -194,8 +207,8 @@
 .bus-loc {
   padding: 6px 10px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: rgba(255, 255, 255, 0.92);
+  background: var(--fsr-badge-bg);
+  color: var(--fsr-on-dark);
   font-weight: 900;
   font-size: 13px;
 
@@ -205,4 +218,16 @@
   max-width: 140px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(6px);
+}
+
+:host-context([data-theme-mode="dark"]) {
+  --fsr-text: #f3f5f7;
+  --fsr-text-muted: rgba(255, 255, 255, 0.65);
+  --fsr-text-strong: rgba(255, 255, 255, 0.92);
+  --fsr-panel-bg: rgba(50, 50, 86, 0.6);
+  --fsr-accent-bg: rgba(255, 255, 255, 0.08);
+  --fsr-accent-border: rgba(255, 255, 255, 0.14);
+  --fsr-dropzone-bg: rgba(255, 255, 255, 0.08);
+  --fsr-badge-bg: rgba(0, 0, 0, 0.8);
+  --fsr-on-dark: #ffffff;
 }
