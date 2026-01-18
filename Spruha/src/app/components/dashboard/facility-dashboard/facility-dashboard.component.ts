@@ -6,6 +6,7 @@ import {
   computed,
   OnInit,
   AfterViewInit,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -99,6 +100,7 @@ interface CarouselItem {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './facility-dashboard.component.html',
   styleUrl: './facility-dashboard.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacilityDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef;

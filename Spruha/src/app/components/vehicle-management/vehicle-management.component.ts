@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 
@@ -42,6 +42,8 @@ type SelectedId = FacilityId | '__ALL__';
   styleUrl: './vehicle-management.component.scss',
 })
 export class VehicleManagementComponent {
+  @ViewChild(FacilityStripsComponent) facilityStrips?: FacilityStripsComponent;
+
   title = 'Fleet Pulse';
   subtitle = 'Vehicle Management Dashboard';
 
@@ -344,6 +346,11 @@ export class VehicleManagementComponent {
       event.currentIndex
     );
 
+    // Notify FacilityStrips component that board data has changed
+    if (this.facilityStrips) {
+      this.facilityStrips.onBoardDataChanged();
+    }
+
     if (this.showSearchRow) this.refreshSearch();
   }
 
@@ -406,6 +413,11 @@ export class VehicleManagementComponent {
         this.bayErrorMsg = 'That bay is not valid.';
       else this.bayErrorMsg = 'Bay number is required.';
       return;
+    }
+
+    // Notify FacilityStrips component that board data has changed
+    if (this.facilityStrips) {
+      this.facilityStrips.onBoardDataChanged();
     }
 
     if (this.showSearchRow) this.refreshSearch();

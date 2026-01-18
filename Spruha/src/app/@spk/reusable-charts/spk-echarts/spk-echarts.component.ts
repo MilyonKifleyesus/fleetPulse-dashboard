@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { NGX_ECHARTS_CONFIG, NgxEchartsModule } from 'ngx-echarts';
 import * as echarts from 'echarts';
 import type { EChartsOption } from 'echarts';
@@ -13,7 +13,8 @@ import type { EChartsOption } from 'echarts';
     },
   ],
   templateUrl: './spk-echarts.component.html',
-  styleUrl: './spk-echarts.component.scss'
+  styleUrl: './spk-echarts.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SpkEchartsComponent {
   @Input() options: EChartsOption = {};

@@ -1,6 +1,15 @@
 // Facility Dashboard Styles
 // Match facility-operations styling
 
+:host {
+  --fd-text: #0b0b0b;
+  --fd-text-muted: rgba(0, 0, 0, 0.65);
+  --fd-card-bg: #ffffff;
+  --fd-card-border: rgba(0, 0, 0, 0.08);
+  color: var(--fd-text);
+  transition: color 220ms ease;
+}
+
 // Typography
 h1,
 h2,
@@ -26,10 +35,10 @@ th {
 
 // Card consistency
 .card.custom-card {
-  background-color: var(--custom-white);
-  border: 1px solid var(--default-border);
+  background-color: var(--fd-card-bg);
+  border: 1px solid var(--fd-card-border);
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 
   &:hover {
     border-color: var(--fleet-primary-green, #5ad85a);
@@ -53,10 +62,17 @@ th {
 
 .facility-link {
   color: inherit;
-  transition: color 0.2s ease;
+  transition: color 220ms ease;
 
   &:hover {
     color: var(--fleet-primary-green, #5ad85a);
     text-decoration: underline !important;
   }
+}
+
+:host-context([data-theme-mode="dark"]) {
+  --fd-text: #f3f5f7;
+  --fd-text-muted: rgba(255, 255, 255, 0.7);
+  --fd-card-bg: #323256;
+  --fd-card-border: rgba(255, 255, 255, 0.12);
 }

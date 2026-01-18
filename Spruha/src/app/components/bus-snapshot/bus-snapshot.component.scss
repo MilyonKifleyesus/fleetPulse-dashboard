@@ -24,7 +24,7 @@
 /* modal container */
 .modal {
   width: min(980px, calc(100vw - 40px));
-  border-radius: 18px;
+  /*border-radius: 18px;*/
   background: linear-gradient(#141414, #0f0f0f);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
   overflow: hidden;
@@ -62,7 +62,7 @@
 .icon-btn {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  /*border-radius: 12px;*/
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(0, 0, 0, 0.35);
   color: #fff;
@@ -97,7 +97,7 @@
 
 .btn {
   border: none;
-  border-radius: 14px;
+  /*border-radius: 14px;*/
   padding: 12px 18px;
   font-weight: 900;
   font-size: 18px;

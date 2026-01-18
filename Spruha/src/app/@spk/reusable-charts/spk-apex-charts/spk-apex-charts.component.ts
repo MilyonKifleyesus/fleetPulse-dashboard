@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
@@ -6,7 +6,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
   standalone: true,
   imports: [NgApexchartsModule],
   templateUrl: './spk-apex-charts.component.html',
-  styleUrl: './spk-apex-charts.component.scss'
+  styleUrl: './spk-apex-charts.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SpkApexChartsComponent {
   @Input() chartOptions: any;  // Accept chart options as input

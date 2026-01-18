@@ -220,6 +220,19 @@ tag:not(:focus):not(.tag--editing):not(:active):not(.readonly):hover{
   background-color: var(--form-control-bg) !important;
   border: 1px solid var(--input-border);
 }
+
+/* Drag preview badges should stay dark like in the dropzone cards. */
+.cdk-drag-preview .bus-badge,
+.cdk-drag-preview .bus-top .bus-badge,
+.cdk-drag-preview .bus-loc {
+  background: rgba(0, 0, 0, 0.85) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cdk-drag-preview .bus-loc {
+  backdrop-filter: none !important;
+}
 .notification-basic{
   background: #ebebeb;
 }
@@ -443,4 +456,18 @@ ul.productdetails {
 
 .spin {
   animation: spin 1s linear infinite;
+}
+
+/* Ensure drag preview has transparent background for PNG buses */
+.cdk-drag-preview {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.cdk-drag-preview .bus--img {
+  background-color: transparent !important;
+}
+
+.cdk-drag-preview .bus-image {
+  background-color: transparent !important;
 }

@@ -124,9 +124,12 @@
               "buildTarget": "spruha:build:development"
             }
           },
+<<<<<<< HEAD
           "options": {
             "hmr": true
           },
+=======
+>>>>>>> 17c391fd9dba8ae5d31019c5626e574e41a13da4
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
