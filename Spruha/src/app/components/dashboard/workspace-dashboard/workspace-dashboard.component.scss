@@ -1,17 +1,35 @@
 .workspace-dashboard-container {
-  padding: 1rem;
+  padding: 0;
+  background: #f8fafc;
+  min-height: 100vh;
+  position: relative;
 
   // Typography
   h1, h2, h3, h4, h5, h6,
   .card-title {
-    font-family: var(--fleet-font-display, "Rajdhani", sans-serif);
-    font-weight: 600;
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 700;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
   .card-body,
   p, span, div {
-    font-family: var(--fleet-font-body, "Inter", sans-serif);
+    font-family: "Inter", sans-serif;
+  }
+
+  // Scanline effect for main content
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.02) 51%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
   }
 }
 

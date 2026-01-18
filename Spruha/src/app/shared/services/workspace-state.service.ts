@@ -50,6 +50,23 @@ export class WorkspaceStateService {
         if (typeof state.lastModified === 'string') {
           state.lastModified = new Date(state.lastModified);
         }
+        
+        // Validate and normalize widget sizes (ensure 1-4 constraint)
+        if (state.widgets && Array.isArray(state.widgets)) {
+          state.widgets = state.widgets.map(widget => {
+            // Ensure size constraints are respected (1-4 for both dimensions)
+            if (widget.size) {
+              widget.size.width = Math.max(1, Math.min(4, widget.size.width || 1));
+              widget.size.height = Math.max(1, Math.min(4, widget.size.height || 1));
+            }
+            if (widget.position) {
+              widget.position.columnSpan = Math.max(1, Math.min(4, widget.position.columnSpan || 1));
+              widget.position.rowSpan = Math.max(1, Math.min(4, widget.position.rowSpan || 1));
+            }
+            return widget;
+          });
+        }
+        
         this.stateSubject.next(state);
         return state;
       }

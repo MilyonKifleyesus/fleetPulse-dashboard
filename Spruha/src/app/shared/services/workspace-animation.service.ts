@@ -71,22 +71,132 @@ export class WorkspaceAnimationService {
   }
 
   /**
-   * Animate layout shift when widgets are added/removed
+   * Animate layout shift when widgets are added/removed/resized using FLIP technique
+   * FLIP: First, Last, Invert, Play
    */
   animateLayoutShift(container: HTMLElement): void {
     if (!container) return;
 
     const widgets = container.querySelectorAll('[data-widget-id]');
+    const firstPositions = new Map<string, DOMRect>();
     
-    widgets.forEach((widget, index) => {
+    // FIRST: Record initial positions
+    widgets.forEach((widget) => {
       const element = widget as HTMLElement;
-      element.style.transition = `transform ${this.animationDuration}ms ${this.easingFunction}`;
+      const widgetId = element.getAttribute('data-widget-id');
+      if (widgetId) {
+        firstPositions.set(widgetId, element.getBoundingClientRect());
+      }
+    });
+
+    // Force reflow to ensure positions are recorded
+    container.offsetHeight;
+
+    // LAST: Let CSS Grid apply new positions (happens automatically)
+    // We need to wait for the next frame to measure new positions
+    
+    requestAnimationFrame(() => {
+      widgets.forEach((widget) => {
+        const element = widget as HTMLElement;
+        const widgetId = element.getAttribute('data-widget-id');
+        if (!widgetId) return;
+
+        const first = firstPositions.get(widgetId);
+        if (!first) return;
+
+        // LAST: Get new position
+        const last = element.getBoundingClientRect();
+
+        // INVERT: Calculate the difference
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+
+        // Only animate if there's actual movement
+        if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) {
+          return;
+        }
+
+        // INVERT: Apply transform to move element back to first position
+        element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        element.style.transition = 'none';
+        element.style.willChange = 'transform';
+
+        // Force reflow
+        element.offsetHeight;
+
+        // PLAY: Animate to final position (0,0)
+        requestAnimationFrame(() => {
+          element.style.transition = `transform ${this.animationDuration}ms ${this.easingFunction}`;
+          element.style.transform = 'translate(0, 0)';
+
+          // Clean up after animation
+          setTimeout(() => {
+            element.style.transform = '';
+            element.style.transition = '';
+            element.style.willChange = '';
+          }, this.animationDuration);
+        });
+      });
+    });
+  }
+
+  /**
+   * Animate size change for a specific widget
+   */
+  animateSizeChange(element: HTMLElement): void {
+    if (!element) return;
+
+    // Record initial size
+    const first = element.getBoundingClientRect();
+
+    // Force reflow
+    element.offsetHeight;
+
+    // Let CSS Grid apply new size
+    requestAnimationFrame(() => {
+      const last = element.getBoundingClientRect();
+      const deltaWidth = first.width - last.width;
+      const deltaHeight = first.height - last.height;
+
+      // Only animate if there's actual size change
+      if (Math.abs(deltaWidth) < 1 && Math.abs(deltaHeight) < 1) {
+        return;
+      }
+
+      // Safety check: avoid division by zero or invalid dimensions
+      const safeWidth = last.width > 0 && isFinite(last.width) ? last.width : first.width || 1;
+      const safeHeight = last.height > 0 && isFinite(last.height) ? last.height : first.height || 1;
+
+      // If both dimensions are zero, skip animation
+      if (safeWidth === 0 && safeHeight === 0) {
+        return;
+      }
+
+      // INVERT: Scale element back to first size
+      const scaleX = safeWidth > 0 && isFinite(safeWidth) ? first.width / safeWidth : 1;
+      const scaleY = safeHeight > 0 && isFinite(safeHeight) ? first.height / safeHeight : 1;
       
-      // Trigger reflow
+      element.style.transformOrigin = 'top left';
+      element.style.transform = `scale(${scaleX}, ${scaleY})`;
+      element.style.transition = 'none';
+      element.style.willChange = 'transform';
+
+      // Force reflow
       element.offsetHeight;
-      
-      // The actual position will be set by CSS Grid
-      // This ensures smooth transition
+
+      // PLAY: Animate to final size
+      requestAnimationFrame(() => {
+        element.style.transition = `transform ${this.animationDuration}ms ${this.easingFunction}`;
+        element.style.transform = 'scale(1, 1)';
+
+        // Clean up after animation
+        setTimeout(() => {
+          element.style.transform = '';
+          element.style.transition = '';
+          element.style.willChange = '';
+          element.style.transformOrigin = '';
+        }, this.animationDuration);
+      });
     });
   }
 

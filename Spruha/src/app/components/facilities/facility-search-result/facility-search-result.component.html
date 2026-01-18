@@ -27,7 +27,7 @@
         cdkDrag
         [cdkDragData]="bus"
         cdkDragPreviewContainer="global"
-        [style.background-image]="'url(' + busImageUrl + ')'"
+        [style.background-image]="'url(\'' + busImageUrl + '\')'"
         style="background-size: cover; background-position: center;"
       >
         <div class="bus-top">
@@ -48,7 +48,7 @@
         <ng-template cdkDragPreview>
           <div
             class="bus bus--img bus--preview"
-            [style.background-image]="'url(' + busImageUrl + ')'"
+            [style.background-image]="'url(\'' + busImageUrl + '\')'"
             style="background-size: cover; background-position: center;"
           >
             <div class="bus-top">

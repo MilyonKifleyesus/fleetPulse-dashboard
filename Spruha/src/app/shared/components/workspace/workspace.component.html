@@ -7,7 +7,7 @@
   cdkDropList
   (cdkDropListDropped)="onWidgetDrop($event)"
 >
-  @for (widget of displayedWidgets; track widget.id) {
+  @for (widget of filteredWidgets; track widget.id) {
   <app-widget-frame
     [widget]="widget"
     [gridColumns]="currentLayout.columns"
@@ -19,6 +19,7 @@
     cdkDrag
     [cdkDragDisabled]="!isEditMode"
   >
+    <!-- Content is projected here - widget-frame will find its content by data-widget-id -->
     <ng-content></ng-content>
   </app-widget-frame>
   }

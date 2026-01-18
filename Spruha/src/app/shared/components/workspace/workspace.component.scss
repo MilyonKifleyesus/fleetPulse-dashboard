@@ -2,12 +2,52 @@
   display: grid;
   width: 100%;
   min-height: 400px;
-  padding: 1rem;
+  padding: 1.5rem;
   position: relative;
-  transition: grid-template-columns 0.3s ease, gap 0.3s ease;
+  background: #f8fafc;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              gap 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background-image 0.5s ease;
+  gap: 1.5rem;
+  // Ensure grid doesn't overflow viewport
+  max-width: 100%; // Use percentage instead of 100vw to avoid scrollbar issues
+  overflow-x: hidden; // Prevent horizontal overflow
+  overflow-y: auto; // Allow vertical scrolling if content exceeds viewport
+  box-sizing: border-box;
+  // Prevent grid items from overflowing
+  contain: layout;
+  // Ensure grid container respects viewport
+  width: 100%;
+  min-width: 0; // Allow grid to shrink below content size
+
+  // Scanline effect
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.02) 51%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  // Enable smooth transitions for grid-area changes
+  > * {
+    transition: grid-area 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, grid-area;
+  }
 
   &.edit-mode {
     // Show grid overlay in edit mode
+    background-image: 
+      linear-gradient(to right, #cbd5e1 1px, transparent 1px),
+      linear-gradient(to bottom, #cbd5e1 1px, transparent 1px);
+    background-size: 30px 30px;
+    
     &::before {
       content: '';
       position: absolute;
@@ -15,12 +55,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: 
-        linear-gradient(to right, var(--default-border) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--default-border) 1px, transparent 1px);
-      background-size: calc((100% - var(--gap) * (var(--columns) - 1)) / var(--columns)) var(--gap);
       pointer-events: none;
-      opacity: 0.3;
       z-index: 0;
     }
   }
@@ -29,10 +64,30 @@
 // CDK Drag styles
 .cdk-drag-preview {
   box-sizing: border-box;
-  border-radius: var(--default-radius);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  opacity: 0.8;
-  z-index: 1000;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(16, 185, 129, 0.5) !important;
+  opacity: 0.95;
+  z-index: 1000 !important;
+  transform: rotate(1deg) scale(1.02);
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid #10b981 !important;
+  cursor: grabbing !important;
+  pointer-events: none;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 2px dashed #10b981 !important;
+  border-radius: 12px;
+}
+
+.cdk-drag-animating {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.workspace-grid.cdk-drop-list-dragging .widget-frame:not(.cdk-drag-placeholder) {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cdk-drag-placeholder {
@@ -44,16 +99,49 @@
 
 .cdk-drag-animating {
   transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 .workspace-grid.cdk-drop-list-dragging .widget-frame:not(.cdk-drag-placeholder) {
   transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+// Smooth transitions for widget position changes
+.widget-frame {
+  transition: grid-area 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, grid-area;
+
+  // Optimize for layout shifts
+  &.layout-shifting {
+    will-change: transform, grid-area;
+  }
 }
 
 // Responsive adjustments
+// Note: grid-template-columns is set dynamically via [style.grid-template-columns]
+// These media queries provide fallback but don't override dynamic calculation
 @media (max-width: 768px) {
   .workspace-grid {
-    padding: 0.5rem;
+    padding: 0.75rem;
+    gap: 1rem;
+    // Grid columns calculated dynamically by calculateLayout()
+    // Widgets auto-wrap to new rows via autoArrangeWidgets()
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .workspace-grid {
+    // Grid columns calculated dynamically by calculateLayout()
+    // Widgets auto-wrap to new rows via autoArrangeWidgets()
+  }
+}
+
+@media (min-width: 1025px) {
+  .workspace-grid {
+    // Grid columns calculated dynamically by calculateLayout()
+    // Defaults to 12 columns on large screens
   }
 }
 

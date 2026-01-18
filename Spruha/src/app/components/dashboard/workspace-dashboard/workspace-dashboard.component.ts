@@ -108,14 +108,37 @@ export class WorkspaceDashboardComponent implements OnInit, OnDestroy {
     private modeService: WorkspaceModeService,
     private widgetRegistry: WidgetRegistryService,
     private datePipe: DatePipe
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     // Load workspace state
     const savedState = this.stateService.loadWorkspaceState(this.workspaceId);
 
     if (savedState && savedState.widgets.length > 0) {
-      this.widgets = savedState.widgets;
+      // Normalize widget sizes to ensure they're within 1-4 range
+      this.widgets = savedState.widgets.map((widget) => ({
+        ...widget,
+        isMaximized: false, // Reset maximize state on load to prevent floating widgets
+        isMinimized: widget.isMinimized || false, // Keep minimized state
+        size: {
+          width: Math.max(
+            1,
+            Math.min(4, widget.size?.width || widget.position?.columnSpan || 1)
+          ),
+          height: Math.max(
+            1,
+            Math.min(4, widget.size?.height || widget.position?.rowSpan || 1)
+          ),
+        },
+        position: {
+          ...widget.position,
+          columnSpan: Math.max(
+            1,
+            Math.min(4, widget.position?.columnSpan || 1)
+          ),
+          rowSpan: Math.max(1, Math.min(4, widget.position?.rowSpan || 1)),
+        },
+      }));
     } else {
       // Initialize with default widgets
       this.initializeDefaultWidgets();
@@ -195,8 +218,8 @@ export class WorkspaceDashboardComponent implements OnInit, OnDestroy {
         type: 'chart-widget',
         title: 'Fleet Utilization',
         icon: 'fe fe-bar-chart-2',
-        position: { column: 1, row: 3, columnSpan: 8, rowSpan: 4 },
-        size: { width: 8, height: 4 },
+        position: { column: 1, row: 3, columnSpan: 4, rowSpan: 4 },
+        size: { width: 4, height: 4 },
         isMinimized: false,
         isMaximized: false,
         config: { chartType: 'utilization' },
@@ -219,8 +242,8 @@ export class WorkspaceDashboardComponent implements OnInit, OnDestroy {
         type: 'table-widget',
         title: 'Vehicles Requiring Maintenance',
         icon: 'fe fe-list',
-        position: { column: 1, row: 7, columnSpan: 12, rowSpan: 5 },
-        size: { width: 12, height: 5 },
+        position: { column: 1, row: 7, columnSpan: 4, rowSpan: 4 },
+        size: { width: 4, height: 4 },
         isMinimized: false,
         isMaximized: false,
         config: {},
@@ -287,7 +310,7 @@ export class WorkspaceDashboardComponent implements OnInit, OnDestroy {
     const avgHealthScore =
       this.vehicles.length > 0
         ? this.vehicles.reduce((sum, v) => sum + (v.healthScore || 0), 0) /
-        this.vehicles.length
+          this.vehicles.length
         : 0;
 
     const totalTrend = this.dashboardStats?.totalFleetUnitsTrend || 0;

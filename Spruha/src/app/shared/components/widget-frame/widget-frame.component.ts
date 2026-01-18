@@ -5,25 +5,28 @@ import {
   EventEmitter,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ElementRef,
   ViewChild,
   HostBinding,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WidgetFrame, GridPosition } from '../../models/workspace.interface';
 import { WorkspaceModeService } from '../../services/workspace-mode.service';
 import { WorkspaceAnimationService } from '../../services/workspace-animation.service';
+import { WidgetSettingsPopupComponent } from '../widget-settings-popup/widget-settings-popup.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-widget-frame',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WidgetSettingsPopupComponent],
   templateUrl: './widget-frame.component.html',
   styleUrl: './widget-frame.component.scss',
 })
-export class WidgetFrameComponent implements OnInit, OnDestroy {
+export class WidgetFrameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() widget!: WidgetFrame;
   @Input() gridColumns: number = 12;
   @Output() resize = new EventEmitter<{
@@ -38,27 +41,58 @@ export class WidgetFrameComponent implements OnInit, OnDestroy {
   @ViewChild('frameElement', { static: false })
   frameElement!: ElementRef<HTMLElement>;
 
+  ngAfterViewInit(): void {
+    // Ensure data-widget-id is set after view init
+    if (this.frameElement?.nativeElement && this.widget?.id) {
+      this.frameElement.nativeElement.setAttribute(
+        'data-widget-id',
+        this.widget.id
+      );
+    }
+  }
+
   @HostBinding('style.grid-area') get gridAreaStyle(): string {
+    // Don't apply grid-area when maximized - it conflicts with fixed positioning
+    if (this.widget?.isMaximized) {
+      return '';
+    }
     return this.gridArea;
   }
 
   @HostBinding('attr.data-widget-id') get widgetId(): string {
-    return this.widget.id;
+    return this.widget?.id || '';
+  }
+
+  @HostBinding('attr.id') get widgetElementId(): string {
+    return `widget-frame-${this.widget?.id || ''}`;
   }
 
   isEditMode = false;
   isResizing = false;
+  isSettingsPopupOpen = false;
   private destroy$ = new Subject<void>();
 
   constructor(
     private modeService: WorkspaceModeService,
-    private animationService: WorkspaceAnimationService
+    private animationService: WorkspaceAnimationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.modeService.mode$.pipe(takeUntil(this.destroy$)).subscribe((mode) => {
       this.isEditMode = mode === 'edit';
+      if (!this.isEditMode) {
+        this.isSettingsPopupOpen = false; // Close popup when exiting edit mode
+      }
     });
+
+    // Set widget ID as data attribute for CSS/JS targeting
+    if (this.frameElement?.nativeElement && this.widget?.id) {
+      this.frameElement.nativeElement.setAttribute(
+        'data-widget-id',
+        this.widget.id
+      );
+    }
   }
 
   ngOnDestroy(): void {
@@ -86,7 +120,39 @@ export class WidgetFrameComponent implements OnInit, OnDestroy {
   }
 
   onSettings(): void {
+    // If not in edit mode, transition to edit mode first
+    if (!this.isEditMode) {
+      this.modeService.setMode('edit');
+      // Wait for edit mode to activate before opening popup
+      setTimeout(() => {
+        this.isSettingsPopupOpen = true;
+        this.cdr.detectChanges();
+      }, 0);
+    } else {
+      // Toggle popup visibility in edit mode
+      this.isSettingsPopupOpen = !this.isSettingsPopupOpen;
+      this.cdr.detectChanges();
+    }
+
+    // Always emit settings event for parent component awareness
     this.settings.emit(this.widget.id);
+  }
+
+  onSettingsSizeChange(event: { columnSpan: number; rowSpan: number }): void {
+    this.resize.emit({
+      id: this.widget.id,
+      size: event,
+    });
+  }
+
+  onSettingsDelete(): void {
+    this.onDelete();
+  }
+
+  onSettingsClose(): void {
+    this.isSettingsPopupOpen = false;
+    // State is automatically saved by workspace component after any change
+    // This ensures layout memory persists after closing settings popup
   }
 
   onResizeStart(
@@ -168,5 +234,43 @@ export class WidgetFrameComponent implements OnInit, OnDestroy {
     return `${this.widget.position.row} / ${this.widget.position.column} / ${
       this.widget.position.row + this.widget.position.rowSpan
     } / ${this.widget.position.column + this.widget.position.columnSpan}`;
+  }
+
+  getIconName(): string {
+    if (!this.widget?.icon) return 'dashboard';
+
+    // Map widget icons to Material Symbols
+    const iconMap: Record<string, string> = {
+      'fe fe-box': 'dashboard',
+      'fe fe-bar-chart': 'bar_chart',
+      'fe fe-bar-chart-2': 'bar_chart',
+      'fe fe-trending-up': 'trending_up',
+      'fe fe-users': 'people',
+      'fe fe-truck': 'local_shipping',
+      'fe fe-wrench': 'build',
+      'fe fe-dollar-sign': 'attach_money',
+      'fe fe-home': 'home',
+      'fe fe-activity': 'activity',
+      'fe fe-pie-chart': 'pie_chart',
+      'fe fe-layers': 'layers',
+      'fe fe-list': 'list',
+    };
+
+    // Try to find mapped icon
+    const mappedIcon = iconMap[this.widget.icon];
+    if (mappedIcon) return mappedIcon;
+
+    // If widget has an icon property that's not a class, try to use it directly
+    if (this.widget.icon && !this.widget.icon.startsWith('fe')) {
+      return this.widget.icon;
+    }
+
+    // Default icon based on widget type
+    if (this.widget.type === 'metric-card') return 'dashboard';
+    if (this.widget.type === 'chart-widget') return 'bar_chart';
+    if (this.widget.type === 'activity-feed') return 'activity';
+    if (this.widget.type === 'table-widget') return 'list';
+
+    return 'dashboard';
   }
 }

@@ -1,0 +1,66 @@
+@if (isOpen) {
+<div class="widget-settings-popup-backdrop" (click)="onClose()"></div>
+<div
+  #popup
+  class="widget-settings-popup"
+  [style.top]="popupStyle.top"
+  [style.left]="popupStyle.left"
+  [style.transform]="popupStyle.transform"
+  (click)="$event.stopPropagation()"
+>
+  <div class="popup-header">
+    <button
+      type="button"
+      class="popup-action-btn delete-btn"
+      (click)="onDelete(); $event.stopPropagation()"
+      title="Delete Widget"
+      aria-label="Delete widget"
+    >
+      <span class="material-symbols-outlined">delete</span>
+    </button>
+    <button
+      type="button"
+      class="popup-action-btn close-btn"
+      (click)="onClose(); $event.stopPropagation()"
+      title="Close"
+      aria-label="Close"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div class="popup-controls">
+    <div class="control-group">
+      <span class="control-label">Width</span>
+      <div class="pill-group">
+        @for (width of [1, 2, 3, 4]; track width) {
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="isWidthActive(width)"
+          (click)="onWidthChange(width); $event.stopPropagation()"
+        >
+          {{ width }}
+        </button>
+        }
+      </div>
+    </div>
+
+    <div class="control-group">
+      <span class="control-label">Height</span>
+      <div class="pill-group">
+        @for (height of [1, 2, 3, 4]; track height) {
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="isHeightActive(height)"
+          (click)="onHeightChange(height); $event.stopPropagation()"
+        >
+          {{ height }}
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+}

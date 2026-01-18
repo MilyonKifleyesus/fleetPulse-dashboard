@@ -125,28 +125,7 @@
             }
           },
           "options": {
-            "hmr": true,
-            "poll": 2000,
-            "watchOptions": {
-              "ignored": [
-                "**/public/assets/icon-fonts/**/*.svg",
-                "**/public/assets/icon-fonts/**/*.js",
-                "**/public/assets/icon-fonts/**/*.json",
-                "**/public/assets/icon-fonts/**/*.md",
-                "**/public/assets/icon-fonts/**/*.html",
-                "**/public/assets/icon-fonts/**/package.json",
-                "**/public/assets/icon-fonts/**/package-lock.json",
-                "**/public/assets/icon-fonts/**/src/**",
-                "**/public/assets/icon-fonts/**/dist/**",
-                "**/public/assets/icon-fonts/**/collection/**",
-                "**/public/assets/icon-fonts/boxicons/svg/**",
-                "**/public/assets/icon-fonts/tabler-icons/**/*.js",
-                "**/public/assets/icon-fonts/tabler-icons/**/*.png",
-                "**/node_modules/**",
-                "**/dist/**",
-                "**/.git/**"
-              ]
-            }
+            "hmr": true
           },
           "defaultConfiguration": "development"
         },
