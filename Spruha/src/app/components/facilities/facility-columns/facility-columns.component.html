@@ -9,12 +9,7 @@
       </div>
 
       <div class="dropzone" cdkDropList [id]="col.dropListId" [cdkDropListData]="col.buses" [cdkDropListConnectedTo]="connectedDropListIds" (cdkDropListDropped)="onDrop(col.id, $event)">
-<<<<<<< HEAD
         <div class="bus bus--img" *ngFor="let bus of col.buses; trackBy: trackByBusId" cdkDrag [cdkDragData]="bus" cdkDragPreviewContainer="global" (dblclick)="onOpenSnapshot(bus, col.label)" [style.background-image]="'url(\'' + busImageUrl + '\')'" style="background-size: cover; background-position: center;">
-=======
-        <div class="bus bus--img" *ngFor="let bus of col.buses; trackBy: trackByBusId" cdkDrag [cdkDragData]="bus" cdkDragPreviewContainer="global" (dblclick)="onOpenSnapshot(bus, col.label)" [style.background-image]="'url(' + busImageUrl + ')'">
-          <img class="bus-image" [src]="busImageUrl" alt="" aria-hidden="true" />
->>>>>>> 17c391fd9dba8ae5d31019c5626e574e41a13da4
           <div class="bus-top">
             <div class="bus-badge">{{ bus.label }}</div>
 
@@ -28,12 +23,7 @@
           </ng-template>
 
           <ng-template cdkDragPreview>
-<<<<<<< HEAD
             <div class="bus bus--img bus--preview" [style.background-image]="'url(\'' + busImageUrl + '\')'" style="background-size: cover; background-position: center;">
-=======
-            <div class="bus bus--img bus--preview" [style.background-image]="'url(' + busImageUrl + ')'">
-              <img class="bus-image" [src]="busImageUrl" alt="" aria-hidden="true" />
->>>>>>> 17c391fd9dba8ae5d31019c5626e574e41a13da4
               <div class="bus-top">
                 <div class="bus-badge">{{ bus.label }}</div>
                 <div class="bus-loc" *ngIf="bus.bay != null && col.id !== 'third_party'">

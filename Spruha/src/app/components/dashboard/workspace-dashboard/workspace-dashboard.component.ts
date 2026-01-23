@@ -620,4 +620,44 @@ export class WorkspaceDashboardComponent implements OnInit, OnDestroy {
   get modeServiceInstance(): WorkspaceModeService {
     return this.modeService;
   }
+
+  /**
+   * Reset workspace to factory/default settings
+   */
+  resetToFactory(): void {
+    const confirmed = confirm(
+      'Are you sure you want to reset the dashboard to factory settings? This will remove all your customizations and cannot be undone.'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    // Reset the workspace state in localStorage
+    this.stateService.resetWorkspaceState(this.workspaceId);
+
+    // Reinitialize with default widgets
+    this.initializeDefaultWidgets();
+
+    // Save the default state
+    const defaultState = {
+      workspaceId: this.workspaceId,
+      widgets: this.widgets,
+      layout: {
+        columns: 12,
+        gap: 16,
+        breakpoint: 'desktop',
+        minWidgetWidth: 280
+      },
+      lastModified: new Date(),
+      version: '1.0.0',
+      isEditMode: false
+    };
+    this.stateService.saveWorkspaceState(defaultState);
+
+    // Exit edit mode if active
+    if (this.modeService.isEditMode()) {
+      this.modeService.setMode('view');
+    }
+  }
 }

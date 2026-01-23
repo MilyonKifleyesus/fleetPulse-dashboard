@@ -16,7 +16,6 @@ import { takeUntil, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SharedModule } from '../../../shared/shared.module';
 import { SpkApexChartsComponent } from '../../../@spk/reusable-charts/spk-apex-charts/spk-apex-charts.component';
-import { SpkReusableTablesComponent } from '../../../@spk/reusable-tables/spk-reusable-tables/spk-reusable-tables.component';
 import {
   VehicleDetail,
   VehicleMetrics,
@@ -35,7 +34,6 @@ import { VehicleDetailService } from '../../../shared/services/vehicle-detail.se
     NgApexchartsModule,
     SharedModule,
     SpkApexChartsComponent,
-    SpkReusableTablesComponent,
   ],
   templateUrl: './vehicle-detail.component.html',
   styleUrl: './vehicle-detail.component.scss',

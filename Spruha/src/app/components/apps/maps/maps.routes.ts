@@ -7,9 +7,13 @@ export const admin: Routes = [
   loadComponent: () =>
     import('./leaflet/leaflet.component').then((m) => m.LeafletComponent),
 },
+{
+  path: 'vector-map',
+  loadComponent: () =>
+    import('./vector-map/vector-map.component').then((m) => m.VectorMapComponent),
+},
 
     
-
 
 ]}
 ];

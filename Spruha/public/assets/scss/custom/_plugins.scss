@@ -1054,11 +1054,28 @@ span.flatpickr-weekday {
 #vector-map,
 #marker-map,
 #marker-image-map,
-#lines-map,
 #visitors-countries,
 #users-map {
   #jvm-regions-group path {
     fill: variables.$light !important;
+  }
+}
+
+// Dark theme override for #lines-map
+#lines-map {
+  background-color: #2d3748 !important;
+
+  #jvm-regions-group path {
+    fill: #4a5568 !important;
+    stroke: #2d3748 !important;
+    stroke-width: 0.5 !important;
+  }
+
+  .jvm-series-lines path,
+  .jvm-series-lines line {
+    stroke: #cbd5e0 !important;
+    stroke-width: 2.5 !important;
+    stroke-opacity: 0.8 !important;
   }
 }
 

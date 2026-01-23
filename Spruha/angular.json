@@ -88,7 +88,10 @@
             ],
 
             "styles": ["src/styles.scss", "node_modules/swiper/swiper.css"],
-            "scripts": []
+            "scripts": [
+              "public/assets/libs/jsvectormap/js/jsvectormap.min.js",
+              "public/assets/libs/jsvectormap/maps/world.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -116,6 +119,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "hmr": true
+          },
           "configurations": {
             "production": {
               "buildTarget": "spruha:build:production"
@@ -124,12 +130,6 @@
               "buildTarget": "spruha:build:development"
             }
           },
-<<<<<<< HEAD
-          "options": {
-            "hmr": true
-          },
-=======
->>>>>>> 17c391fd9dba8ae5d31019c5626e574e41a13da4
           "defaultConfiguration": "development"
         },
         "extract-i18n": {

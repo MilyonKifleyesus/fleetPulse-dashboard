@@ -17,6 +17,19 @@ export const App_Route: Route[] = [
         (m) => m.LoginComponent
       ),
   },
+  {
+    path: 'vehicle/:vehicleId',
+    component: FullLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./components/dashboard/vehicle-detail/vehicle-detail.component').then(
+            (m) => m.VehicleDetailComponent
+          ),
+      },
+    ],
+  },
   { path: '', component: FullLayoutComponent, children: content },
   { path: '', component: MessageLayoutComponent, children: Message_Routes },
 

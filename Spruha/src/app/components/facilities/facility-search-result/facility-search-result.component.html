@@ -22,7 +22,6 @@
       class="search-item"
       *ngFor="let bus of searchResults; trackBy: trackByBusId"
     >
-<<<<<<< HEAD
       <div
         class="bus bus--img bus--search"
         cdkDrag
@@ -31,16 +30,6 @@
         [style.background-image]="'url(\'' + busImageUrl + '\')'"
         style="background-size: cover; background-position: center;"
       >
-=======
-        <div
-          class="bus bus--img bus--search"
-          cdkDrag
-          [cdkDragData]="bus"
-          cdkDragPreviewContainer="global"
-          [style.background-image]="'url(' + busImageUrl + ')'"
-        >
-        <img class="bus-image" [src]="busImageUrl" alt="" aria-hidden="true" />
->>>>>>> 17c391fd9dba8ae5d31019c5626e574e41a13da4
         <div class="bus-top">
           <div class="bus-badge">{{ bus.label }}</div>
 
@@ -57,19 +46,11 @@
         </ng-template>
 
         <ng-template cdkDragPreview>
-<<<<<<< HEAD
           <div
             class="bus bus--img bus--preview"
             [style.background-image]="'url(\'' + busImageUrl + '\')'"
             style="background-size: cover; background-position: center;"
           >
-=======
-            <div
-              class="bus bus--img bus--preview"
-              [style.background-image]="'url(' + busImageUrl + ')'"
-            >
-            <img class="bus-image" [src]="busImageUrl" alt="" aria-hidden="true" />
->>>>>>> 17c391fd9dba8ae5d31019c5626e574e41a13da4
             <div class="bus-top">
               <div class="bus-badge">{{ bus.label }}</div>
 
