@@ -1079,6 +1079,24 @@ span.flatpickr-weekday {
   }
 }
 
+// War Room map styles
+#war-room-map {
+  background-color: #ffffff !important;
+  
+  #jvm-regions-group path {
+    fill: #d0d0d0 !important;
+    stroke: #a0a0a0 !important;
+    stroke-width: 0.5 !important;
+  }
+  
+  .jvm-series-lines path,
+  .jvm-series-lines line {
+    stroke: #00FF41 !important; // Tactical green
+    stroke-width: 3 !important;
+    stroke-opacity: 0.8 !important;
+  }
+}
+
 .jvm-zoom-btn {
   display: flex;
   align-items: center;

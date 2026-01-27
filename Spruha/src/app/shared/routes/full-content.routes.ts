@@ -99,6 +99,13 @@ export const content: Routes = [
       {
         path: '',
         loadChildren: () =>
+          import('../../../app/components/apps/war-room/war-room.routes').then(
+            (r) => r.WarRoomRoutingModule
+          ),
+      },
+      {
+        path: '',
+        loadChildren: () =>
           import('../../../app/components/apps/tables/tables.route').then(
             (r) => r.tablesRoutingModule
           ),

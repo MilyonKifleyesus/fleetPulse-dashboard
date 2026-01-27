@@ -1,0 +1,529 @@
+@use '../../war-room.component.scss' as *;
+
+.war-room-map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  overflow: hidden;
+  background-color: #ffffff;
+
+  // Fullscreen styles
+  &:fullscreen,
+  &:-webkit-full-screen,
+  &:-moz-full-screen,
+  &:-ms-fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    background-color: #ffffff !important;
+    z-index: 9999;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    .map-container {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 100vh !important;
+      max-height: 100vh !important;
+      background-color: #ffffff !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+    }
+
+    #war-room-map {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 100vh !important;
+      max-height: 100vh !important;
+      background-color: #ffffff !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .grid-overlay {
+      width: 100% !important;
+      height: 100% !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+    }
+
+    .node-markers-overlay {
+      width: 100% !important;
+      height: 100% !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+    }
+
+    ::ng-deep {
+      .jvm-container {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        background-color: #ffffff !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        outline: none !important;
+      }
+
+      svg {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.map-container {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  min-height: 280px;
+  height: 100%;
+  overflow: visible;
+  background-color: #ffffff;
+}
+
+#war-room-map {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 0.35rem;
+  display: block;
+  visibility: visible !important;
+  opacity: 1 !important;
+  box-sizing: border-box;
+
+  // Direct style for zoom container to override library inline styles
+  // Positioned top-right, grouped with fullscreen button
+  ::ng-deep .jvm-zoom-container {
+    position: absolute !important;
+    top: 6px !important;
+    bottom: auto !important;
+    right: 0.5rem !important;
+    left: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    z-index: 40 !important;
+  }
+
+  ::ng-deep {
+    .jvm-container {
+      background-color: #ffffff !important;
+      width: 100% !important;
+      height: 100% !important;
+      position: relative !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      display: block !important; // Ensure container is displayed
+    }
+
+    // Ensure SVG is visible
+    svg {
+      width: 100% !important;
+      height: 100% !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      max-width: 100% !important; // Prevent overflow
+      max-height: 100% !important; // Prevent overflow
+    }
+
+    #jvm-regions-group path {
+      fill: #d0d0d0 !important; // Darker for visibility (was #e8e8e8)
+      stroke: #a0a0a0 !important; // Darker stroke (was #d0d0d0)
+      stroke-width: 0.5 !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    .jvm-series-lines path,
+    .jvm-series-lines line {
+      stroke: #00FF41 !important; // Tactical green
+      stroke-width: 3 !important;
+      stroke-opacity: 0.8 !important;
+      visibility: visible !important;
+    }
+
+    .jvm-marker {
+      fill: #00FF41 !important; // Tactical green for markers
+      visibility: visible !important;
+      opacity: 1 !important;
+      cursor: pointer !important;
+      pointer-events: auto !important; // Ensure markers are clickable
+      z-index: 30 !important; // Higher than overlay
+    }
+
+    // Ensure all marker circles are clickable
+    circle.jvm-marker,
+    circle[data-index],
+    circle[class*="jvm-marker"] {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      z-index: 30 !important;
+    }
+
+    // Ensure all map elements are visible
+    .jvm-series-container,
+    .jvm-zoom-container,
+    .jvm-tooltip {
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    // Ensure markers group is clickable
+    #jvm-markers-group,
+    g[class*="markers"] {
+      pointer-events: auto !important;
+    }
+
+    // Ensure marker circles have proper pointer events
+    #jvm-markers-group circle,
+    g[class*="markers"] circle {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+    }
+
+    // Reposition zoom buttons top-right, grouped with fullscreen (left: 536px equivalent → right)
+    .jvm-zoom-container,
+    div.jvm-zoom-container,
+    #war-room-map .jvm-zoom-container,
+    #war-room-map div.jvm-zoom-container {
+      position: absolute !important;
+      top: 6px !important;
+      bottom: auto !important;
+      right: 0.5rem !important;
+      left: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.25rem !important;
+      z-index: 40 !important;
+    }
+
+    .jvm-zoom-btn {
+      left: auto !important;
+      top: auto !important;
+      position: relative !important;
+      background-color: rgba(255, 255, 255, 0.9) !important;
+      border: 1px solid #e5e5e5 !important;
+      color: #000000 !important;
+      width: 28px !important;
+      height: 28px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 0.875rem !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+      border-radius: 2px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .jvm-zoom-btn:hover {
+      background-color: #00FF41 !important;
+      color: #000000 !important;
+      border-color: #00FF41 !important;
+      box-shadow: 0 2px 6px rgba(0, 255, 65, 0.4) !important;
+      transform: scale(1.05) !important;
+    }
+
+    .jvm-zoom-btn:active {
+      transform: scale(0.95) !important;
+    }
+  }
+}
+
+.map-controls {
+  position: absolute;
+  top: 6px;
+  right: 0.5rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.map-control-btn {
+  width: 28px;
+  height: 28px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e5e5;
+  color: #000000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 0.875rem;
+  line-height: 1;
+  font-weight: 700;
+  padding: 0;
+
+  &:hover {
+    background-color: #00FF41 !important;
+    color: #000000 !important;
+    border-color: #00FF41;
+    box-shadow: 0 2px 6px rgba(0, 255, 65, 0.4);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:focus {
+    outline: 2px solid #00FF41;
+    outline-offset: 2px;
+  }
+}
+
+.zoom-in-btn,
+.zoom-out-btn {
+  font-size: 1rem;
+}
+
+.fullscreen-btn .fullscreen-icon {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  display: inline-block;
+  line-height: 1;
+}
+
+.node-markers-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none; // Allow clicks to pass through to SVG markers below
+}
+
+.node-marker-wrapper {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none; // Allow clicks to pass through to SVG markers
+
+  // Only the label should be clickable, not the marker area
+  .glass-tag {
+    pointer-events: auto; // Label can be clicked
+  }
+
+  &.selected {
+    .node-marker {
+      transform: scale(1.5);
+      box-shadow: 0 0 15px $tactical-green;
+    }
+
+    .glass-tag {
+      border-color: $tactical-green;
+    }
+  }
+
+  &.hub {
+    .node-marker {
+      background-color: $war-gray;
+      border-color: $tactical-green;
+    }
+  }
+}
+
+.node-marker {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: $tactical-green;
+  border: 2px solid $war-gray;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transition: all 0.2s ease;
+  pointer-events: none; // Don't block clicks to SVG markers below
+
+  &.hub-marker {
+    background-color: $war-gray;
+    border-color: $tactical-green;
+  }
+}
+
+.glass-tag {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border-left: 2px solid $tactical-green;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: $black;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 0.75rem;
+  margin-left: -50%;
+  transform: translateX(50%);
+  pointer-events: auto; // Label can be clicked
+  cursor: pointer;
+  user-select: none;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Transit line animations (handled by SVG in map)
+.transit-line {
+  stroke: $tactical-green;
+  stroke-width: 3;
+  stroke-dasharray: 0;
+  filter: drop-shadow(0 0 2px rgba(228, 224, 224, 0.5));
+}
+
+.chevron-path {
+  stroke: $tactical-green;
+  stroke-width: 5;
+  stroke-dasharray: 12 24;
+  animation: move-chevrons 1.5s linear infinite;
+}
+
+@keyframes move-chevrons {
+  from {
+    stroke-dashoffset: 72;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+// -------- Responsive: map container & SVG --------
+@media (max-width: 575.98px) {
+  .war-room-map-container {
+    min-height: 240px;
+  }
+
+  .map-container {
+    min-height: 240px;
+  }
+
+  #war-room-map {
+    min-height: 240px;
+    border-radius: 0.2rem;
+  }
+
+  .map-controls {
+    top: 6px;
+    right: 0.375rem;
+  }
+
+  .map-control-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+
+  .zoom-in-btn,
+  .zoom-out-btn {
+    font-size: 0.875rem;
+  }
+
+  .fullscreen-btn .fullscreen-icon {
+    font-size: 0.75rem;
+  }
+
+  .node-marker {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+
+  .glass-tag {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
+    margin-top: 0.5rem;
+    max-width: 90px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .war-room-map-container {
+    min-height: 400px;
+  }
+
+  .map-container {
+    min-height: 400px;
+  }
+
+  #war-room-map {
+    min-height: 400px;
+  }
+}
+
+@media (min-width: 992px) {
+  .war-room-map-container {
+    min-height: 500px;
+  }
+
+  .map-container {
+    min-height: 500px;
+  }
+
+  #war-room-map {
+    min-height: 500px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .war-room-map-container {
+    min-height: 600px;
+  }
+
+  .map-container {
+    min-height: 600px;
+  }
+
+  #war-room-map {
+    min-height: 600px;
+  }
+}

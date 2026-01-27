@@ -1,0 +1,120 @@
+@if (isVisible()) {
+  <div class="modal-overlay" (click)="onBackdropClick($event)">
+    <div class="modal-container" (click)="stopPropagation($event)">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-section">
+          <div class="modal-title-bar"></div>
+          <h1 class="modal-title">ADD COMPANY NODE</h1>
+          <p class="modal-subtitle">FLEET REGISTRATION MODULE // ACCESS TIER 01</p>
+        </div>
+        <button class="modal-close-btn" type="button" (click)="onClose()" aria-label="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="error-message">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <!-- Company Name Field -->
+        <div class="form-field">
+          <label class="form-label" for="company-name">
+            COMPANY NAME <span class="required-indicator">*</span>
+          </label>
+          <input
+            type="text"
+            id="company-name"
+            class="form-input"
+            placeholder="INPUT OFFICIAL ENTITY NAME..."
+            [value]="companyName()"
+            (input)="companyName.set($any($event.target).value)"
+            [disabled]="isSubmitting()"
+          />
+        </div>
+
+        <!-- Location Field -->
+        <div class="form-field">
+          <label class="form-label" for="location">
+            LOCATION <span class="required-indicator">*</span>
+          </label>
+          <div class="location-input-wrapper">
+            <span class="location-icon material-symbols-outlined">public</span>
+            <input
+              type="text"
+              id="location"
+              class="form-input location-input"
+              placeholder="CITY, PROVINCE (e.g., Toronto, Ontario)..."
+              [value]="location()"
+              (input)="location.set($any($event.target).value)"
+              [disabled]="isSubmitting()"
+            />
+          </div>
+          <p class="form-hint">Enter city and province (e.g., "Toronto, Ontario") or coordinates (e.g., "49.8951, -97.1384")</p>
+        </div>
+
+        <!-- Company Logo Field -->
+        <div class="form-field">
+          <label class="form-label" for="company-logo">
+            COMPANY LOGO
+          </label>
+          <div class="logo-upload-area" [class.has-logo]="logoPreview()">
+            @if (logoPreview()) {
+              <div class="logo-preview">
+                <img [src]="logoPreview()" alt="Logo preview" />
+                <button type="button" class="remove-logo-btn" (click)="removeLogo()" aria-label="Remove logo">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            } @else {
+              <input
+                type="file"
+                id="company-logo"
+                class="logo-file-input"
+                accept=".svg,.png,.jpg,.jpeg,.gif,.webp,image/svg+xml,image/png,image/jpeg,image/gif,image/webp"
+                (change)="onFileSelected($event)"
+                [disabled]="isSubmitting()"
+              />
+              <label for="company-logo" class="logo-upload-label">
+                <span class="upload-icon">
+                  <span class="material-symbols-outlined">add</span>
+                </span>
+                <span class="upload-text">UPLOAD ASSET SIGNATURE</span>
+                <span class="upload-hint">SVG, PNG, JPG, GIF, OR WEBP</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-abort"
+          (click)="onClose()"
+          [disabled]="isSubmitting()"
+        >
+          ABORT
+        </button>
+        <button
+          type="button"
+          class="btn-execute"
+          (click)="onSubmit()"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            EXECUTING...
+          } @else {
+            EXECUTE SYNC
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

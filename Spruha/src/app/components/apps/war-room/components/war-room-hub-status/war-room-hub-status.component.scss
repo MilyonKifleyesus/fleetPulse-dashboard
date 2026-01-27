@@ -1,0 +1,165 @@
+@use '../../war-room.component.scss' as *;
+
+.hub-status-container {
+  padding: 0.5rem 0 0.75rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hub-status-header {
+  margin-bottom: 0.625rem;
+}
+
+.section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $zinc-600;
+  margin: 0;
+}
+
+.hub-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.hub-status-card {
+  position: relative;
+  padding: 0.625rem 0.75rem;
+  background: $card-bg;
+  border: 1px solid $card-border;
+  border-radius: $radius-cell;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &.border-tactical-green {
+    border-color: rgba($tactical-green, 0.25);
+  }
+
+  &.border-zinc-700 {
+    border-color: $card-border;
+  }
+}
+
+.hub-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.2rem 0;
+}
+
+.hub-status-value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 0.2rem 0;
+}
+
+.hub-capacity {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.quantum-chart-container {
+  padding: 0.75rem 1rem;
+  background: $card-bg;
+  border: 1px solid $card-border;
+  border-radius: $radius-cell;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1rem;
+}
+
+.quantum-chart-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: $primary-forest;
+  margin: 0 0 0.5rem 0;
+}
+
+.quantum-chart {
+  height: 4rem;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.quantum-bar {
+  flex: 1;
+  background: rgba($primary-forest, 0.1);
+  border-radius: 3px 3px 0 0;
+  transition: background 0.2s ease;
+
+  &.highlighted {
+    background: $tactical-green;
+  }
+}
+
+.quantum-chart-footer {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: $zinc-500;
+}
+
+.global-override-section {
+  padding: 0.5rem 0 0;
+  margin-top: auto;
+  background: transparent;
+  border-top: none;
+}
+
+.global-override-btn {
+  width: 100%;
+  position: relative;
+  padding: 0.75rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: $primary-forest;
+  border: none;
+  border-radius: $radius-cell;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba($primary-forest, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 22%;
+    height: 56%;
+    width: 3px;
+    background: $tactical-green;
+    border-radius: 0 2px 2px 0;
+  }
+
+  &:hover {
+    background: #17302a;
+    box-shadow: 0 3px 10px rgba($primary-forest, 0.25);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}

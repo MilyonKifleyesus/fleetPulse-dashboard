@@ -1,0 +1,37 @@
+<div class="activity-log-container">
+  <div class="activity-log-header">
+    <h2 class="section-title">CRITICAL OPERATION LOG</h2>
+  </div>
+
+  <div class="activity-log-entries">
+    @for (log of getDisplayedLogs(); track log.id) {
+      <div
+        class="log-entry"
+        [class.selected]="isSelected(log)"
+        [class.status-active]="getStatusClass(log.status) === 'status-active'"
+        [class.status-info]="getStatusClass(log.status) === 'status-info'"
+        (click)="onLogClick(log)"
+      >
+        <div class="log-header">
+          <div class="log-header-left">
+            @if (log.logo) {
+              <img [src]="log.logo" alt="Company logo" class="company-logo" />
+            }
+            <div class="log-title-wrapper">
+              <span class="log-status">{{ log.status }}</span>
+              <span class="log-timestamp">{{ formatTimestamp(log.timestamp) }}</span>
+            </div>
+          </div>
+        </div>
+        <p class="log-title">
+          <span class="company-name" (click)="onCompanyNameClick(log, $event)">{{ getCompanyNameFromTitle(log.title) }}</span>
+          @if (getLocationFromTitle(log.title)) {
+            <span class="location-separator">|</span>
+            <span class="location-name">{{ getLocationFromTitle(log.title) }}</span>
+          }
+        </p>
+        <p class="log-description">{{ log.description }}</p>
+      </div>
+    }
+  </div>
+</div>
