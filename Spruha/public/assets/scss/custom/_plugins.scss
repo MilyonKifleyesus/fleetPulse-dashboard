@@ -1081,12 +1081,16 @@ span.flatpickr-weekday {
 
 // War Room map styles
 #war-room-map {
-  background-color: #ffffff !important;
+  background-color: #1a1a1a !important;
   
   #jvm-regions-group path {
-    fill: #d0d0d0 !important;
-    stroke: #a0a0a0 !important;
+    fill: #2d2d2d !important;
+    stroke: #3d3d3d !important;
     stroke-width: 0.5 !important;
+  }
+  
+  #jvm-regions-group path:hover {
+    fill: #404040 !important;
   }
   
   .jvm-series-lines path,

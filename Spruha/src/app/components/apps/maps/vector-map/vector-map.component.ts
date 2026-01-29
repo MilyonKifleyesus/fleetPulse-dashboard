@@ -38,7 +38,7 @@ export class VectorMapComponent implements AfterViewInit, OnDestroy {
     {
       name: 'indianapolis',
       latLng: [39.7684, -86.1581],
-      company: 'Arbroc',
+      company: 'ARBOC',
       city: 'Indianapolis',
     },
     {
@@ -74,7 +74,7 @@ export class VectorMapComponent implements AfterViewInit, OnDestroy {
     {
       name: 'turkey',
       latLng: [39.9334, 32.8597],
-      company: 'Karzan',
+      company: 'Karsan',
       city: 'Turkey',
     },
   ];

@@ -16,6 +16,19 @@ export class WarRoomRealtimeService implements OnDestroy {
   private updateInterval: Subscription | null = null;
   private activityLogIntervalSub: Subscription | null = null;
   private isRunning = false;
+  private readonly companyLogos: Record<string, string> = {
+    'creative carriage': '/assets/images/creative-carriage-logo.png',
+    'alexander dennis': '/assets/images/alexander-dennis.jpg',
+    'karsan': '/assets/images/KARSAN.jpg',
+    'karzan': '/assets/images/KARSAN.jpg',
+    'arboc': '/assets/images/ARBOC.jpg',
+    'arbroc': '/assets/images/ARBOC.jpg',
+    'tam': '/assets/images/tam-logo.png',
+    'nfl': '/assets/images/New-Flyer.jpg',
+    'new flyer': '/assets/images/New-Flyer.jpg',
+    'nova': '/assets/images/Nova-Bus.jpg.png',
+    'nova bus': '/assets/images/Nova-Bus.jpg.png',
+  };
 
   constructor(private warRoomService: WarRoomService) {}
 
@@ -137,6 +150,7 @@ export class WarRoomRealtimeService implements OnDestroy {
       title: `${randomCompany.name.toUpperCase()} | ${location}`,
       description: randomDescription,
       location: companyNode?.city || location,
+      logo: this.getCompanyLogo(randomCompany.name),
     };
 
     this.warRoomService.addActivityLog(log);
@@ -181,6 +195,12 @@ export class WarRoomRealtimeService implements OnDestroy {
     const change = (Math.random() - 0.5) * 2 * variation;
     const newValue = current + change;
     return Math.max(min, Math.min(max, Math.round(newValue * 10) / 10));
+  }
+
+  private getCompanyLogo(companyName: string): string | undefined {
+    const lowerName = companyName.toLowerCase();
+    const match = Object.keys(this.companyLogos).find((key) => lowerName.includes(key));
+    return match ? this.companyLogos[match] : undefined;
   }
 
   /**

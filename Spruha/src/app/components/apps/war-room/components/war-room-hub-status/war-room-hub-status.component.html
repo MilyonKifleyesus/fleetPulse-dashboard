@@ -46,11 +46,3 @@
     </button>
   </div>
 </div>
-
-<!-- Add Company Modal -->
-<app-add-company-modal
-  #modalRef
-  [isVisible]="modalVisible()"
-  (companyAdded)="onCompanyAdded($event)"
-  (close)="onModalClose()"
-></app-add-company-modal>

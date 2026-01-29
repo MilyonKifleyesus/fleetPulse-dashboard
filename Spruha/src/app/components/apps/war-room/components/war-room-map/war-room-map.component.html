@@ -8,45 +8,62 @@
 
     <!-- Map controls: zoom in, zoom out, fullscreen (grouped top-right) -->
     <div class="map-controls">
-      <button
-        type="button"
-        class="map-control-btn zoom-in-btn"
-        (click)="zoomIn()"
-        aria-label="Zoom in"
-        title="Zoom in"
-      >+</button>
-      <button
-        type="button"
-        class="map-control-btn zoom-out-btn"
-        (click)="zoomOut()"
-        aria-label="Zoom out"
-        title="Zoom out"
-      >−</button>
-      <button
-        type="button"
-        class="map-control-btn fullscreen-btn"
-        (click)="toggleFullscreen()"
+      <button type="button" class="map-control-btn zoom-in-btn" (click)="zoomIn()" aria-label="Zoom in"
+        title="Zoom in">+</button>
+      <button type="button" class="map-control-btn zoom-out-btn" (click)="zoomOut()" aria-label="Zoom out"
+        title="Zoom out">−</button>
+      <button type="button" class="map-control-btn fullscreen-btn" (click)="toggleFullscreen()"
         [attr.aria-label]="getFullscreenState() ? 'Exit fullscreen' : 'Enter fullscreen'"
-        [title]="getFullscreenState() ? 'Exit Fullscreen (ESC)' : 'Enter Fullscreen'"
-      >
+        [title]="getFullscreenState() ? 'Exit Fullscreen (ESC)' : 'Enter Fullscreen'">
         <span class="fullscreen-icon">{{ getFullscreenState() ? '⤓' : '⤢' }}</span>
       </button>
     </div>
   </div>
-
   <!-- Node Markers Overlay -->
   <div class="node-markers-overlay">
     @for (node of nodes(); track node.id) {
-      <div
-        class="node-marker-wrapper"
-        [style.top.px]="getNodePosition(node).top"
-        [style.left.px]="getNodePosition(node).left"
-        [class.selected]="isNodeSelected(node)"
-        [class.hub]="isHub(node)"
-      >
-        <div class="node-marker" [class.hub-marker]="isHub(node)"></div>
-        <div class="glass-tag">{{ getNodeDisplayName(node) }}</div>
-      </div>
+    <!-- Hide overlay label for companies with logos - they're shown in SVG instead -->
+    @if (!((node.company && (node.company.toLowerCase().includes('creative carriage') ||
+    node.company.toLowerCase().includes('alexander dennis') || node.company.toLowerCase().includes('karsan') ||
+    node.company.toLowerCase().includes('karzan') || node.company.toLowerCase().includes('arboc') ||
+    node.company.toLowerCase().includes('arbroc') || node.company.toLowerCase().includes('tam') ||
+    node.company.toLowerCase().includes('nfl') || node.company.toLowerCase().includes('new flyer') ||
+    node.company.toLowerCase().includes('nova'))) || node.logo)) {
+    <div class="node-marker-wrapper" [style.top.px]="getNodePosition(node).top"
+      [style.left.px]="getNodePosition(node).left" [class.selected]="isNodeSelected(node)" [class.hub]="isHub(node)">
+      <div class="node-marker" [class.hub-marker]="isHub(node)"></div>
+      <div class="glass-tag">{{ getNodeDisplayName(node) }}</div>
+    </div>
+    }
     }
   </div>
+
+  <!-- Company Logo Hover Tooltip -->
+  @if (hoveredCompanyTooltip()) {
+  <div class="company-logo-tooltip" 
+       [style.top.px]="hoveredCompanyTooltip()!.position.top"
+       [style.left.px]="hoveredCompanyTooltip()!.position.left">
+    <div class="tooltip-content">
+      <div class="tooltip-header">
+        <img [src]="hoveredCompanyTooltip()!.logoPath" 
+             [alt]="hoveredCompanyTooltip()!.displayName + ' logo'"
+             class="tooltip-logo"
+             (error)="onLogoError($event)">
+        <div class="tooltip-title">{{ hoveredCompanyTooltip()!.displayName }}</div>
+      </div>
+      <div class="tooltip-body">
+        <div class="tooltip-description">{{ hoveredCompanyTooltip()!.description }}</div>
+        <div class="tooltip-location">
+          <span class="tooltip-label">LOCATION:</span>
+          <span class="tooltip-value">{{ hoveredCompanyTooltip()!.node.city }}{{ hoveredCompanyTooltip()!.node.country ? ', ' + hoveredCompanyTooltip()!.node.country : '' }}</span>
+        </div>
+        <div class="tooltip-status">
+          <span class="tooltip-label">STATUS:</span>
+          <span class="tooltip-value status-online">{{ hoveredCompanyTooltip()!.node.status }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="tooltip-arrow"></div>
+  </div>
+  }
 </div>

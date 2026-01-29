@@ -360,7 +360,7 @@
 **Documentation**: [TypeScript Namespaces](https://www.typescriptlang.org/docs/handbook/namespaces.html)
 
 ---
-
+<!-- second documetion need  -->
 ## CardData Interface (Lines 28-36)
 
 ### Lines 28-36: CardData Interface Definition
@@ -597,12 +597,13 @@ imports: [
 **Documentation**: [Component Providers](https://angular.io/api/core/Component#providers)
 
 ---
-
+<!-- i am studing here in vidio of 21:15  -->
 ## Class Declaration & Properties (Lines 54-103)
 
 ### Line 54: `export class WorkspaceDashboardComponent implements OnInit, OnDestroy {`
 
-**WHERE**: `src/app/components/dashboard/workspace-dashboard/workspace-dashboard.component.ts:54`
+**WHERE**: `src/app/components/dashboard/workspace-dashboard/workspace-dashboard.component.ts:54` 
+
 
 **WHY**: 
 - `export`: Makes class accessible to other modules
@@ -722,7 +723,7 @@ cards: CardData[] = [];
 - [TypeScript Union Types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types)
 
 ---
-
+// this is on milli google ml note book for documation  
 ### Lines 65-70: UI State Properties
 
 **WHERE**: `src/app/components/dashboard/workspace-dashboard/workspace-dashboard.component.ts:65-70`
@@ -823,7 +824,7 @@ ChartOptions1: any = {};
 // WHY: Configuration for donut charts (active/maintenance percentages)
 // WHEN: Set by updateActiveOperations() method
 // HOW: ApexCharts configuration objects
-// WHICH: Chart config pattern
+// WHICH: Chart config pattern //  
 circleOptions: any = {};
 circleOptions1: any = {};
 ```
@@ -1087,7 +1088,7 @@ constructor(
 
 **Documentation**: See [WorkspaceStateService](../Services/workspace-state.service.md)
 
----
+<!-- this were it start the documention  -->
 
 ### Line 117: `if (savedState && savedState.widgets.length > 0) {`
 

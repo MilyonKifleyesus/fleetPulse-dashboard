@@ -1,4 +1,4 @@
-import { Component, input, output, signal, inject, HostListener, effect, ElementRef, Renderer2, OnDestroy } from '@angular/core';
+import { Component, input, output, signal, inject, HostListener, effect, ElementRef, Renderer2, OnDestroy, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WarRoomService } from '../../../../../shared/services/war-room.service';
@@ -6,6 +6,7 @@ import { WarRoomService } from '../../../../../shared/services/war-room.service'
 export interface CompanyFormData {
   companyName: string;
   location: string;
+  description?: string;
   logo?: string | ArrayBuffer | null;
   logoFile?: File;
 }
@@ -19,6 +20,8 @@ export interface CompanyFormData {
 export class AddCompanyModalComponent implements OnDestroy {
   // Inputs
   isVisible = input<boolean>(false);
+  /** When true, overlay is positioned over the map area only (no moveToBody, absolute positioning) */
+  useMapPositioning = input<boolean>(false);
 
   // Outputs
   companyAdded = output<CompanyFormData>();
@@ -33,6 +36,7 @@ export class AddCompanyModalComponent implements OnDestroy {
   // Form data
   companyName = signal<string>('');
   location = signal<string>('');
+  description = signal<string>('');
   logoFile = signal<File | null>(null);
   logoPreview = signal<string | null>(null);
 
@@ -40,30 +44,28 @@ export class AddCompanyModalComponent implements OnDestroy {
   isSubmitting = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
+  @HostBinding('class.map-positioned') get isMapPositioned(): boolean {
+    return this.useMapPositioning();
+  }
+
   constructor() {
-    // Move modal to body when visible
+    // Move modal to body when visible and NOT using map positioning
     effect(() => {
       const visible = this.isVisible();
-      if (visible) {
-        // Use setTimeout to ensure DOM is ready after Angular's change detection
-        setTimeout(() => {
-          this.moveToBody();
-        }, 0);
+      const mapPos = this.useMapPositioning();
+      if (visible && !mapPos) {
+        setTimeout(() => this.moveToBody(), 0);
       }
     });
   }
 
   ngOnDestroy(): void {
-    // Clean up: remove from body if still attached
     const element = this.elementRef.nativeElement;
     if (element.parentNode === document.body) {
       this.renderer.removeChild(document.body, element);
     }
   }
 
-  /**
-   * Move modal component to body element for proper rendering
-   */
   private moveToBody(): void {
     const element = this.elementRef.nativeElement;
     if (element.parentNode !== document.body) {
@@ -218,6 +220,7 @@ export class AddCompanyModalComponent implements OnDestroy {
       const formData: CompanyFormData = {
         companyName: this.companyName().trim(),
         location: this.location().trim(),
+        description: this.description().trim() || undefined,
         logo: this.logoPreview(),
         logoFile: this.logoFile() || undefined,
       };
@@ -244,6 +247,7 @@ export class AddCompanyModalComponent implements OnDestroy {
   private resetForm(): void {
     this.companyName.set('');
     this.location.set('');
+    this.description.set('');
     this.logoFile.set(null);
     this.logoPreview.set(null);
     this.errorMessage.set(null);

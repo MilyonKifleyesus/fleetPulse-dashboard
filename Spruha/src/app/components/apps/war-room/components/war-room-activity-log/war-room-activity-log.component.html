@@ -10,6 +10,7 @@
         [class.selected]="isSelected(log)"
         [class.status-active]="getStatusClass(log.status) === 'status-active'"
         [class.status-info]="getStatusClass(log.status) === 'status-info'"
+        [class.has-logo]="!!log.logo"
         (click)="onLogClick(log)"
       >
         <div class="log-header">
@@ -23,14 +24,24 @@
             </div>
           </div>
         </div>
-        <p class="log-title">
-          <span class="company-name" (click)="onCompanyNameClick(log, $event)">{{ getCompanyNameFromTitle(log.title) }}</span>
+        <div class="log-content">
+          <div class="log-info-row">
+            <span class="info-label">Company:</span>
+            <span class="company-name" (click)="onCompanyNameClick(log, $event)">{{ getCompanyNameFromTitle(log.title) }}</span>
+          </div>
           @if (getLocationFromTitle(log.title)) {
-            <span class="location-separator">|</span>
-            <span class="location-name">{{ getLocationFromTitle(log.title) }}</span>
+            <div class="log-info-row">
+              <span class="info-label">Location:</span>
+              <span class="location-name">{{ getLocationFromTitle(log.title) }}</span>
+            </div>
           }
-        </p>
-        <p class="log-description">{{ log.description }}</p>
+          @if (log.description) {
+            <div class="log-info-row description-row">
+              <span class="info-label">Description:</span>
+              <span class="log-description">{{ log.description }}</span>
+            </div>
+          }
+        </div>
       </div>
     }
   </div>

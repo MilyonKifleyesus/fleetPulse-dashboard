@@ -26,6 +26,8 @@ export interface Node {
   company: string;
   companyId: string;
   city: string;
+  description?: string;
+  logo?: string | ArrayBuffer;
   country?: string;
   coordinates: {
     latitude: number;

@@ -1,79 +1,23 @@
 <div class="war-room-container">
-  <!-- Header -->
-  <app-war-room-header [currentTime]="currentTime()"></app-war-room-header>
-
   <!-- Main Content -->
   <main class="war-room-main">
     <!-- Map Area -->
     <div class="war-room-map-area">
       <app-war-room-map [nodes]="nodes()" [selectedCompany]="selectedCompany()"
-        (nodeSelected)="onCompanySelected($event.companyId)"></app-war-room-map>
-
-      <!-- Top Metrics Toggle Button -->
-      <button 
-        class="top-metrics-toggle-btn metric-toggle-btn"
-        (click)="toggleTopMetrics()"
-        [attr.aria-label]="topMetricsVisible() ? 'Hide top metrics' : 'Show top metrics'"
-        [attr.aria-expanded]="topMetricsVisible()"
-      >
-        <span class="toggle-icon" [class.expanded]="topMetricsVisible()">▶</span>
-        <span class="toggle-text">{{ topMetricsVisible() ? 'HIDE METRICS' : 'SHOW METRICS' }}</span>
-      </button>
-
-      <!-- Overlay Metrics (Top Left) -->
-      <div class="overlay-metrics-top" [class.hidden]="!topMetricsVisible()">
-        @if (networkMetrics(); as metrics) {
-        <div class="metric-card data-flow-integrity">
-          <p class="metric-label">DATA FLOW INTEGRITY</p>
-          <div class="metric-value-row">
-            <span class="metric-value">{{ metrics.dataFlowIntegrity }}%</span>
-            <span class="metric-status" [class]="getDataFlowIntegrityClass(metrics.dataFlowIntegrity)">
-              {{ getDataFlowIntegrityStatus(metrics.dataFlowIntegrity) }}
-            </span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" [style.width.%]="metrics.dataFlowIntegrity"></div>
-          </div>
-        </div>
-
-        <div class="metric-card fleet-sync-rate">
-          <p class="metric-label">FLEET SYNC RATE</p>
-          <div class="metric-value-row">
-            <span class="metric-value">{{ metrics.fleetSyncRate | number }}</span>
-            <span class="metric-status">ACTIVE UNITS</span>
-          </div>
-        </div>
-        }
-      </div>
-
-      <!-- Toggle Button for Metrics Panel -->
-      <button 
-        class="metrics-toggle-btn metric-toggle-btn"
-        (click)="toggleMetricsPanel()"
-        [attr.aria-label]="metricsPanelVisible() ? 'Hide metrics panel' : 'Show metrics panel'"
-        [attr.aria-expanded]="metricsPanelVisible()"
-      >
-        <span class="toggle-icon" [class.expanded]="metricsPanelVisible()">▼</span>
-        <span class="toggle-text">{{ metricsPanelVisible() ? 'HIDE METRICS' : 'SHOW METRICS' }}</span>
-      </button>
-
-      <!-- Bottom Metrics Panel -->
-      <div class="overlay-metrics-bottom" [class.hidden]="!metricsPanelVisible()">
-        <app-war-room-metrics [networkThroughput]="networkThroughput()" [geopoliticalHeatmap]="geopoliticalHeatmap()"
-          [satelliteStatuses]="satelliteStatuses()"></app-war-room-metrics>
-      </div>
+        (nodeSelected)="onNodeSelected($event)"></app-war-room-map>
+      @if (addCompanyModalVisible()) {
+      <app-add-company-modal #addCompanyModalRef [isVisible]="true" [useMapPositioning]="true"
+        (companyAdded)="onCompanyAdded($event)" (close)="onAddCompanyModalClose()" />
+      }
     </div>
 
     <!-- Sidebar -->
     <aside class="war-room-sidebar" [class.expanded]="activityLogVisible() || hubStatusVisible()">
       <!-- Activity Log Toggle Button -->
-      <button 
-        class="sidebar-toggle-btn activity-log-toggle bio-cell-toggle"
-        [class.active]="activityLogVisible()"
+      <button class="sidebar-toggle-btn activity-log-toggle bio-cell-toggle" [class.active]="activityLogVisible()"
         (click)="toggleActivityLog()"
         [attr.aria-label]="activityLogVisible() ? 'Hide activity log' : 'Show activity log'"
-        [attr.aria-expanded]="activityLogVisible()"
-      >
+        [attr.aria-expanded]="activityLogVisible()">
         <span class="tactical-edge"></span>
         <span class="toggle-icon" [class.expanded]="activityLogVisible()">▶</span>
         <span class="toggle-text">{{ activityLogVisible() ? 'HIDE LOG' : 'SHOW LOG' }}</span>
@@ -86,13 +30,9 @@
       </div>
 
       <!-- Hub Status Toggle Button -->
-      <button 
-        class="sidebar-toggle-btn hub-status-toggle bio-cell-toggle"
-        [class.active]="hubStatusVisible()"
-        (click)="toggleHubStatus()"
-        [attr.aria-label]="hubStatusVisible() ? 'Hide hub status' : 'Show hub status'"
-        [attr.aria-expanded]="hubStatusVisible()"
-      >
+      <button class="sidebar-toggle-btn hub-status-toggle bio-cell-toggle" [class.active]="hubStatusVisible()"
+        (click)="toggleHubStatus()" [attr.aria-label]="hubStatusVisible() ? 'Hide hub status' : 'Show hub status'"
+        [attr.aria-expanded]="hubStatusVisible()">
         <span class="tactical-edge"></span>
         <span class="toggle-icon" [class.expanded]="hubStatusVisible()">▶</span>
         <span class="toggle-text">{{ hubStatusVisible() ? 'HIDE HUB' : 'SHOW HUB' }}</span>
@@ -100,11 +40,9 @@
 
       <!-- Hub Status Section -->
       <div class="sidebar-section" [class.hidden]="!hubStatusVisible()">
-        <app-war-room-hub-status [selectedCompany]="selectedCompany()"></app-war-room-hub-status>
+        <app-war-room-hub-status [selectedCompany]="selectedCompany()"
+          (addCompanyRequested)="onAddCompanyRequested()"></app-war-room-hub-status>
       </div>
     </aside>
   </main>
-
-  <!-- Footer -->
-  <app-war-room-footer [networkMetrics]="networkMetrics()"></app-war-room-footer>
 </div>

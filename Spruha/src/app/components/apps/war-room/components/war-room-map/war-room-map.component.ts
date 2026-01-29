@@ -1,7 +1,9 @@
-import { Component, input, output, AfterViewInit, OnDestroy, inject, effect } from '@angular/core';
+import { Component, input, output, AfterViewInit, OnDestroy, inject, effect, signal, computed, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Node as WarRoomNode, CompanyData } from '../../../../../shared/models/war-room.interface';
 import { WarRoomService } from '../../../../../shared/services/war-room.service';
+import { AppStateService } from '../../../../../shared/services/app-state.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 declare global {
   interface Window {
@@ -21,7 +23,381 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   selectedCompany = input<CompanyData | null>(null);
 
   // Outputs
-  nodeSelected = output<WarRoomNode>();
+  nodeSelected = output<WarRoomNode | undefined>();
+
+  // Helper methods for template
+  getSelectedNode(): WarRoomNode | undefined {
+    const selectedId = this.selectedCompany()?.id;
+    if (!selectedId) return undefined;
+    return this.nodes().find(n => n.companyId === selectedId);
+  }
+
+  getSelectedNodePosition(): { top: number; left: number } {
+    const node = this.getSelectedNode();
+    if (!node) return { top: 0, left: 0 };
+    return this.getNodePosition(node);
+  }
+
+  getSelectedNodeCity(): string {
+    return this.getSelectedNode()?.city || '';
+  }
+
+  private getCompanyLogoFileName(node: WarRoomNode): string | null {
+    const companyLower = node.company?.toLowerCase() || '';
+    const companyLogos: Record<string, string> = {
+      'creative carriage': 'creative-carriage-logo.png',
+      'alexander dennis': 'alexander-dennis.jpg',
+      'karsan': 'KARSAN.jpg',
+      'karzan': 'KARSAN.jpg',
+      'arboc': 'ARBOC.jpg',
+      'arbroc': 'ARBOC.jpg',
+      'tam': 'tam-logo.png',
+      'nfl': 'New-Flyer.jpg',
+      'new flyer': 'New-Flyer.jpg',
+      'nova': 'Nova-Bus.jpg.png',
+      'nova bus': 'Nova-Bus.jpg.png'
+    };
+
+    const matchingKey = Object.keys(companyLogos).find(key => companyLower.includes(key));
+    return matchingKey ? companyLogos[matchingKey] : null;
+  }
+
+  private getCompanyLogoSource(node: WarRoomNode): string | null {
+    const customLogo = typeof node.logo === 'string' ? node.logo.trim() : '';
+    if (customLogo) {
+      return customLogo;
+    }
+    return this.getCompanyLogoFileName(node);
+  }
+
+  private getLogoImagePaths(logoSource: string): string[] {
+    const trimmed = logoSource.trim();
+    if (!trimmed) return [];
+
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+      return [trimmed];
+    }
+
+    if (
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('/') ||
+      trimmed.startsWith('./') ||
+      trimmed.startsWith('../')
+    ) {
+      return [trimmed];
+    }
+
+    const baseUrl = window.location.origin;
+    return [
+      `${baseUrl}/assets/images/${trimmed}`,
+      `/assets/images/${trimmed}`,
+      `./assets/images/${trimmed}`,
+      `assets/images/${trimmed}`,
+    ];
+  }
+
+  private getCompanyDescription(node: WarRoomNode): string {
+    const customDescription = node.description?.trim();
+    if (customDescription) {
+      return customDescription;
+    }
+    const companyLower = node.company?.toLowerCase() || '';
+    const descriptionKey = Object.keys(this.companyDescriptions).find(key => companyLower.includes(key));
+    if (descriptionKey) {
+      return this.companyDescriptions[descriptionKey];
+    }
+    const location = node.country ? `${node.city}, ${node.country}` : node.city;
+    return `${this.getCompanyDisplayName(node)} is a transportation company located in ${location}.`;
+  }
+
+  private getCompanyDisplayName(node: WarRoomNode): string {
+    const companyLower = node.company?.toLowerCase() || '';
+    if (companyLower.includes('karzan') || companyLower.includes('karsan')) {
+      return 'Karsan';
+    }
+    if (companyLower.includes('arboc') || companyLower.includes('arbroc')) {
+      return 'ARBOC';
+    }
+    if (companyLower.includes('nova')) {
+      return 'Nova Bus';
+    }
+    return node.company;
+  }
+
+  private getCompanyLogoPath(logoSource: string | null): string {
+    const baseUrl = window.location.origin;
+    if (!logoSource) {
+      return `${baseUrl}/assets/images/default-logo.png`;
+    }
+    const paths = this.getLogoImagePaths(logoSource);
+    return paths[0] || `${baseUrl}/assets/images/default-logo.png`;
+  }
+
+  private getLogoSizeMultiplier(node: WarRoomNode): number {
+    const companyLower = node.company?.toLowerCase() || '';
+    if (companyLower.includes('nova')) {
+      return 2.4;
+    }
+    if (companyLower.includes('tam')) {
+      return 2.0;
+    }
+    return 1.0;
+  }
+
+  private getLogoImageSize(radius: number, zoomFactor: number, sizeMultiplier: number = 1): number {
+    const baseImageSize = radius * 4.6 * sizeMultiplier;
+    const effectiveZoom = Math.max(1, zoomFactor);
+    const scaleFactor = Math.pow(effectiveZoom, 0.6);
+    const responsiveImageSize = baseImageSize / scaleFactor;
+    const minSize = radius * 2.4 * sizeMultiplier;
+    const maxSize = radius * 8.0 * sizeMultiplier;
+    return Math.max(minSize, Math.min(maxSize, responsiveImageSize));
+  }
+
+  private showCompanyTooltipAtElement(node: WarRoomNode, target: Element, logoSource: string | null): void {
+    const description = this.getCompanyDescription(node);
+    const displayName = this.getCompanyDisplayName(node);
+    const logoPath = this.getCompanyLogoPath(logoSource);
+    const rect = target.getBoundingClientRect();
+
+    const bounds = this.getTooltipBounds();
+    const availableWidth = Math.max(120, bounds.right - bounds.left);
+    const availableHeight = Math.max(120, bounds.bottom - bounds.top);
+    const tooltipWidth = Math.min(420, Math.max(260, Math.floor(availableWidth * 0.92)));
+    const tooltipHeight = Math.min(360, Math.max(180, Math.floor(availableHeight * 0.6)));
+    const spacing = 12;
+
+    let tooltipTop = rect.top - spacing;
+    let tooltipLeft = rect.left + (rect.width / 2);
+
+    if (tooltipLeft + (tooltipWidth / 2) > bounds.right) {
+      tooltipLeft = bounds.right - (tooltipWidth / 2);
+    }
+    if (tooltipLeft - (tooltipWidth / 2) < bounds.left) {
+      tooltipLeft = bounds.left + (tooltipWidth / 2);
+    }
+
+    if (tooltipTop - tooltipHeight < bounds.top) {
+      tooltipTop = rect.bottom + spacing;
+    }
+
+    if (tooltipTop + tooltipHeight > bounds.bottom) {
+      tooltipTop = bounds.bottom - tooltipHeight;
+    }
+
+    this.hoveredCompanyTooltip.set({
+      node,
+      displayName,
+      logoPath,
+      description,
+      position: { top: tooltipTop, left: tooltipLeft }
+    });
+
+    const markerIndex = this.getNodeIndex(node);
+    this.tooltipAnchor = { node, markerIndex, logoSource, element: target };
+    this.scheduleTooltipClamp();
+  }
+
+  private getNodeIndex(node: WarRoomNode): number {
+    const nodes = this.nodes();
+    const nodeId = node.id;
+    if (nodeId === undefined || nodeId === null) {
+      return nodes.indexOf(node);
+    }
+    return nodes.findIndex((n) => n.id === nodeId);
+  }
+
+  private getTooltipBounds(): { left: number; right: number; top: number; bottom: number } {
+    const padding = 12;
+    const viewportBounds = {
+      left: padding,
+      top: padding,
+      right: window.innerWidth - padding,
+      bottom: window.innerHeight - padding
+    };
+
+    const mapContainer = document.getElementById('war-room-map');
+    const container = (mapContainer ? mapContainer.closest('.war-room-map-container') : null) as HTMLElement | null;
+    if (!container) {
+      return viewportBounds;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const bounds = {
+      left: Math.max(viewportBounds.left, containerRect.left + padding),
+      top: Math.max(viewportBounds.top, containerRect.top + padding),
+      right: Math.min(viewportBounds.right, containerRect.right - padding),
+      bottom: Math.min(viewportBounds.bottom, containerRect.bottom - padding)
+    };
+
+    if (bounds.right <= bounds.left || bounds.bottom <= bounds.top) {
+      return viewportBounds;
+    }
+
+    return bounds;
+  }
+
+  private scheduleTooltipClamp(): void {
+    if (!this.hoveredCompanyTooltip()) return;
+
+    if (this.tooltipClampRafId !== null) {
+      cancelAnimationFrame(this.tooltipClampRafId);
+    }
+
+    this.tooltipClampRafId = requestAnimationFrame(() => {
+      this.tooltipClampRafId = null;
+      this.clampTooltipToBounds();
+    });
+  }
+
+  private clampTooltipToBounds(): void {
+    const tooltip = this.hoveredCompanyTooltip();
+    if (!tooltip) return;
+
+    const tooltipEl = document.querySelector('.company-logo-tooltip') as HTMLElement | null;
+    if (!tooltipEl) return;
+
+    const bounds = this.getTooltipBounds();
+    const rect = tooltipEl.getBoundingClientRect();
+    let deltaX = 0;
+    let deltaY = 0;
+
+    if (rect.left < bounds.left) {
+      deltaX = bounds.left - rect.left;
+    } else if (rect.right > bounds.right) {
+      deltaX = bounds.right - rect.right;
+    }
+
+    if (rect.top < bounds.top) {
+      deltaY = bounds.top - rect.top;
+    } else if (rect.bottom > bounds.bottom) {
+      deltaY = bounds.bottom - rect.bottom;
+    }
+
+    if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
+      this.hoveredCompanyTooltip.set({
+        ...tooltip,
+        position: {
+          top: tooltip.position.top + deltaY,
+          left: tooltip.position.left + deltaX
+        }
+      });
+    }
+  }
+
+  private refreshTooltipPosition(): void {
+    const tooltip = this.hoveredCompanyTooltip();
+    if (!tooltip) return;
+
+    const anchor = this.tooltipAnchor;
+    const container = document.getElementById('war-room-map');
+    if (!container || !anchor) {
+      this.scheduleTooltipClamp();
+      return;
+    }
+
+    let target: Element | null = anchor.element;
+    if (!target || !target.isConnected) {
+      const svg = container.querySelector('svg');
+      if (svg && anchor.markerIndex >= 0) {
+        target =
+          svg.querySelector(`image#company-logo-image-${anchor.markerIndex}`) ||
+          svg.querySelector(`circle[data-index=\"${anchor.markerIndex}\"]`) ||
+          svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*=\"jvm-marker\"]')[anchor.markerIndex] ||
+          anchor.element ||
+          null;
+      }
+    }
+
+    if (target) {
+      this.showCompanyTooltipAtElement(anchor.node, target, anchor.logoSource);
+    } else {
+      this.scheduleTooltipClamp();
+    }
+  }
+
+  private resetMapToFullWorldView(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const fullWorldViewBox = '0 0 950 550';
+    svg.setAttribute('viewBox', fullWorldViewBox);
+
+    const mapAny = this.mapInstance as any;
+    if (mapAny) {
+      try {
+        if (typeof mapAny.updateSize === 'function') {
+          mapAny.updateSize();
+        }
+      } catch (e) {
+        console.warn('updateSize failed:', e);
+      }
+      try {
+        if (typeof mapAny.setFocus === 'function') {
+          mapAny.setFocus({ lat: 0, lng: 0, scale: 1, animate: false });
+        }
+      } catch (e) {
+        console.warn('setFocus reset failed:', e);
+      }
+      try {
+        if (typeof mapAny.setZoom === 'function') {
+          mapAny.setZoom(1);
+        }
+      } catch (e) {
+        console.warn('setZoom reset failed:', e);
+      }
+      try {
+        if (typeof mapAny._applyTransform === 'function' && mapAny._baseScale !== undefined) {
+          mapAny.scale = mapAny._baseScale;
+          if (mapAny._baseTransX !== undefined) {
+            mapAny.transX = mapAny._baseTransX;
+          }
+          if (mapAny._baseTransY !== undefined) {
+            mapAny.transY = mapAny._baseTransY;
+          }
+          mapAny._applyTransform();
+        }
+      } catch (e) {
+        console.warn('internal transform reset failed:', e);
+      }
+    }
+
+    this.updateLabelPositions();
+    this.updateCompanyLogosAndLabelsPositions();
+  }
+
+  private clearCompanyTooltip(): void {
+    this.hoveredCompanyTooltip.set(null);
+    this.tooltipAnchor = null;
+    if (this.tooltipClampRafId !== null) {
+      cancelAnimationFrame(this.tooltipClampRafId);
+      this.tooltipClampRafId = null;
+    }
+  }
+
+  onPopupClose(event: Event): void {
+    event.stopPropagation();
+    this.nodeSelected.emit(undefined);
+  }
+
+  onPopupViewDetails(event: Event): void {
+    event.stopPropagation();
+    const node = this.getSelectedNode();
+    if (node) {
+      this.nodeSelected.emit(node);
+    }
+  }
+
+  onLogoError(event: Event): void {
+    const img = event.target as HTMLImageElement | null;
+    if (!img) return;
+    if (img.src.endsWith('/assets/images/default-logo.png')) return;
+    img.src = '/assets/images/default-logo.png';
+  }
 
   // ...
 
@@ -29,29 +405,133 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
 
   // Services
   private warRoomService = inject(WarRoomService);
+  private appStateService = inject(AppStateService);
+
+  // Theme management
+  private appState = toSignal(this.appStateService.state$, {
+    initialValue: {
+      theme: 'light',
+      direction: 'ltr',
+      navigationStyles: 'vertical',
+      menuStyles: '',
+      layoutStyles: 'default',
+      pageStyles: 'regular',
+      widthStyles: 'fullwidth',
+      menuPosition: 'fixed',
+      headerPosition: 'fixed',
+      menuColor: 'dark',
+      headerColor: 'light',
+      themePrimary: '',
+      themeBackground: '',
+      backgroundImage: ''
+    }
+  });
+  currentTheme = computed(() => (this.appState()?.theme || 'light') as 'light' | 'dark');
+
+  // Host binding for theme-aware CSS
+  @HostBinding('attr.data-theme-mode') get themeMode(): string {
+    return this.currentTheme();
+  }
+
+  // Color schemes for light and dark themes
+  private readonly colorSchemes = {
+    light: {
+      backgroundColor: '#f5f5f5',
+      regionFill: '#e0e0e0',
+      regionStroke: '#d0d0d0',
+      regionHoverFill: '#d5d5d5',
+      regionFillOpacity: 0.8,
+    },
+    dark: {
+      backgroundColor: '#1a1a1a',
+      regionFill: '#2d2d2d',
+      regionStroke: '#3d3d3d',
+      regionHoverFill: '#404040',
+      regionFillOpacity: 0.7,
+    }
+  };
+
+  // Company descriptions - single source of truth
+  private readonly companyDescriptions: Record<string, string> = {
+    'creative carriage': `Creative Carriage has been a leader in wheelchair accessible vehicle manufacturing and conversions since 1988, when they built Canada's first fully-compliant wheelchair accessible taxi. Based near Brantford, Ontario, they specialize in custom, low-floor van conversions and serve as the exclusive Ontario dealer for six major US manufacturers of accessible and specialty vehicles. Their mission is to improve design and safety standards for wheelchair accessible vehicles.`,
+    'alexander dennis': `Alexander Dennis is a world-class bus manufacturer with over 130 years of heritage in design and engineering excellence. Operating 16 facilities across 10 countries and operating North America's only double-deck bus facility in Las Vegas, they lead the industry's transition to zero-emission mobility with 3,000+ electric buses delivered globally.`,
+    'karsan': `Karsan is a leading Turkish commercial vehicle manufacturer with over 58 years of industry experience. We specialize in innovative public transportation solutions, including electric buses like the e-JEST and e-ATAK, as well as hydrogen-powered and autonomous vehicles. As Turkey's only independent multi-brand vehicle manufacturer, we manage the entire value chain from R&D to after-sales service. Our state-of-the-art manufacturing facilities in Bursa can produce up to 20,000 vehicles annually.`,
+    'karzan': `Karsan is a leading Turkish commercial vehicle manufacturer with over 58 years of industry experience. We specialize in innovative public transportation solutions, including electric buses like the e-JEST and e-ATAK, as well as hydrogen-powered and autonomous vehicles. As Turkey's only independent multi-brand vehicle manufacturer, we manage the entire value chain from R&D to after-sales service. Our state-of-the-art manufacturing facilities in Bursa can produce up to 20,000 vehicles annually.`,
+    'arboc': `ARBOC Specialty Vehicles is North America's pioneer and industry leader in low-floor cutaway bus technology, founded in 2008 and based in Middlebury, Indiana. With 5,000+ buses produced and a 70% market share in Canada and the US, they specialize in fully accessible paratransit, transit, and shuttle vehicles that exceed federal fuel economy and accessibility standards.`,
+    'arbroc': `ARBOC Specialty Vehicles is North America's pioneer and industry leader in low-floor cutaway bus technology, founded in 2008 and based in Middlebury, Indiana. With 5,000+ buses produced and a 70% market share in Canada and the US, they specialize in fully accessible paratransit, transit, and shuttle vehicles that exceed federal fuel economy and accessibility standards.`,
+    'tam': `TAM-Europe is a leading bus and commercial vehicle manufacturer founded in 1947 and based in Maribor, Slovenia. With over 77 years of experience, they specialize in airport buses (VivAir with 40% global market share), electric city buses, and coaches serving markets globally, with strong commitment to product efficiency and environmental sustainability.`,
+    'nfl': `New Flyer is North America's largest transit bus manufacturer, founded in 1930 and headquartered in Winnipeg, Manitoba. Operating under parent company NFI Group, they offer the advanced Xcelsior family of buses including battery-electric (Xcelsior CHARGE NG™), hydrogen fuel cell (Xcelsior CHARGE FC™), and hybrid options, with 35,000+ buses in service globally and 265+ million zero-emission miles traveled.`,
+    'new flyer': `New Flyer is North America's largest transit bus manufacturer, founded in 1930 and headquartered in Winnipeg, Manitoba. Operating under parent company NFI Group, they offer the advanced Xcelsior family of buses including battery-electric (Xcelsior CHARGE NG™), hydrogen fuel cell (Xcelsior CHARGE FC™), and hybrid options, with 35,000+ buses in service globally and 265+ million zero-emission miles traveled.`,
+    'nova': `Nova Bus is Canada's leading transit bus manufacturer, founded in 1993 and based in Saint-Eustache, Quebec. As part of the Volvo Group, they deliver innovative mobility solutions including the 100% electric LFSe+ bus with dual charging options, CNG, diesel-electric hybrid, and conventional vehicles, supporting transit agencies across North America with proven expertise and industry-leading parts and service support.`,
+    'nova bus': `Nova Bus is Canada's leading transit bus manufacturer, founded in 1993 and based in Saint-Eustache, Quebec. As part of the Volvo Group, they deliver innovative mobility solutions including the 100% electric LFSe+ bus with dual charging options, CNG, diesel-electric hybrid, and conventional vehicles, supporting transit agencies across North America with proven expertise and industry-leading parts and service support.`
+  };
 
   // Private properties
   private mapInstance: any = null;
   private scriptsLoaded = false;
   private labelPositions = new Map<string, { x: number; y: number }>();
-  private updateLabelsInterval: ReturnType<typeof setInterval> | null = null;
+  private updateLabelsRAFId: number | null = null;
+  private labelsUpdateDirty: boolean = false;
   private mapReadyRetryInterval: ReturnType<typeof setInterval> | null = null;
   private isFullscreen = false;
   private destroyed = false;
   private labelObserver: MutationObserver | null = null;
   private nodeObserver: MutationObserver | null = null;
+  private viewBoxObserver: MutationObserver | null = null;
   private boundFullscreenHandler: (() => void) | null = null;
+  private boundResizeHandler: (() => void) | null = null;
+  private boundWheelHandler: ((e: WheelEvent) => void) | null = null;
+  private boundPanSyncMouseDownHandler: ((e: MouseEvent) => void) | null = null;
+  private boundPanSyncMouseMoveHandler: ((e: MouseEvent) => void) | null = null;
+  private boundPanSyncMouseUpHandler: ((e: MouseEvent) => void) | null = null;
+  private boundDragMouseMoveHandler: ((e: MouseEvent) => void) | null = null;
+  private boundDragMouseUpHandler: ((e: MouseEvent) => void) | null = null;
+  private maintainFullWorldView: boolean = true; // Flag to maintain full world view by default
   private zoomTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private isDragging: boolean = false;
+  private dragStartX: number = 0;
+  private dragStartY: number = 0;
+  private dragStartViewBoxX: number = 0;
+  private dragStartViewBoxY: number = 0;
+  private currentPopup: HTMLElement | null = null;
+  private closePopupHandler: ((e: MouseEvent) => void) | null = null;
+  private closePopupTimer: ReturnType<typeof setTimeout> | null = null;
   private updateMarkersTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private mapInitAttempts = 0;
   private readonly maxMapInitRetries = 10;
+  
+  // Hover tooltip state
+  hoveredCompanyTooltip = signal<{
+    node: WarRoomNode;
+    displayName: string;
+    logoPath: string;
+    description: string;
+    position: { top: number; left: number };
+  } | null>(null);
+  private tooltipTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private tooltipClampRafId: number | null = null;
+  private tooltipAnchor: {
+    node: WarRoomNode;
+    markerIndex: number;
+    logoSource: string | null;
+    element: Element;
+  } | null = null;
+  /** Cache for map elements to improve performance during drag/zoom */
+  private elementCache = new Map<string, Element | null>();
   /** Queued company id to zoom to when map becomes ready (avoids "map not available" race). */
   private pendingZoomCompanyId: string | null = null;
+  /** Track if user has manually zoomed (to prevent auto-reset) */
+  private userHasZoomed: boolean = false;
+  /** Flag to track initialization phase to ignore automated layout shifts */
+  private isInitializing: boolean = false;
 
   constructor() {
     // Effect to zoom to selected company location when it changes
     effect(() => {
       const selected = this.selectedCompany();
+      if (this.mapInstance && this.scriptsLoaded) {
+        this.updateSelectedMarkerStyles();
+      }
       if (selected && this.mapInstance) {
         // Clear any existing timeout
         if (this.zoomTimeoutId) {
@@ -95,6 +575,23 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
         }
       };
     });
+
+    effect(() => {
+      const selected = this.selectedCompany();
+      if (!selected && this.mapInstance && this.scriptsLoaded) {
+        // When no company is selected, ensure full world view is visible.
+        this.userHasZoomed = false;
+        this.resetToFullWorldView();
+      }
+    });
+
+    // Effect to update map colors when theme changes
+    effect(() => {
+      const theme = this.currentTheme();
+      if (this.mapInstance && !this.destroyed) {
+        this.updateMapColors(theme);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -111,9 +608,16 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Cleanup tooltip
+    if (this.tooltipTimeoutId) {
+      clearTimeout(this.tooltipTimeoutId);
+      this.tooltipTimeoutId = null;
+    }
+    this.clearCompanyTooltip();
     this.destroyed = true;
     this.pendingZoomCompanyId = null;
-    
+
+    // Remove resize listener
     // Clear timeouts
     if (this.zoomTimeoutId) {
       clearTimeout(this.zoomTimeoutId);
@@ -123,17 +627,24 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       clearTimeout(this.updateMarkersTimeoutId);
       this.updateMarkersTimeoutId = null;
     }
+    if (this.tooltipTimeoutId) {
+      clearTimeout(this.tooltipTimeoutId);
+      this.tooltipTimeoutId = null;
+    }
     
-    // Clear intervals
-    if (this.updateLabelsInterval) {
-      clearInterval(this.updateLabelsInterval);
-      this.updateLabelsInterval = null;
+    // Cancel RAF loop
+    if (this.updateLabelsRAFId !== null) {
+      cancelAnimationFrame(this.updateLabelsRAFId);
+      this.updateLabelsRAFId = null;
     }
     if (this.mapReadyRetryInterval) {
       clearInterval(this.mapReadyRetryInterval);
       this.mapReadyRetryInterval = null;
     }
-    
+
+    // Remove popup if it exists (this will also clean up the click listener)
+    this.hideMarkerPopup();
+
     // Disconnect MutationObservers
     if (this.labelObserver) {
       this.labelObserver.disconnect();
@@ -143,7 +654,11 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       this.nodeObserver.disconnect();
       this.nodeObserver = null;
     }
-    
+    if (this.viewBoxObserver) {
+      this.viewBoxObserver.disconnect();
+      this.viewBoxObserver = null;
+    }
+
     // Remove event listeners
     if (this.boundFullscreenHandler) {
       document.removeEventListener('fullscreenchange', this.boundFullscreenHandler);
@@ -151,7 +666,26 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       document.removeEventListener('msfullscreenchange', this.boundFullscreenHandler);
       this.boundFullscreenHandler = null;
     }
-    
+    if (this.boundResizeHandler) {
+      window.removeEventListener('resize', this.boundResizeHandler);
+      this.boundResizeHandler = null;
+    }
+    if (this.boundPanSyncMouseDownHandler) {
+      const container = document.getElementById('war-room-map');
+      if (container) {
+        container.removeEventListener('mousedown', this.boundPanSyncMouseDownHandler);
+      }
+      this.boundPanSyncMouseDownHandler = null;
+    }
+    if (this.boundPanSyncMouseMoveHandler) {
+      document.removeEventListener('mousemove', this.boundPanSyncMouseMoveHandler);
+      this.boundPanSyncMouseMoveHandler = null;
+    }
+    if (this.boundPanSyncMouseUpHandler) {
+      document.removeEventListener('mouseup', this.boundPanSyncMouseUpHandler);
+      this.boundPanSyncMouseUpHandler = null;
+    }
+
     if (this.isFullscreen) {
       this.exitFullscreen();
     }
@@ -269,9 +803,12 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       }
       return;
     }
-    
+
     // Reset attempt counter on successful initialization
     this.mapInitAttempts = 0;
+
+    // Set initializing flag
+    this.isInitializing = true;
 
     console.log('Map container dimensions:', rect.width, 'x', rect.height);
 
@@ -298,6 +835,9 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       this.mapInstance = null;
     }
 
+    // Clear element cache
+    this.elementCache.clear();
+
     setTimeout(() => {
       try {
         if (this.destroyed) return;
@@ -322,18 +862,30 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
         }));
 
         // Get transit routes from service
-        const transitRoutes = this.warRoomService.transitRoutes();
-        const lines = transitRoutes.map((route) => ({
-          from: route.from,
-          to: route.to,
-        }));
+        // COMMENTED OUT: Lines removed from map
+        // const transitRoutes = this.warRoomService.transitRoutes();
+        // const lines = transitRoutes.map((route) => ({
+        //   from: route.from,
+        //   to: route.to,
+        // }));
+        const lines: any[] = []; // Empty array to prevent lines from being added
+
+        // Get current theme for initial map colors
+        const currentTheme = this.currentTheme();
+        const colors = this.colorSchemes[currentTheme] || this.colorSchemes.dark;
 
         // Initialize the map with proper configuration
         const mapConfig: any = {
           selector: '#war-room-map',
           map: 'world',
           zoomButtons: false, // use custom zoom in/out in .map-controls
-          backgroundColor: '#ffffff', // White background per mockup
+          backgroundColor: colors.backgroundColor,
+          // Enable scroll zoom
+          zoomOnScroll: true, // Enable scroll zoom
+          zoomMin: 1, // Minimum zoom level (full world view)
+          zoomMax: 15, // Maximum zoom level
+          // Enable pan/drag functionality
+          panOnDrag: true, // Enable dragging to pan the map
           markers: allMarkers,
           markerStyle: {
             initial: {
@@ -351,34 +903,92 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
           },
           regionStyle: {
             initial: {
-              fill: '#d0d0d0', // Darker for visibility (was #e8e8e8)
-              stroke: '#a0a0a0', // Darker stroke (was #d0d0d0)
+              fill: colors.regionFill,
+              fillOpacity: colors.regionFillOpacity,
+              stroke: colors.regionStroke,
               strokeWidth: 0.5,
             },
             hover: {
-              fill: '#a0a0a0', // Darker hover state
+              fill: colors.regionHoverFill,
             },
           },
+          // Use custom tooltip only (prevents duplicate tooltips)
+          showTooltip: false,
         };
 
         // Add lines if supported
-        if (lines.length > 0) {
-          mapConfig.lines = lines;
-          mapConfig.lineStyle = {
-            stroke: '#00FF41', // Tactical green
-            strokeWidth: 3,
-            strokeDasharray: '0', // Solid lines
-            strokeOpacity: 0.8,
-          };
-        }
+        // COMMENTED OUT: Lines removed from map
+        // if (lines.length > 0) {
+        //   mapConfig.lines = lines;
+        //   mapConfig.lineStyle = {
+        //     stroke: '#00FF41', // Tactical green
+        //     strokeWidth: 3,
+        //     strokeDasharray: '0', // Solid lines
+        //     strokeOpacity: 0.8,
+        //   };
+        // }
 
-        // Add tooltip handler
+        // Add tooltip handler - ensure it works for Creative Carriage
         mapConfig.onMarkerTipShow = (event: any, label: any, index: number) => {
           const node = nodes[index];
-          if (label && label.html && node) {
-            label.html(
-              `<div style="font-weight: 600; margin-bottom: 4px;">${node.company}</div><div style="font-size: 12px; color: #6c757d;">${node.city}</div>`
-            );
+          if (!node) return;
+
+          console.log('Tooltip show for node:', node.company, 'index:', index);
+
+          const companyLower = node.company?.toLowerCase() || '';
+          const hasDescription = Object.keys(this.companyDescriptions).some(key => companyLower.includes(key));
+
+          // Debug logging for Karsan/Karzan tooltip
+          if (companyLower.includes('karsan') || companyLower.includes('karzan')) {
+            console.log(`[KARSAN/KARZAN Tooltip Debug] Company: "${node.company}", Lowercase: "${companyLower}", Has description: ${hasDescription}`);
+          }
+
+          if (hasDescription) {
+            const descriptionKey = Object.keys(this.companyDescriptions).find(key => companyLower.includes(key));
+            const description = descriptionKey ? this.companyDescriptions[descriptionKey] : '';
+
+            if (companyLower.includes('karsan') || companyLower.includes('karzan')) {
+              console.log(`[KARSAN/KARZAN Tooltip] Description key: "${descriptionKey}", Description length: ${description.length}`);
+            }
+
+            const tooltipHtml = `<div style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #00FF41;">${node.company}</div>
+               <div style="font-size: 11px; color: #6c757d; margin-bottom: 6px;">${node.city}</div>
+               <div style="font-size: 11px; color: #888; line-height: 1.4; max-width: 300px;">${description}</div>`;
+
+            // Try multiple methods to set tooltip content
+            if (label && typeof label.html === 'function') {
+              label.html(tooltipHtml);
+              if (companyLower.includes('karsan')) {
+                console.log(`[KARSAN Tooltip] Set via label.html() method`);
+              }
+            } else if (label && label.innerHTML !== undefined) {
+              label.innerHTML = tooltipHtml;
+              if (companyLower.includes('karsan')) {
+                console.log(`[KARSAN Tooltip] Set via label.innerHTML`);
+              }
+            } else if (label && label.textContent !== undefined) {
+              // Fallback: create a div and append
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = tooltipHtml;
+              if (label.appendChild) {
+                label.innerHTML = '';
+                label.appendChild(tempDiv);
+                if (companyLower.includes('karsan')) {
+                  console.log(`[KARSAN Tooltip] Set via appendChild fallback`);
+                }
+              }
+            }
+            console.log(`${node.company} tooltip set`);
+          } else {
+            const tooltipHtml = `<div style="font-weight: 600; margin-bottom: 4px;">${node.company}</div><div style="font-size: 12px; color: #6c757d;">${node.city}</div>`;
+            if (label && typeof label.html === 'function') {
+              label.html(tooltipHtml);
+            } else if (label && label.innerHTML !== undefined) {
+              label.innerHTML = tooltipHtml;
+            }
+            if (companyLower.includes('karsan')) {
+              console.warn(`[KARSAN Tooltip] No description found! Company: "${node.company}", Lowercase: "${companyLower}"`);
+            }
           }
         };
 
@@ -391,7 +1001,22 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
 
         // Add event handlers for zoom/pan to update label positions
         mapConfig.onViewportChange = () => {
+          // Mark that user has interacted with the map (zoomed/panned)
+          // Only if we're not in the initialization phase where many automatic layout shifts happen
+          if (!this.isInitializing) {
+            this.userHasZoomed = true;
+          }
+
           this.updateLabelPositions();
+          // Update logo and label positions when viewport changes - ensure text sticks to circle
+          // Use requestAnimationFrame for smoother updates, but also call directly for immediate response
+          this.updateCompanyLogosAndLabelsPositions();
+          this.refreshTooltipPosition();
+          requestAnimationFrame(() => {
+            this.updateCompanyLogosAndLabelsPositions();
+            // Re-apply logos and labels in case they were lost
+            this.addCompanyLogosAndLabels();
+          });
         };
 
         // Initialize the map
@@ -403,14 +1028,59 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
           this.mapInstance = new window.jsVectorMap(mapConfig);
           console.log('Map instance created successfully:', this.mapInstance);
 
+          // Immediately after map creation, set to full world view
+          // Do this before any other operations
+          setTimeout(() => {
+            if (!this.destroyed && !this.pendingZoomCompanyId) {
+              this.resetToFullWorldView();
+            }
+          }, 50);
+
           setTimeout(() => {
             if (this.destroyed) return;
             this.updateLabelPositions();
             this.startLabelPositionUpdates();
             this.attachMarkerClickHandlers();
+            this.attachMarkerHoverHandlers(); // Add hover handlers for tooltips
             const pending = this.pendingZoomCompanyId;
             this.pendingZoomCompanyId = null;
             if (pending) this.zoomToCompany(pending, 12);
+
+            // Remove lines group from DOM if it exists
+            const svg = finalCheck.querySelector('svg');
+            if (svg) {
+              const linesGroup = svg.querySelector('#jvm-lines-group');
+              if (linesGroup) {
+                linesGroup.remove();
+                console.log('Removed lines group from map');
+              }
+            }
+
+            // Add logos and company names to Creative Carriage markers
+            this.addCompanyLogosAndLabels();
+
+            // Reset to full world view by default (after logos are added)
+            // Only if no pending zoom is queued
+            if (!pending) {
+              // Call immediately and also after a delay to ensure it sticks
+              this.resetToFullWorldView();
+              setTimeout(() => {
+                if (!this.destroyed) {
+                  this.resetToFullWorldView();
+                }
+              }, 500);
+              setTimeout(() => {
+                if (!this.destroyed) {
+                  this.resetToFullWorldView();
+                  // Initialization complete - allow user interactions to be tracked
+                  this.isInitializing = false;
+                  console.log('Map initialization complete - user interactions enabled');
+                }
+              }, 2500); // Give plenty of time for all layout shifts to settle
+            } else {
+              // If there was a pending zoom, we're done initializing
+              this.isInitializing = false;
+            }
           }, 1000);
 
           // Listen for fullscreen changes
@@ -432,9 +1102,17 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
                 if (!svg.getAttribute('viewBox')) {
                   console.warn('SVG missing viewBox, forcing default...');
                   svg.setAttribute('viewBox', '0 0 950 550'); // Standard world map dimensions
-                  svg.style.width = '100%';
-                  svg.style.height = '100%';
                 }
+
+                // Ensure SVG is responsive - remove fixed width/height attributes
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = '100%';
+                svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'); // Show entire map, maintain aspect ratio
+
+                // Immediately set to full world view
+                svg.setAttribute('viewBox', '0 0 950 550');
 
                 // Check if SVG has content
                 const hasContent = svg.children.length > 0;
@@ -468,6 +1146,26 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
                 console.warn('No region paths found - map regions may not have rendered');
               }
 
+              // Ensure SVG is responsive
+              this.ensureSvgResponsive();
+
+              // Reset to full world view by default (zoom out to show entire map)
+              // Only if no pending zoom is queued
+              if (!this.pendingZoomCompanyId) {
+                this.resetToFullWorldView();
+              }
+
+              // Setup resize handler to keep SVG responsive
+              this.setupResizeHandler();
+
+              // Setup viewBox observer to maintain full world view
+              this.setupViewBoxObserver();
+
+              // Setup wheel/scroll zoom handler
+              this.setupWheelZoomHandler();
+              // Keep logo overlays synced while dragging the map
+              this.setupPanSyncHandlers();
+
               // Check for markers
               const markers = finalCheck.querySelectorAll('.jvm-marker, circle[class*="marker"], circle[data-index]');
               console.log('Number of markers found:', markers.length);
@@ -488,24 +1186,25 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
         }
 
         // If lines need to be added after initialization, use addLines method
-        if (this.mapInstance && this.mapInstance.addLines && lines.length > 0) {
-          setTimeout(() => {
-            try {
-              this.mapInstance.addLines(lines.map((line: any) => ({
-                ...line,
-                style: {
-                  stroke: '#00FF41', // Tactical green
-                  strokeWidth: 3,
-                  strokeDasharray: '0',
-                  strokeOpacity: 0.8,
-                },
-              })));
-              console.log('Lines added to map');
-            } catch (error) {
-              console.warn('Could not add lines via addLines method:', error);
-            }
-          }, 500);
-        }
+        // COMMENTED OUT: Lines removed from map
+        // if (this.mapInstance && this.mapInstance.addLines && lines.length > 0) {
+        //   setTimeout(() => {
+        //     try {
+        //       this.mapInstance.addLines(lines.map((line: any) => ({
+        //         ...line,
+        //         style: {
+        //           stroke: '#00FF41', // Tactical green
+        //           strokeWidth: 3,
+        //           strokeDasharray: '0',
+        //           strokeOpacity: 0.8,
+        //         },
+        //       })));
+        //       console.log('Lines added to map');
+        //     } catch (error) {
+        //       console.warn('Could not add lines via addLines method:', error);
+        //     }
+        //   }, 500);
+        // }
       } catch (error) {
         console.error('Error initializing map:', error);
         console.error('Error details:', error);
@@ -517,7 +1216,8 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
    * Get node display name
    */
   getNodeDisplayName(node: WarRoomNode): string {
-    return `${node.city.toUpperCase()} (${node.hubCode || node.company})`;
+    const displayName = this.getCompanyDisplayName(node).toUpperCase();
+    return `${node.city.toUpperCase()} (${node.hubCode || displayName})`;
   }
 
   /**
@@ -533,6 +1233,82 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
    */
   isHub(node: WarRoomNode): boolean {
     return node.isHub || node.type === 'Hub';
+  }
+
+  /**
+   * Hide and remove the current marker popup if it exists
+   */
+  private hideMarkerPopup(): void {
+    if (this.currentPopup) {
+      this.currentPopup.remove();
+      this.currentPopup = null;
+    }
+  }
+
+  /**
+   * Show a popup with company details when a marker is clicked
+   */
+  private showMarkerPopup(node: WarRoomNode, marker: HTMLElement, event: MouseEvent): void {
+    // Remove any existing popup first
+    this.hideMarkerPopup();
+
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const companyLower = node.company?.toLowerCase() || '';
+    const descriptionKey = Object.keys(this.companyDescriptions).find(key => companyLower.includes(key));
+    const description = descriptionKey ? this.companyDescriptions[descriptionKey] : null;
+
+    // Create popup element
+    const popup = document.createElement('div');
+    popup.className = 'marker-popup';
+    popup.style.position = 'absolute';
+    popup.style.zIndex = '1000';
+    popup.style.pointerEvents = 'auto';
+
+    // Build popup content
+    if (description) {
+      popup.innerHTML = `
+        <div style="background-color: rgba(26, 26, 26, 0.95); border: 1px solid #00FF41; border-radius: 4px; padding: 12px; max-width: 350px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);">
+          <div style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #00FF41;">${node.company}</div>
+          <div style="font-size: 11px; color: #6c757d; margin-bottom: 6px;">${node.city}</div>
+          <div style="font-size: 11px; color: #888; line-height: 1.4;">${description}</div>
+        </div>
+      `;
+    } else {
+      popup.innerHTML = `
+        <div style="background-color: rgba(26, 26, 26, 0.95); border: 1px solid #00FF41; border-radius: 4px; padding: 8px;">
+          <div style="font-weight: 600; margin-bottom: 4px; color: #00FF41;">${node.company}</div>
+          <div style="font-size: 12px; color: #6c757d;">${node.city}</div>
+        </div>
+      `;
+    }
+
+    // Position popup near the marker
+    const rect = marker.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    popup.style.left = (rect.left - containerRect.left + rect.width / 2) + 'px';
+    popup.style.top = (rect.top - containerRect.top - 10) + 'px';
+    popup.style.transform = 'translate(-50%, -100%)';
+
+    // Append to container
+    container.appendChild(popup);
+    this.currentPopup = popup;
+
+    // Add click handler to close popup when clicking outside
+    this.closePopupHandler = (e: MouseEvent) => {
+      if (popup && !popup.contains(e.target as Node) && !marker.contains(e.target as Node)) {
+        this.hideMarkerPopup();
+      }
+    };
+
+    // Use setTimeout to avoid immediate closure
+    this.closePopupTimer = setTimeout(() => {
+      if (this.closePopupHandler) {
+        document.addEventListener('click', this.closePopupHandler);
+      }
+      this.closePopupTimer = null;
+    }, 0);
   }
 
   /**
@@ -657,13 +1433,32 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Start updating label positions periodically and on map events
+   * Start updating label positions using requestAnimationFrame
    */
   private startLabelPositionUpdates(): void {
-    // Update positions periodically to handle zoom/pan
-    this.updateLabelsInterval = setInterval(() => {
-      this.updateLabelPositions();
-    }, 100);
+    // RAF-based update loop
+    const updateLoop = () => {
+      if (this.destroyed) return;
+
+      if (this.labelsUpdateDirty || this.isDragging) {
+        this.updateLabelPositions();
+        // Also update company logos and labels to ensure they stick to circles and are responsive
+        this.updateCompanyLogosAndLabelsPositions();
+        // Re-apply logos to ensure they're always positioned correctly
+        this.addCompanyLogosAndLabels();
+        this.labelsUpdateDirty = false;
+      }
+
+      // Continue RAF loop only if dirty or map is animating
+      if (this.labelsUpdateDirty || this.isDragging) {
+        this.updateLabelsRAFId = requestAnimationFrame(updateLoop);
+      } else {
+        this.updateLabelsRAFId = null;
+      }
+    };
+
+    // Start the RAF loop
+    this.updateLabelsRAFId = requestAnimationFrame(updateLoop);
 
     // Also try to listen to map events if available
     if (this.mapInstance) {
@@ -676,7 +1471,11 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
             // Listen to transform changes on the SVG
             this.labelObserver = new MutationObserver(() => {
               if (!this.destroyed) {
-                this.updateLabelPositions();
+                this.labelsUpdateDirty = true;
+                // Restart RAF loop if it's not running
+                if (this.updateLabelsRAFId === null) {
+                  this.updateLabelsRAFId = requestAnimationFrame(updateLoop);
+                }
               }
             });
             this.labelObserver.observe(svg, {
@@ -688,6 +1487,33 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       } catch (e) {
         console.warn('Could not set up map event listeners:', e);
       }
+    }
+  }
+
+  /**
+   * Mark labels as dirty and trigger update
+   */
+  private markLabelsDirty(): void {
+    this.labelsUpdateDirty = true;
+    if (this.updateLabelsRAFId === null && !this.destroyed) {
+      const updateLoop = () => {
+        if (this.destroyed) return;
+
+        if (this.labelsUpdateDirty || this.isDragging) {
+          this.updateLabelPositions();
+          this.updateCompanyLogosAndLabelsPositions();
+          this.addCompanyLogosAndLabels();
+          this.refreshTooltipPosition();
+          this.labelsUpdateDirty = false;
+        }
+
+        if (this.labelsUpdateDirty || this.isDragging) {
+          this.updateLabelsRAFId = requestAnimationFrame(updateLoop);
+        } else {
+          this.updateLabelsRAFId = null;
+        }
+      };
+      this.updateLabelsRAFId = requestAnimationFrame(updateLoop);
     }
   }
 
@@ -722,6 +1548,11 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
       console.log('Node count unchanged, updating label positions only');
       this.updateLabelPositions();
       this.attachMarkerClickHandlers();
+      // Re-add logos and labels in case markers were repositioned
+      setTimeout(() => {
+        this.addCompanyLogosAndLabels();
+        this.updateCompanyLogosAndLabelsPositions();
+      }, 200);
     }
   }
 
@@ -770,7 +1601,9 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
             event.stopPropagation(); // Prevent event bubbling
             event.preventDefault(); // Prevent default behavior
             console.log(`Marker ${index} clicked directly:`, node);
+            this.clearCompanyTooltip();
             this.nodeSelected.emit(node);
+            this.hideMarkerPopup();
           }, true); // Use capture phase for better reliability
 
           // Also add mousedown as backup
@@ -799,6 +1632,82 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
         subtree: true
       });
     }, 500);
+  }
+
+  /**
+   * Attach hover handlers to markers for tooltip display
+   * This ensures tooltips work even if jsVectorMap's built-in tooltip doesn't
+   */
+  private attachMarkerHoverHandlers(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) {
+      console.warn('Container not found for attaching marker hover handlers');
+      return;
+    }
+
+    const nodes = this.nodes();
+    if (nodes.length === 0) {
+      console.warn('No nodes available for marker hover handlers');
+      return;
+    }
+
+    // Wait a bit for markers to be fully rendered
+    setTimeout(() => {
+      const svg = container.querySelector('svg');
+      if (!svg) {
+        console.warn('SVG not found for attaching marker hover handlers');
+        return;
+      }
+
+      // Find all marker circles in the SVG
+      const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');
+      console.log(`Found ${markers.length} markers to attach hover handlers to`);
+
+      markers.forEach((marker: Element, index: number) => {
+        if (index < nodes.length && !marker.hasAttribute('data-hover-handler')) {
+          const node = nodes[index];
+          const logoSource = this.getCompanyLogoSource(node);
+
+          // Mark marker as having a hover handler to prevent duplicates
+          marker.setAttribute('data-hover-handler', 'true');
+
+          const handleMouseEnter: EventListener = (event) => {
+            if (this.destroyed) return;
+
+            if (this.tooltipTimeoutId) {
+              clearTimeout(this.tooltipTimeoutId);
+              this.tooltipTimeoutId = null;
+            }
+
+            const mouseEvent = event as MouseEvent;
+            this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);
+          };
+
+          const handleMouseLeave: EventListener = () => {
+            if (this.destroyed) return;
+
+            if (this.tooltipTimeoutId) {
+              clearTimeout(this.tooltipTimeoutId);
+              this.tooltipTimeoutId = null;
+            }
+
+            this.clearCompanyTooltip();
+          };
+
+          const handleMouseMove: EventListener = (event) => {
+            if (this.destroyed || !this.hoveredCompanyTooltip()) return;
+            const mouseEvent = event as MouseEvent;
+            this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);
+          };
+
+          marker.addEventListener('mouseenter', handleMouseEnter, true);
+          marker.addEventListener('mouseleave', handleMouseLeave, true);
+          marker.addEventListener('mousemove', handleMouseMove, true);
+
+          console.log(`Attached hover handler to marker ${index} for node:`, node.company);
+        }
+      });
+    }, 600);
   }
 
   /**
@@ -1095,6 +2004,8 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
    *                    Higher number = more zoom (e.g., 10 = medium, 12 = high, 15 = very high)
    */
   zoomToCompany(companyId: string, zoomScale: number = 12): void {
+    // Mark that we're programmatically zooming (not user manual zoom)
+    // This allows the zoom to happen without interference
     const nodes = this.nodes();
 
     if (nodes.length === 0) {
@@ -1162,15 +2073,72 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
+   * Apply selected styles to markers, logos, and labels based on selectedCompany.
+   */
+  private updateSelectedMarkerStyles(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const nodes = this.nodes();
+    const selectedId = this.selectedCompany()?.id || null;
+    const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');
+    const markersGroup = svg.querySelector('#jvm-markers-group') || svg;
+
+    nodes.forEach((node, index) => {
+      let marker = svg.querySelector(`circle[data-index="${index}"]`) as SVGCircleElement | null;
+      if (!marker && index < markers.length) {
+        marker = markers[index] as SVGCircleElement;
+      }
+
+      if (!marker) return;
+
+      const isSelected = !!selectedId && node.companyId === selectedId;
+
+      if (isSelected) {
+        marker.classList.add('selected-marker');
+      } else {
+        marker.classList.remove('selected-marker');
+      }
+
+      const logoImage = markersGroup.querySelector(`image[id="company-logo-image-${index}"]`) as SVGImageElement | null;
+      if (logoImage) {
+        if (isSelected) {
+          logoImage.setAttribute('data-selected', 'true');
+        } else {
+          logoImage.removeAttribute('data-selected');
+        }
+      }
+
+      const label = markersGroup.querySelector(`text[data-marker-index="${index}"]`) as SVGTextElement | null;
+      if (label) {
+        if (isSelected) {
+          label.setAttribute('data-selected', 'true');
+        } else {
+          label.removeAttribute('data-selected');
+        }
+      }
+    });
+  }
+
+  /**
    * Toggle fullscreen mode for the map
    */
   toggleFullscreen(): void {
-    const mapContainer = document.getElementById('war-room-map');
-    if (!mapContainer) return;
+    // Check current fullscreen state first
+    const currentState = this.getFullscreenState();
 
-    if (!this.isFullscreen) {
-      this.enterFullscreen(mapContainer);
+    if (!currentState) {
+      const container = document.querySelector('.war-room-map-container') as HTMLElement;
+      if (container) {
+        this.enterFullscreen(container);
+      } else {
+        console.warn('Map container not found for fullscreen');
+      }
     } else {
+      // Exit fullscreen
       this.exitFullscreen();
     }
   }
@@ -1178,61 +2146,27 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   /**
    * Enter fullscreen mode
    */
-  private enterFullscreen(element: HTMLElement): void {
-    // Try to enter fullscreen on the map container instead of just the map div
-    const mapContainer = element.closest('.war-room-map-container') as HTMLElement;
-    const targetElement = mapContainer || element;
+  private enterFullscreen(element?: HTMLElement): void {
+    const container = (element || document.querySelector('.war-room-map-container')) as HTMLElement;
+    if (!container) return;
 
-    if (targetElement.requestFullscreen) {
-      targetElement.requestFullscreen().then(() => {
-        this.isFullscreen = true;
-        // Force container to fill screen
-        targetElement.style.width = '100vw';
-        targetElement.style.height = '100vh';
-        targetElement.style.minHeight = '100vh';
-        targetElement.style.maxHeight = '100vh';
-        targetElement.style.backgroundColor = '#ffffff';
+    // Add fallback class immediately
+    container.classList.add('fullscreen-fallback-active');
+    this.isFullscreen = true;
 
-        // Resize map after entering fullscreen
-        setTimeout(() => {
-          if (this.mapInstance && this.mapInstance.updateSize) {
-            this.mapInstance.updateSize();
-          }
-          this.updateLabelPositions();
-        }, 300);
-      }).catch((err) => {
-        console.error('Error entering fullscreen:', err);
-      });
-    } else if ((targetElement as any).webkitRequestFullscreen) {
-      // Safari
-      (targetElement as any).webkitRequestFullscreen();
-      this.isFullscreen = true;
-      targetElement.style.width = '100vw';
-      targetElement.style.height = '100vh';
-      targetElement.style.minHeight = '100vh';
-      targetElement.style.maxHeight = '100vh';
-      targetElement.style.backgroundColor = '#ffffff';
-      setTimeout(() => {
-        if (this.mapInstance && this.mapInstance.updateSize) {
-          this.mapInstance.updateSize();
-        }
-        this.updateLabelPositions();
-      }, 300);
-    } else if ((targetElement as any).msRequestFullscreen) {
-      // IE/Edge
-      (targetElement as any).msRequestFullscreen();
-      this.isFullscreen = true;
-      targetElement.style.width = '100vw';
-      targetElement.style.height = '100vh';
-      targetElement.style.minHeight = '100vh';
-      targetElement.style.maxHeight = '100vh';
-      targetElement.style.backgroundColor = '#ffffff';
-      setTimeout(() => {
-        if (this.mapInstance && this.mapInstance.updateSize) {
-          this.mapInstance.updateSize();
-        }
-        this.updateLabelPositions();
-      }, 300);
+    try {
+      if (container.requestFullscreen) {
+        container.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message} (${err.name})`);
+          // If native fullscreen fails, we still have the class set for CSS fallback
+        });
+      } else if ((container as any).webkitRequestFullscreen) {
+        (container as any).webkitRequestFullscreen();
+      } else if ((container as any).msRequestFullscreen) {
+        (container as any).msRequestFullscreen();
+      }
+    } catch (e) {
+      console.error('Fullscreen request exception:', e);
     }
   }
 
@@ -1240,60 +2174,25 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
    * Exit fullscreen mode
    */
   private exitFullscreen(): void {
-    const mapContainer = document.querySelector('.war-room-map-container') as HTMLElement;
+    const container = document.querySelector('.war-room-map-container') as HTMLElement;
+    if (container) {
+      container.classList.remove('fullscreen-fallback-active');
+    }
 
-    if (document.exitFullscreen) {
-      document.exitFullscreen().then(() => {
-        this.isFullscreen = false;
-        // Reset container styles
-        if (mapContainer) {
-          mapContainer.style.width = '';
-          mapContainer.style.height = '';
-          mapContainer.style.minHeight = '';
-          mapContainer.style.maxHeight = '';
+    this.isFullscreen = false;
+
+    if (document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement) {
+      try {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(e => console.warn('Exit fullscreen error:', e));
+        } else if ((document as any).webkitExitFullscreen) {
+          (document as any).webkitExitFullscreen();
+        } else if ((document as any).msExitFullscreen) {
+          (document as any).msExitFullscreen();
         }
-        // Resize map after exiting fullscreen
-        setTimeout(() => {
-          if (this.mapInstance && this.mapInstance.updateSize) {
-            this.mapInstance.updateSize();
-          }
-          this.updateLabelPositions();
-        }, 300);
-      }).catch((err) => {
-        console.error('Error exiting fullscreen:', err);
-      });
-    } else if ((document as any).webkitExitFullscreen) {
-      // Safari
-      (document as any).webkitExitFullscreen();
-      this.isFullscreen = false;
-      if (mapContainer) {
-        mapContainer.style.width = '';
-        mapContainer.style.height = '';
-        mapContainer.style.minHeight = '';
-        mapContainer.style.maxHeight = '';
+      } catch (e) {
+        console.warn('Exit fullscreen exception:', e);
       }
-      setTimeout(() => {
-        if (this.mapInstance && this.mapInstance.updateSize) {
-          this.mapInstance.updateSize();
-        }
-        this.updateLabelPositions();
-      }, 300);
-    } else if ((document as any).msExitFullscreen) {
-      // IE/Edge
-      (document as any).msExitFullscreen();
-      this.isFullscreen = false;
-      if (mapContainer) {
-        mapContainer.style.width = '';
-        mapContainer.style.height = '';
-        mapContainer.style.minHeight = '';
-        mapContainer.style.maxHeight = '';
-      }
-      setTimeout(() => {
-        if (this.mapInstance && this.mapInstance.updateSize) {
-          this.mapInstance.updateSize();
-        }
-        this.updateLabelPositions();
-      }, 300);
     }
   }
 
@@ -1301,37 +2200,134 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
    * Check if currently in fullscreen mode
    */
   getFullscreenState(): boolean {
-    return this.isFullscreen || !!(
+    // Check actual DOM state first, then fallback to flag
+    const fullscreenElement =
       document.fullscreenElement ||
       (document as any).webkitFullscreenElement ||
-      (document as any).msFullscreenElement
-    );
+      (document as any).msFullscreenElement;
+
+    // Update internal flag to match actual state
+    if (fullscreenElement) {
+      this.isFullscreen = true;
+    } else {
+      this.isFullscreen = false;
+    }
+
+    return !!fullscreenElement;
   }
 
   /**
    * Zoom the map in one step (custom control).
+   * Directly manipulates the SVG viewBox to zoom in.
    */
   zoomIn(): void {
-    if (!this.mapInstance) return;
-    if (typeof (this.mapInstance as any).zoomIn === 'function') {
-      (this.mapInstance as any).zoomIn();
-      setTimeout(() => this.updateLabelPositions(), 300);
-      return;
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Mark that user is manually zooming
+    this.userHasZoomed = true;
+
+    // Try jsVectorMap API first
+    if (this.mapInstance && typeof (this.mapInstance as any).zoomIn === 'function') {
+      try {
+        (this.mapInstance as any).zoomIn();
+        setTimeout(() => {
+          this.updateLabelPositions();
+          this.updateCompanyLogosAndLabelsPositions();
+          this.refreshTooltipPosition();
+        }, 300);
+        return;
+      } catch (e) {
+        console.warn('jsVectorMap zoomIn failed, using manual zoom:', e);
+      }
     }
-    this.zoomByWheel(-1);
+
+    // Manual zoom by manipulating viewBox
+    this.zoomViewBox(svg, 1.5); // Zoom in by 1.5x
   }
 
   /**
    * Zoom the map out one step (custom control).
+   * Directly manipulates the SVG viewBox to zoom out.
    */
   zoomOut(): void {
-    if (!this.mapInstance) return;
-    if (typeof (this.mapInstance as any).zoomOut === 'function') {
-      (this.mapInstance as any).zoomOut();
-      setTimeout(() => this.updateLabelPositions(), 300);
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Mark that user is manually zooming
+    this.userHasZoomed = true;
+
+    // Try jsVectorMap API first
+    if (this.mapInstance && typeof (this.mapInstance as any).zoomOut === 'function') {
+      try {
+        (this.mapInstance as any).zoomOut();
+        setTimeout(() => {
+          this.updateLabelPositions();
+          this.updateCompanyLogosAndLabelsPositions();
+          this.refreshTooltipPosition();
+        }, 300);
+        return;
+      } catch (e) {
+        console.warn('jsVectorMap zoomOut failed, using manual zoom:', e);
+      }
+    }
+
+    // Manual zoom by manipulating viewBox
+    this.zoomViewBox(svg, 1 / 1.5); // Zoom out by 1/1.5x
+  }
+
+  /**
+   * Manually zoom the SVG by adjusting the viewBox.
+   * @param svg - The SVG element to zoom
+   * @param factor - Zoom factor (>1 = zoom in, <1 = zoom out)
+   */
+  private zoomViewBox(svg: SVGElement, factor: number): void {
+    const currentViewBox = svg.getAttribute('viewBox');
+    if (!currentViewBox) {
+      // No viewBox, set default
+      svg.setAttribute('viewBox', '0 0 950 550');
       return;
     }
-    this.zoomByWheel(1);
+
+    const [x, y, width, height] = currentViewBox.split(' ').map(Number);
+    const fullWorldWidth = 950;
+    const fullWorldHeight = 550;
+
+    // Calculate new viewBox dimensions
+    const newWidth = width / factor;
+    const newHeight = height / factor;
+
+    // Prevent zooming out beyond full world view
+    if (newWidth >= fullWorldWidth || newHeight >= fullWorldHeight) {
+      // Reset to full world view
+      this.userHasZoomed = false;
+      this.resetMapToFullWorldView();
+    } else {
+      // Calculate center point to zoom around
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+
+      // Calculate new x, y to keep center point
+      const newX = centerX - newWidth / 2;
+      const newY = centerY - newHeight / 2;
+
+      // Clamp to map bounds
+      const clampedX = Math.max(0, Math.min(fullWorldWidth - newWidth, newX));
+      const clampedY = Math.max(0, Math.min(fullWorldHeight - newHeight, newY));
+
+      // Set new viewBox
+      svg.setAttribute('viewBox', `${clampedX} ${clampedY} ${newWidth} ${newHeight}`);
+    }
+
+    // Mark labels as dirty to trigger RAF update
+    this.markLabelsDirty();
+    this.refreshTooltipPosition();
   }
 
   /**
@@ -1340,6 +2336,10 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   private zoomByWheel(direction: -1 | 1): void {
     const el = document.getElementById('war-room-map');
     if (!el) return;
+
+    // Mark that user is manually zooming
+    this.userHasZoomed = true;
+
     const delta = 120 * direction; // negative = zoom in, positive = zoom out
     el.dispatchEvent(new WheelEvent('wheel', { deltaY: delta, bubbles: true }));
     setTimeout(() => this.updateLabelPositions(), 300);
@@ -1375,6 +2375,389 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
+   * Update positions of company logos and labels when viewport changes
+   * Makes everything responsive to zoom
+   */
+  /**
+   * Update positions of company logos and labels when viewport changes
+   * Makes everything responsive to zoom
+   */
+  private updateCompanyLogosAndLabelsPositions(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const nodes = this.nodes();
+    const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');
+
+    if (markers.length === 0) return;
+
+    // Get current viewBox for zoom calculation
+    const viewBox = svg.getAttribute('viewBox');
+
+    // Calculate zoom factor
+    let zoomFactor = 1;
+    if (viewBox) {
+      const parts = viewBox.split(' ').map(parseFloat);
+      if (parts.length === 4) {
+        const viewBoxWidth = parts[2];
+        const viewBoxHeight = parts[3];
+        const baseWidth = 950;
+        const baseHeight = 550;
+
+        const widthRatio = baseWidth / viewBoxWidth;
+        const heightRatio = baseHeight / viewBoxHeight;
+        zoomFactor = (widthRatio + heightRatio) / 2;
+        zoomFactor = Math.max(0.1, Math.min(10, zoomFactor));
+      }
+    }
+
+    const markersGroup = svg.querySelector('#jvm-markers-group') || svg;
+    const logosGroup = markersGroup.querySelector('#jvm-logos-group') || markersGroup;
+    const labelsGroup = markersGroup.querySelector('#jvm-labels-group') || markersGroup;
+
+    nodes.forEach((node, index) => {
+      // Find the marker for this node
+      let marker: Element | null = svg.querySelector(`circle[data-index="${index}"]`);
+      if (!marker && index < markers.length) {
+        marker = markers[index];
+      }
+
+      if (!marker) return;
+
+      // Get marker attributes
+      const markerEl = marker as Element;
+      const cx = parseFloat(markerEl.getAttribute('cx') || '0');
+      const cy = parseFloat(markerEl.getAttribute('cy') || '0');
+      const r = parseFloat(markerEl.getAttribute('r') || '8');
+
+      // Update logo image position
+      const logoImageId = `company-logo-image-${index}`;
+      const logoImage = logosGroup.querySelector(`image[id="${logoImageId}"]`);
+
+      if (logoImage) {
+        const imageSize = this.getLogoImageSize(r, zoomFactor, this.getLogoSizeMultiplier(node));
+
+        logoImage.setAttribute('x', (cx - imageSize / 2).toString());
+        logoImage.setAttribute('y', (cy - imageSize / 2).toString());
+        logoImage.setAttribute('width', imageSize.toString());
+        logoImage.setAttribute('height', imageSize.toString());
+      }
+
+      // Update label position if it exists
+      const label = labelsGroup.querySelector(`text[data-marker-index="${index}"]`);
+      if (label) {
+        label.setAttribute('x', cx.toString());
+        label.setAttribute('y', (cy + r + 15).toString());
+      }
+    });
+  }
+
+  /**
+   * Add company logos and labels to markers for specific companies
+   * Uses SVG pattern to integrate logo with circle marker
+   */
+  private addCompanyLogosAndLabels(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const nodes = this.nodes();
+    const markersGroup = svg.querySelector('#jvm-markers-group') as SVGGElement;
+    if (!markersGroup) return;
+
+    // Keep labels below logos to prevent text covering images
+    let labelsGroup = markersGroup.querySelector('#jvm-labels-group') as SVGGElement | null;
+    if (!labelsGroup) {
+      labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      labelsGroup.setAttribute('id', 'jvm-labels-group');
+      markersGroup.appendChild(labelsGroup);
+    }
+
+    let logosGroup = markersGroup.querySelector('#jvm-logos-group') as SVGGElement | null;
+    if (!logosGroup) {
+      logosGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      logosGroup.setAttribute('id', 'jvm-logos-group');
+      markersGroup.appendChild(logosGroup);
+    } else {
+      // Ensure logos render above labels
+      markersGroup.appendChild(logosGroup);
+    }
+
+    // Get or create defs section for patterns
+    let defs = svg.querySelector('defs') as SVGDefsElement;
+    if (!defs) {
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svg.insertBefore(defs, svg.firstChild);
+    }
+
+    // Find nodes with logos
+    nodes.forEach((node, index) => {
+      const logoSource = this.getCompanyLogoSource(node);
+
+      if (logoSource) {
+        // Find the corresponding marker circle
+        const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index]');
+        let marker = svg.querySelector(`circle[data-index="${index}"]`) as SVGCircleElement | null;
+        if (!marker && index < markers.length) {
+          marker = markers[index] as SVGCircleElement;
+        }
+
+        if (marker) {
+          const cx = parseFloat(marker.getAttribute('cx') || '0');
+          const cy = parseFloat(marker.getAttribute('cy') || '0');
+          const r = parseFloat(marker.getAttribute('r') || '8');
+
+          // Use image overlay instead of pattern - more reliable
+          const logoImageId = `company-logo-image-${index}`;
+          let logoImage = logosGroup.querySelector(`image[id="${logoImageId}"]`) as SVGImageElement;
+          if (!logoImage) {
+            logoImage = markersGroup.querySelector(`image[id="${logoImageId}"]`) as SVGImageElement;
+          }
+
+          if (!logoImage) {
+            // Create image element directly in markers group (overlay on circle)
+            logoImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            logoImage.setAttribute('id', logoImageId);
+            logoImage.setAttribute('data-marker-index', index.toString());
+            logoImage.setAttribute('class', 'company-logo-image');
+
+            // Calculate responsive image size based on current zoom
+            // Get zoom factor from viewBox if available - use same simplified calculation
+            const viewBox = svg.getAttribute('viewBox');
+            let zoomFactor = 1;
+            if (viewBox) {
+              const [vbX, vbY, vbWidth, vbHeight] = viewBox.split(' ').map(Number);
+              const baseWidth = 950; // Base map width
+              const baseHeight = 550; // Base map height
+
+              // Simplified zoom factor calculation (same as updateCompanyLogosAndLabelsPositions)
+              const widthRatio = baseWidth / vbWidth;
+              const heightRatio = baseHeight / vbHeight;
+              zoomFactor = (widthRatio + heightRatio) / 2;
+              zoomFactor = Math.max(0.1, Math.min(10, zoomFactor));
+            }
+
+            const imageSize = this.getLogoImageSize(r, zoomFactor, this.getLogoSizeMultiplier(node));
+
+            logoImage.setAttribute('x', (cx - imageSize / 2).toString());
+            logoImage.setAttribute('y', (cy - imageSize / 2).toString());
+            logoImage.setAttribute('width', imageSize.toString());
+            logoImage.setAttribute('height', imageSize.toString());
+            logoImage.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+            // Try different path formats
+            const imagePaths = this.getLogoImagePaths(logoSource);
+
+            // Set initial path - prefer relative path for better compatibility
+            const primaryPath = imagePaths[0]; // Use resolved primary path
+            logoImage.setAttribute('href', primaryPath);
+            // Also try xlink:href for older SVG compatibility
+            logoImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', primaryPath);
+            console.log(`[${node.company}] Setting logo image with path:`, primaryPath);
+            console.log(`[${node.company}] All fallback paths:`, imagePaths);
+
+            // Add error handler to try fallback paths
+            let currentPathIndex = 0; // Start with the primary path index
+            let triedDefaultFallback = false;
+            const errorHandler = () => {
+              const currentHref = logoImage.getAttribute('href') || '';
+              console.warn(`[${node.company}] Logo failed to load from: ${currentHref}`);
+
+              if (imagePaths.length <= 1) {
+                if (!triedDefaultFallback) {
+                  triedDefaultFallback = true;
+                  const fallbackPath = '/assets/images/default-logo.png';
+                  console.warn(`[${node.company}] Falling back to default logo: ${fallbackPath}`);
+                  logoImage.setAttribute('href', fallbackPath);
+                  logoImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', fallbackPath);
+                  return;
+                }
+                console.error(`[${node.company}] Default logo fallback also failed.`);
+                return;
+              }
+
+              if (currentPathIndex < imagePaths.length - 1) {
+                currentPathIndex++;
+                const nextPath = imagePaths[currentPathIndex];
+                console.log(`[${node.company}] Trying fallback path ${currentPathIndex + 1}/${imagePaths.length}: ${nextPath}`);
+                logoImage.setAttribute('href', nextPath);
+                logoImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', nextPath);
+              } else {
+                console.error(`[${node.company}] Logo failed to load from all ${imagePaths.length} paths:`, imagePaths);
+                console.error(`[${node.company}] Please verify the logo source is valid:`, logoSource);
+                console.error(`[${node.company}] Check browser Network tab for 404 errors`);
+                console.error(`[${node.company}] Current window location:`, window.location.href);
+              }
+            };
+
+            logoImage.addEventListener('error', errorHandler);
+
+            // Add load handler to confirm success
+            logoImage.addEventListener('load', () => {
+              console.log(`✓ [${node.company}] Logo loaded successfully from:`, logoImage.getAttribute('href'));
+            }, { once: true });
+
+            // Insert image into the logos group so it appears above labels
+            logosGroup.appendChild(logoImage);
+          } else {
+            // Update existing image position - make it responsive to zoom
+            const viewBox = svg.getAttribute('viewBox');
+            let zoomFactor = 1;
+            if (viewBox) {
+              const [vbX, vbY, vbWidth, vbHeight] = viewBox.split(' ').map(Number);
+              const svgRect = svg.getBoundingClientRect();
+              const baseWidth = 950;
+              const baseHeight = 550;
+              zoomFactor = Math.max(baseWidth / vbWidth, baseHeight / vbHeight);
+            }
+
+            const imageSize = this.getLogoImageSize(r, zoomFactor, this.getLogoSizeMultiplier(node));
+
+            logoImage.setAttribute('x', (cx - imageSize / 2).toString());
+            logoImage.setAttribute('y', (cy - imageSize / 2).toString());
+            logoImage.setAttribute('width', imageSize.toString());
+            logoImage.setAttribute('height', imageSize.toString());
+
+            if (logoImage.parentNode !== logosGroup) {
+              logosGroup.appendChild(logoImage);
+            }
+          }
+
+          // Ensure hover handlers are attached (for both new and existing logos)
+          if (logoImage && !logoImage.hasAttribute('data-hover-attached')) {
+            this.attachLogoHoverHandlers(logoImage, node, logoSource, index);
+            logoImage.setAttribute('data-hover-attached', 'true');
+          }
+
+          // Keep circle visible with stroke (logo will overlay it)
+          marker.setAttribute('fill', '#00FF41'); // Keep original fill as fallback
+          marker.setAttribute('fill-opacity', '0.3'); // Semi-transparent so logo shows through
+          marker.setAttribute('stroke', '#ffffff');
+          marker.setAttribute('stroke-width', '2');
+          marker.setAttribute('stroke-opacity', '0.8');
+
+          // Check if text label already exists
+          const existingText = markersGroup.querySelector(`text[data-marker-index="${index}"]`);
+
+          // Always update or create text element to ensure it's visible and positioned correctly
+          let text = labelsGroup.querySelector(`text[data-marker-index="${index}"]`) as SVGTextElement;
+
+          if (!text) {
+            // Create SVG text element for company name - positioned to stick to circle
+            text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('data-marker-index', index.toString());
+            text.setAttribute('class', 'company-label');
+            labelsGroup.appendChild(text);
+          } else if (text.parentNode !== labelsGroup) {
+            labelsGroup.appendChild(text);
+          }
+
+          // Always update text properties to ensure it sticks to circle
+          text.setAttribute('x', cx.toString());
+          text.setAttribute('y', (cy + r + 15).toString()); // Position below the circle
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('font-size', '12');
+          text.setAttribute('dominant-baseline', 'hanging'); // Align text from top
+          text.style.fill = '#00FF41'; // Tactical green
+          text.style.fontWeight = 'bold';
+          text.style.fontFamily = 'Arial, sans-serif';
+          text.style.pointerEvents = 'none';
+          text.style.userSelect = 'none';
+          text.style.textShadow = '0 0 4px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.6)';
+          text.style.transform = 'none'; // Ensure no transforms that cause floating
+          text.style.visibility = 'visible';
+          text.style.opacity = '1';
+          // Custom display names for specific companies
+          let displayName = node.company.toUpperCase();
+          if (node.company?.toLowerCase().includes('nova')) {
+            displayName = 'NOVA BUS';
+          }
+          if (node.company?.toLowerCase().includes('karzan') || node.company?.toLowerCase().includes('karsan')) {
+            displayName = 'KARSAN';
+          }
+          if (node.company?.toLowerCase().includes('arboc') || node.company?.toLowerCase().includes('arbroc')) {
+            displayName = 'ARBOC';
+          }
+          text.textContent = displayName;
+        }
+      }
+    });
+
+    this.updateSelectedMarkerStyles();
+  }
+
+  /**
+   * Attach hover event handlers to company logo images for tooltip display
+   */
+  private attachLogoHoverHandlers(
+    logoImage: SVGImageElement,
+    node: WarRoomNode,
+    logoSource: string,
+    markerIndex: number
+  ): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Mouse enter handler
+    const handleMouseEnter: EventListener = (event) => {
+      if (this.destroyed) return;
+
+      if (this.tooltipTimeoutId) {
+        clearTimeout(this.tooltipTimeoutId);
+        this.tooltipTimeoutId = null;
+      }
+
+      const mouseEvent = event as MouseEvent;
+      this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);
+    };
+
+    // Mouse leave handler
+    const handleMouseLeave: EventListener = () => {
+      if (this.destroyed) return;
+      
+      // Clear timeout if tooltip hasn't shown yet
+      if (this.tooltipTimeoutId) {
+        clearTimeout(this.tooltipTimeoutId);
+        this.tooltipTimeoutId = null;
+      }
+      
+      // Hide tooltip immediately
+      this.clearCompanyTooltip();
+    };
+
+    // Mouse move handler to update position
+    const handleMouseMove: EventListener = (event) => {
+      if (this.destroyed || !this.hoveredCompanyTooltip()) return;
+      const mouseEvent = event as MouseEvent;
+      this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);
+    };
+
+    // Attach event listeners
+    logoImage.addEventListener('mouseenter', handleMouseEnter);
+    logoImage.addEventListener('mouseleave', handleMouseLeave);
+    logoImage.addEventListener('mousemove', handleMouseMove);
+
+    if (!logoImage.hasAttribute('data-logo-click-handler')) {
+      logoImage.addEventListener('click', (event: MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        this.clearCompanyTooltip();
+        this.nodeSelected.emit(node);
+        this.hideMarkerPopup();
+      }, true);
+      logoImage.setAttribute('data-logo-click-handler', 'true');
+    }
+  }
+
+  /**
    * Setup fullscreen change listeners
    */
   private setupFullscreenListeners(): void {
@@ -1387,21 +2770,31 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
     // Create bound handler
     this.boundFullscreenHandler = () => {
       if (this.destroyed) return;
-      
+
       const wasFullscreen = this.isFullscreen;
-      this.isFullscreen = this.getFullscreenState();
+      // Update flag based on actual DOM state
+      const currentState = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).msFullscreenElement
+      );
+      this.isFullscreen = currentState;
       const mapContainer = document.querySelector('.war-room-map-container') as HTMLElement;
       const mapDiv = document.getElementById('war-room-map');
       const mapContainerDiv = document.querySelector('.map-container') as HTMLElement;
 
       if (this.isFullscreen && !wasFullscreen) {
+        // Get current theme colors
+        const theme = this.currentTheme();
+        const colors = this.colorSchemes[theme as 'light' | 'dark'] || this.colorSchemes.dark;
+
         // Entering fullscreen - ensure container fills screen
         if (mapContainer) {
           mapContainer.style.width = '100vw';
           mapContainer.style.height = '100vh';
           mapContainer.style.minHeight = '100vh';
           mapContainer.style.maxHeight = '100vh';
-          mapContainer.style.backgroundColor = '#ffffff';
+          mapContainer.style.backgroundColor = colors.backgroundColor;
           mapContainer.style.position = 'fixed';
           mapContainer.style.top = '0';
           mapContainer.style.left = '0';
@@ -1414,7 +2807,7 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
           mapContainerDiv.style.height = '100%';
           mapContainerDiv.style.minHeight = '100vh';
           mapContainerDiv.style.maxHeight = '100vh';
-          mapContainerDiv.style.backgroundColor = '#ffffff';
+          mapContainerDiv.style.backgroundColor = colors.backgroundColor;
         }
 
         if (mapDiv) {
@@ -1422,12 +2815,12 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
           mapDiv.style.height = '100%';
           mapDiv.style.minHeight = '100vh';
           mapDiv.style.maxHeight = '100vh';
-          mapDiv.style.backgroundColor = '#ffffff';
+          mapDiv.style.backgroundColor = colors.backgroundColor;
         }
 
-        // Ensure body/html don't have black background
-        document.body.style.backgroundColor = '#ffffff';
-        document.documentElement.style.backgroundColor = '#ffffff';
+        // Ensure body/html use theme-appropriate background in fullscreen
+        document.body.style.backgroundColor = colors.backgroundColor;
+        document.documentElement.style.backgroundColor = colors.backgroundColor;
       } else if (!this.isFullscreen && wasFullscreen) {
         // Exiting fullscreen - reset styles
         if (mapContainer) {
@@ -1468,6 +2861,7 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
         }
         if (!this.destroyed) {
           this.updateLabelPositions();
+          this.refreshTooltipPosition();
         }
       }, 300);
     };
@@ -1476,5 +2870,505 @@ export class WarRoomMapComponent implements AfterViewInit, OnDestroy {
     fullscreenChangeEvents.forEach((eventName) => {
       document.addEventListener(eventName, this.boundFullscreenHandler!);
     });
+  }
+
+  /**
+   * Update map colors based on current theme
+   * @param theme - Current theme ('light' or 'dark')
+   */
+  private updateMapColors(theme: 'light' | 'dark'): void {
+    if (!this.mapInstance) return;
+
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const colors = this.colorSchemes[theme] || this.colorSchemes.dark;
+    const svg = container.querySelector('svg');
+
+    if (svg) {
+      // Update map background color
+      container.style.backgroundColor = colors.backgroundColor;
+
+      // Update all region paths
+      const regionPaths = svg.querySelectorAll('#jvm-regions-group path') as NodeListOf<SVGPathElement>;
+      regionPaths.forEach((pathElement) => {
+        pathElement.setAttribute('fill', colors.regionFill);
+        pathElement.setAttribute('fill-opacity', colors.regionFillOpacity.toString());
+        pathElement.setAttribute('stroke', colors.regionStroke);
+      });
+
+      // Update map container background if it exists
+      const mapContainer = container.closest('.map-container') as HTMLElement;
+      if (mapContainer) {
+        mapContainer.style.backgroundColor = colors.backgroundColor;
+      }
+
+      // Update jvm-container background if it exists
+      const jvmContainer = container.querySelector('.jvm-container') as HTMLElement;
+      if (jvmContainer) {
+        jvmContainer.style.backgroundColor = colors.backgroundColor;
+      }
+    }
+
+    // Update map instance background if the API supports it
+    if (this.mapInstance && typeof this.mapInstance.setBackgroundColor === 'function') {
+      this.mapInstance.setBackgroundColor(colors.backgroundColor);
+    }
+  }
+
+  /**
+   * Ensure SVG is responsive and shows entire map
+   * Only resets to full world view on initial load, not when user has zoomed
+   */
+  private ensureSvgResponsive(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Remove fixed width/height attributes that prevent responsiveness
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+
+    // Ensure viewBox is set (required for responsive SVG)
+    // Full world map viewBox: "0 0 950 550" shows entire world
+    const fullWorldViewBox = '0 0 950 550';
+    const currentViewBox = svg.getAttribute('viewBox');
+
+    // Only reset to full world view if:
+    // 1. No viewBox is set (initial load)
+    // 2. User hasn't manually zoomed AND (we're on initial load OR we're initializing)
+    if (!currentViewBox) {
+      // No viewBox set, set it to full world (initial load)
+      svg.setAttribute('viewBox', fullWorldViewBox);
+    } else if (!this.userHasZoomed && !this.pendingZoomCompanyId) {
+      // Only auto-reset if user hasn't zoomed and no pending zoom
+      // Force reset if we're still initializing or if viewBox is close to default
+      const [vbX, vbY, vbWidth, vbHeight] = currentViewBox.split(' ').map(Number);
+
+      // If we are initializing, be aggressive about resetting
+      if (this.isInitializing) {
+        if (currentViewBox !== fullWorldViewBox) {
+          svg.setAttribute('viewBox', fullWorldViewBox);
+        }
+      } else if (Math.abs(vbWidth - 950) < 5 && Math.abs(vbHeight - 550) < 5 && currentViewBox !== fullWorldViewBox) {
+        // Very close to full world but not exact - fix it (likely library artifact)
+        svg.setAttribute('viewBox', fullWorldViewBox);
+      }
+    }
+    // If user has zoomed, don't interfere with their zoom level
+
+    // Set preserveAspectRatio to show entire map and maintain aspect ratio
+    // xMidYMid meet ensures the entire map is visible and centered within container
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+    // Force responsive sizing via CSS
+    // Use 100% for both width and height - preserveAspectRatio will handle fitting
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.style.maxWidth = '100%';
+    svg.style.maxHeight = '100%';
+    svg.style.display = 'block';
+    svg.style.position = 'relative';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.margin = '0';
+    svg.style.padding = '0';
+    svg.style.verticalAlign = 'top'; // Align to top to prevent negative positioning
+
+    // Ensure jvm-container is also properly sized and positioned
+    const jvmContainer = container.querySelector('.jvm-container') as HTMLElement;
+    if (jvmContainer) {
+      jvmContainer.style.width = '100%';
+      jvmContainer.style.height = '100%';
+      jvmContainer.style.position = 'relative'; // Required for absolute positioned SVG
+      jvmContainer.style.overflow = 'hidden';
+      jvmContainer.style.top = '0';
+      jvmContainer.style.left = '0';
+      jvmContainer.style.margin = '0';
+      jvmContainer.style.padding = '0';
+    }
+
+    console.log('SVG made responsive:', {
+      viewBox: svg.getAttribute('viewBox'),
+      preserveAspectRatio: svg.getAttribute('preserveAspectRatio'),
+      containerSize: {
+        width: container.getBoundingClientRect().width,
+        height: container.getBoundingClientRect().height
+      },
+      svgSize: {
+        width: svg.getBoundingClientRect().width,
+        height: svg.getBoundingClientRect().height
+      }
+    });
+  }
+
+  /**
+   * Setup resize handler to keep SVG responsive on window resize
+   */
+  private setupResizeHandler(): void {
+    if (this.boundResizeHandler) {
+      return; // Already set up
+    }
+
+    this.boundResizeHandler = () => {
+      if (this.destroyed) return;
+
+      // Debounce resize handler
+      if (this.updateMarkersTimeoutId) {
+        clearTimeout(this.updateMarkersTimeoutId);
+      }
+
+      this.updateMarkersTimeoutId = setTimeout(() => {
+        if (!this.destroyed) {
+          this.ensureSvgResponsive();
+          // Mark labels as dirty to trigger RAF update after resize
+          this.markLabelsDirty();
+          this.refreshTooltipPosition();
+        }
+        this.updateMarkersTimeoutId = null;
+      }, 150);
+    };
+
+    window.addEventListener('resize', this.boundResizeHandler);
+  }
+
+  /**
+   * Reset map to full world view (zoom out to show entire map)
+   * Only resets if user hasn't manually zoomed
+   */
+  private resetToFullWorldView(): void {
+    // Don't reset if user has manually zoomed
+    if (this.userHasZoomed) {
+      console.log('Skipping resetToFullWorldView - user has manually zoomed');
+      return;
+    }
+
+    const container = document.getElementById('war-room-map');
+    if (!container) {
+      console.warn('resetToFullWorldView: Container not found');
+      return;
+    }
+
+    const svg = container.querySelector('svg');
+    if (!svg) {
+      console.warn('resetToFullWorldView: SVG not found');
+      return;
+    }
+
+    // Set viewBox to full world map dimensions (0 0 950 550)
+    // This ensures the entire world map is visible
+    const fullWorldViewBox = '0 0 950 550';
+    const currentViewBox = svg.getAttribute('viewBox');
+
+    console.log('resetToFullWorldView: Current viewBox:', currentViewBox, 'Target:', fullWorldViewBox);
+
+    // Force reset to full world view (only on initial load)
+    console.log('Forcing reset to full world view');
+    this.resetMapToFullWorldView();
+
+    // Force viewBox multiple times to ensure it sticks (map library might override it)
+    // Only if user hasn't manually zoomed
+    const forceViewBox = () => {
+      if (this.destroyed || this.userHasZoomed) return;
+      if (svg && svg.parentNode) {
+        const checkViewBox = svg.getAttribute('viewBox');
+        if (checkViewBox !== fullWorldViewBox) {
+          console.log('ViewBox was changed to:', checkViewBox, '- forcing back to full world view');
+          this.resetMapToFullWorldView();
+        }
+      }
+    };
+
+    // Force multiple times to override any library changes (only on initial load)
+    if (!this.userHasZoomed) {
+      setTimeout(forceViewBox, 50);
+      setTimeout(forceViewBox, 200);
+      setTimeout(forceViewBox, 500);
+      setTimeout(forceViewBox, 1000);
+    }
+  }
+
+  /**
+   * Setup viewBox monitoring (for debugging/logging, not auto-reset)
+   * This helps track viewBox changes but doesn't auto-reset to allow user zoom control
+   */
+  private setupViewBoxObserver(): void {
+    if (this.viewBoxObserver) {
+      return; // Already set up
+    }
+
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const fullWorldViewBox = '0 0 950 550';
+
+    // Just observe and log, don't auto-reset (allows user to zoom in if they want)
+    this.viewBoxObserver = new MutationObserver((mutations) => {
+      if (this.destroyed) return;
+
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'viewBox') {
+          const target = mutation.target as SVGElement;
+          if (target.tagName === 'svg') {
+            const currentViewBox = target.getAttribute('viewBox');
+            if (currentViewBox) {
+              const [vbX, vbY, vbWidth, vbHeight] = currentViewBox.split(' ').map(Number);
+              // Log viewBox changes for debugging
+              if (currentViewBox !== fullWorldViewBox) {
+                console.log('ViewBox changed:', currentViewBox, 'Zoom level:', (950 / vbWidth).toFixed(2) + 'x');
+              }
+            }
+          }
+        }
+      });
+    });
+
+    this.viewBoxObserver.observe(svg, {
+      attributes: true,
+      attributeFilter: ['viewBox']
+    });
+
+    console.log('ViewBox observer set up for monitoring');
+  }
+
+  /**
+   * Setup wheel/scroll event handler for zoom functionality
+   */
+  private setupWheelZoomHandler(): void {
+    if (this.boundWheelHandler) {
+      return; // Already set up
+    }
+
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    this.boundWheelHandler = (e: WheelEvent) => {
+      if (this.destroyed) return;
+
+      // Only handle wheel events on the map container
+      if (e.target !== container && !container.contains(e.target as Node)) {
+        return;
+      }
+
+      // Mark that user is manually zooming
+      this.userHasZoomed = true;
+
+      // Prevent default scroll behavior
+      e.preventDefault();
+      e.stopPropagation();
+
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      // Determine zoom direction
+      // deltaY > 0 = scroll down = zoom out
+      // deltaY < 0 = scroll up = zoom in
+      const zoomFactor = e.deltaY > 0 ? 1 / 1.1 : 1.1; // 10% zoom per scroll step
+
+      // Get mouse position relative to SVG for zooming around cursor point
+      const rect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // Get current viewBox
+      let currentViewBox = svg.getAttribute('viewBox');
+      if (!currentViewBox) {
+        svg.setAttribute('viewBox', '0 0 950 550');
+        currentViewBox = '0 0 950 550';
+      }
+
+      const [x, y, width, height] = currentViewBox.split(' ').map(Number);
+      const fullWorldWidth = 950;
+      const fullWorldHeight = 550;
+
+      // Calculate new viewBox dimensions
+      const newWidth = width / zoomFactor;
+      const newHeight = height / zoomFactor;
+
+      // Prevent zooming out beyond full world view
+      if (newWidth >= fullWorldWidth || newHeight >= fullWorldHeight) {
+        // Reset to full world view
+        this.userHasZoomed = false;
+        this.resetMapToFullWorldView();
+        return;
+      }
+
+      // Calculate mouse position in viewBox coordinates
+      const mouseXInViewBox = x + (mouseX / rect.width) * width;
+      const mouseYInViewBox = y + (mouseY / rect.height) * height;
+
+      // Calculate new x, y to keep mouse position fixed
+      const newX = mouseXInViewBox - (mouseX / rect.width) * newWidth;
+      const newY = mouseYInViewBox - (mouseY / rect.height) * newHeight;
+
+      // Clamp to map bounds
+      const clampedX = Math.max(0, Math.min(fullWorldWidth - newWidth, newX));
+      const clampedY = Math.max(0, Math.min(fullWorldHeight - newHeight, newY));
+
+      // Set new viewBox
+      svg.setAttribute('viewBox', `${clampedX} ${clampedY} ${newWidth} ${newHeight}`);
+
+      // Update positions after zoom
+      setTimeout(() => {
+        this.updateLabelPositions();
+        this.updateCompanyLogosAndLabelsPositions();
+        this.refreshTooltipPosition();
+      }, 50);
+    };
+
+    // Add wheel event listener with passive: false to allow preventDefault
+    container.addEventListener('wheel', this.boundWheelHandler, { passive: false });
+    console.log('Wheel zoom handler set up');
+  }
+
+  /**
+   * Keep logo/image overlays synced while jsVectorMap handles drag panning.
+   * The library updates marker positions on drag without emitting viewport change events,
+   * so we mark labels dirty during drag to keep overlays stuck to markers.
+   */
+  private setupPanSyncHandlers(): void {
+    if (this.boundPanSyncMouseDownHandler || this.boundPanSyncMouseMoveHandler || this.boundPanSyncMouseUpHandler) {
+      return; // Already set up
+    }
+
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    this.boundPanSyncMouseDownHandler = (e: MouseEvent) => {
+      if (e.button !== 0) return;
+
+      const target = e.target as HTMLElement;
+      if (
+        target.closest('circle.jvm-marker') ||
+        target.closest('image.company-logo-image') ||
+        target.closest('text.company-label') ||
+        target.closest('.marker-popup') ||
+        target.closest('.map-control-btn')
+      ) {
+        return;
+      }
+
+      this.isDragging = true;
+      this.userHasZoomed = true;
+      this.markLabelsDirty();
+    };
+
+    this.boundPanSyncMouseMoveHandler = () => {
+      if (!this.isDragging) return;
+      this.markLabelsDirty();
+    };
+
+    this.boundPanSyncMouseUpHandler = () => {
+      if (!this.isDragging) return;
+      this.isDragging = false;
+      this.markLabelsDirty();
+    };
+
+    container.addEventListener('mousedown', this.boundPanSyncMouseDownHandler);
+    document.addEventListener('mousemove', this.boundPanSyncMouseMoveHandler);
+    document.addEventListener('mouseup', this.boundPanSyncMouseUpHandler);
+    console.log('Pan sync handlers set up');
+  }
+
+  /**
+   * Setup map drag/pan handler for manual panning
+   */
+  private setupMapDragHandler(): void {
+    const container = document.getElementById('war-room-map');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Create bound handlers
+    this.boundDragMouseMoveHandler = (e: MouseEvent) => {
+      if (!this.isDragging) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const currentViewBox = svg.getAttribute('viewBox');
+      if (!currentViewBox) return;
+
+      const [x, y, width, height] = currentViewBox.split(' ').map(Number);
+      const fullWorldWidth = 950;
+      const fullWorldHeight = 550;
+
+      // Calculate mouse delta
+      const deltaX = (this.dragStartX - e.clientX) * (width / svg.clientWidth);
+      const deltaY = (this.dragStartY - e.clientY) * (height / svg.clientHeight);
+
+      // Calculate new viewBox position
+      let newX = this.dragStartViewBoxX + deltaX;
+      let newY = this.dragStartViewBoxY + deltaY;
+
+      // Clamp to map bounds
+      newX = Math.max(0, Math.min(fullWorldWidth - width, newX));
+      newY = Math.max(0, Math.min(fullWorldHeight - height, newY));
+
+      // Update viewBox
+      svg.setAttribute('viewBox', `${newX} ${newY} ${width} ${height}`);
+
+      // Mark labels as dirty to trigger RAF update
+      this.markLabelsDirty();
+    };
+
+    this.boundDragMouseUpHandler = (e: MouseEvent) => {
+      if (!this.isDragging) return;
+
+      this.isDragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+
+      // Mark labels as dirty for final update
+      this.markLabelsDirty();
+    };
+
+    // Add mousedown handler to SVG
+    svg.addEventListener('mousedown', (e: MouseEvent) => {
+      // Don't start drag if clicking on a marker, popup, or control button
+      const target = e.target as HTMLElement;
+      if (
+        target.closest('circle.jvm-marker') ||
+        target.closest('.marker-popup') ||
+        target.closest('.map-control-btn') ||
+        target.closest('image.company-logo-image') ||
+        target.closest('text.company-label')
+      ) {
+        return;
+      }
+
+      // Don't start drag if right-click
+      if (e.button !== 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const currentViewBox = svg.getAttribute('viewBox');
+      if (!currentViewBox) return;
+
+      const [x, y] = currentViewBox.split(' ').map(Number);
+
+      this.isDragging = true;
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+      this.dragStartViewBoxX = x;
+      this.dragStartViewBoxY = y;
+      this.userHasZoomed = true;
+
+      document.body.style.cursor = 'grabbing';
+      document.body.style.userSelect = 'none';
+
+      // Add global mouse move and up handlers
+      document.addEventListener('mousemove', this.boundDragMouseMoveHandler!);
+      document.addEventListener('mouseup', this.boundDragMouseUpHandler!);
+    });
+
+    console.log('Map drag handler set up');
   }
 }

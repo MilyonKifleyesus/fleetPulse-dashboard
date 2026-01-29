@@ -20,11 +20,21 @@ import {
 const COMPANY_IDS = {
   TAM: 'tam',
   CREATIVE: 'creative',
-  ARBROC: 'arbroc',
+  ARBOC: 'arboc',
   NFL: 'nfl',
   NOVA: 'nova',
   ALEXANDER: 'alexander',
-  KARZAN: 'karzan',
+  KARSAN: 'karsan',
+};
+
+const COMPANY_LOGOS = {
+  TAM: '/assets/images/tam-logo.png',
+  CREATIVE: '/assets/images/creative-carriage-logo.png',
+  ARBOC: '/assets/images/ARBOC.jpg',
+  NFL: '/assets/images/New-Flyer.jpg',
+  NOVA: '/assets/images/Nova-Bus.jpg.png',
+  ALEXANDER: '/assets/images/alexander-dennis.jpg',
+  KARSAN: '/assets/images/KARSAN.jpg',
 };
 
 // Nodes (locations on the map)
@@ -44,8 +54,8 @@ export const mockNodes: Node[] = [
   {
     id: 'node-indianapolis',
     name: 'indianapolis',
-    company: 'Arbroc',
-    companyId: COMPANY_IDS.ARBROC,
+    company: 'ARBOC',
+    companyId: COMPANY_IDS.ARBOC,
     city: 'Indianapolis',
     coordinates: { latitude: 39.7684, longitude: -86.1581 },
     type: 'Hub',
@@ -92,8 +102,8 @@ export const mockNodes: Node[] = [
   {
     id: 'node-turkey',
     name: 'turkey',
-    company: 'Karzan',
-    companyId: COMPANY_IDS.KARZAN,
+    company: 'Karsan',
+    companyId: COMPANY_IDS.KARSAN,
     city: 'Turkey',
     coordinates: { latitude: 39.9208, longitude: 32.8541 },
     type: 'Facility',
@@ -200,6 +210,7 @@ export const mockActivityLogs: ActivityLog[] = [
     title: 'TAM | NANJING, CHINA',
     description: 'PEAK EFFICIENCY // LOAD BALANCING COMPLETE',
     location: 'Nanjing, China',
+    logo: COMPANY_LOGOS.TAM,
   },
   {
     id: 'log-2',
@@ -210,16 +221,18 @@ export const mockActivityLogs: ActivityLog[] = [
     title: 'CREATIVE CARRIAGE | PARIS, ONTARIO',
     description: 'SYNC SUCCESS // LATENCY REDUCED -24MS',
     location: 'Paris, Ontario',
+    logo: COMPANY_LOGOS.CREATIVE,
   },
   {
     id: 'log-3',
     timestamp: new Date('2026-01-22T14:20:15'),
-    company: 'Arbroc',
-    companyId: COMPANY_IDS.ARBROC,
+    company: 'ARBOC',
+    companyId: COMPANY_IDS.ARBOC,
     status: 'INFO',
-    title: 'ARBROC | INDIANAPOLIS',
+    title: 'ARBOC | INDIANAPOLIS',
     description: 'HUB SHIFT START',
     location: 'Indianapolis',
+    logo: COMPANY_LOGOS.ARBOC,
   },
   {
     id: 'log-4',
@@ -230,6 +243,7 @@ export const mockActivityLogs: ActivityLog[] = [
     title: 'NFL | WINNIPEG',
     description: 'SYSTEM OPTIMAL',
     location: 'Winnipeg',
+    logo: COMPANY_LOGOS.NFL,
   },
   {
     id: 'log-5',
@@ -240,6 +254,7 @@ export const mockActivityLogs: ActivityLog[] = [
     title: 'NOVA | ST. EUSTACHE',
     description: 'SYNC ACTIVE',
     location: 'St. Eustache',
+    logo: COMPANY_LOGOS.NOVA,
   },
   {
     id: 'log-6',
@@ -250,16 +265,18 @@ export const mockActivityLogs: ActivityLog[] = [
     title: 'ALEXANDER DENNIS | LAS VEGAS',
     description: 'OPERATIONAL',
     location: 'Las Vegas',
+    logo: COMPANY_LOGOS.ALEXANDER,
   },
   {
     id: 'log-7',
     timestamp: new Date('2026-01-22T14:10:05'),
-    company: 'Karzan',
-    companyId: COMPANY_IDS.KARZAN,
+    company: 'Karsan',
+    companyId: COMPANY_IDS.KARSAN,
     status: 'INFO',
-    title: 'KARZAN | TURKEY',
+    title: 'KARSAN | TURKEY',
     description: 'CONNECTED',
     location: 'Turkey',
+    logo: COMPANY_LOGOS.KARSAN,
   },
 ];
 
@@ -359,14 +376,14 @@ export const mockCompanies: CompanyData[] = [
     },
   },
   {
-    id: COMPANY_IDS.ARBROC,
-    name: 'Arbroc',
+    id: COMPANY_IDS.ARBOC,
+    name: 'ARBOC',
     hubs: [
       {
-        id: 'hub-arbroc-ind',
+        id: 'hub-arboc-ind',
         code: 'IND',
-        companyId: COMPANY_IDS.ARBROC,
-        companyName: 'Arbroc',
+        companyId: COMPANY_IDS.ARBOC,
+        companyName: 'ARBOC',
         status: 'ONLINE',
         capacity: '84% CAP',
         capacityPercentage: 84,
@@ -443,14 +460,14 @@ export const mockCompanies: CompanyData[] = [
     },
   },
   {
-    id: COMPANY_IDS.KARZAN,
-    name: 'Karzan',
+    id: COMPANY_IDS.KARSAN,
+    name: 'Karsan',
     hubs: [
       {
-        id: 'hub-karzan-tky',
+        id: 'hub-karsan-tky',
         code: 'TKY',
-        companyId: COMPANY_IDS.KARZAN,
-        companyName: 'Karzan',
+        companyId: COMPANY_IDS.KARSAN,
+        companyName: 'Karsan',
         status: 'ONLINE',
         capacity: '71% CAP',
         capacityPercentage: 71,

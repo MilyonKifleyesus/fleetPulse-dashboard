@@ -1,27 +1,15 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { NetworkMetrics } from '../../../../../shared/models/war-room.interface';
 
 @Component({
   selector: 'app-war-room-footer',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './war-room-footer.component.html',
   styleUrl: './war-room-footer.component.scss',
 })
 export class WarRoomFooterComponent {
   networkMetrics = input<NetworkMetrics | null>(null);
-  
-  // Search functionality
-  searchTerm = signal<string>('');
-  
-  /**
-   * Handle search input
-   */
-  onSearch(value: string): void {
-    this.searchTerm.set(value);
-    // TODO: Implement search functionality
-  }
   
   /**
    * Get node density status based on value

@@ -4,7 +4,6 @@
       <!-- Modal Header -->
       <div class="modal-header">
         <div class="modal-title-section">
-          <div class="modal-title-bar"></div>
           <h1 class="modal-title">ADD COMPANY NODE</h1>
           <p class="modal-subtitle">FLEET REGISTRATION MODULE // ACCESS TIER 01</p>
         </div>
@@ -55,7 +54,22 @@
               [disabled]="isSubmitting()"
             />
           </div>
-          <p class="form-hint">Enter city and province (e.g., "Toronto, Ontario") or coordinates (e.g., "49.8951, -97.1384")</p>
+          <p class="form-hint">ENTER CITY AND PROVINCE (E.G., "TORONTO, ONTARIO") OR COORDINATES (E.G., "49.8951, -97.1384")</p>
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-field">
+          <label class="form-label" for="company-description">
+            DESCRIPTION
+          </label>
+          <textarea
+            id="company-description"
+            class="form-input form-textarea"
+            placeholder="ENTER COMPANY DESCRIPTION..."
+            [value]="description()"
+            (input)="description.set($any($event.target).value)"
+            [disabled]="isSubmitting()"
+          ></textarea>
         </div>
 
         <!-- Company Logo Field -->

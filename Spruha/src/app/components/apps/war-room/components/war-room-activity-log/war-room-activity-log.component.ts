@@ -83,7 +83,8 @@ export class WarRoomActivityLogComponent {
    */
   getCompanyNameFromTitle(title: string): string {
     const parts = title.split('|');
-    return parts.length > 0 ? parts[0].trim() : title;
+    const companyName = parts.length > 0 ? parts[0].trim() : title;
+    return this.normalizeCompanyName(companyName);
   }
 
   /**
@@ -101,5 +102,22 @@ export class WarRoomActivityLogComponent {
     event.stopPropagation(); // Prevent triggering the parent click handler twice
     console.log('Company name clicked:', log.company, 'companyId:', log.companyId);
     this.companySelected.emit(log.companyId);
+  }
+
+  private normalizeCompanyName(companyName: string): string {
+    const lowerName = companyName.toLowerCase();
+    if (lowerName.includes('karzan') || lowerName.includes('karsan')) {
+      return 'KARSAN';
+    }
+    if (lowerName.includes('arbroc') || lowerName.includes('arboc')) {
+      return 'ARBOC';
+    }
+    if (lowerName.includes('nova bus') || lowerName.includes('nova')) {
+      return 'Nova Bus';
+    }
+    if (lowerName.includes('nfl') || lowerName.includes('new flyer')) {
+      return 'New Flyer';
+    }
+    return companyName;
   }
 }
