@@ -1,0 +1,9401 @@
+# War Room Line‑by‑Line Documentation
+
+## Spruha/src/app/components/apps/war-room/war-room.component.ts
+- Line 1: `import { Component, OnInit, OnDestroy, signal, inject, viewChild, effect } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { CommonModule } from '@angular/common';` - Loads external tools or data types.
+- Line 3: `import { WarRoomService } from '../../../shared/services/war-room.service';` - Loads external tools or data types.
+- Line 4: `import { WarRoomRealtimeService } from '../../../shared/services/war-room-realtime.service';` - Loads external tools or data types.
+- Line 5: `import { Node, CompanyData, ActivityLog } from '../../../shared/models/war-room.interface';` - Loads external tools or data types.
+- Line 6: `import { WarRoomMapComponent } from './components/war-room-map/war-room-map.component';` - Loads external tools or data types.
+- Line 7: `import { WarRoomActivityLogComponent } from './components/war-room-activity-log/war-room-activity-log.component';` - Loads external tools or data types.
+- Line 8: `import { WarRoomHubStatusComponent } from './components/war-room-hub-status/war-room-hub-status.component';` - Loads external tools or data types.
+- Line 9: `import { AddCompanyModalComponent, CompanyFormData } from './components/add-company-modal/add-company-modal.component';` - Loads external tools or data types.
+- Line 10: `` - Blank line for readability.
+- Line 11: `@Component({` - Marks this class as a UI component.
+- Line 12: `selector: 'app-war-room',` - Defines the HTML tag name for this component.
+- Line 13: `imports: [` - Loads external tools or data types.
+- Line 14: `CommonModule,` - App logic step.
+- Line 15: `WarRoomMapComponent,` - App logic step.
+- Line 16: `WarRoomActivityLogComponent,` - App logic step.
+- Line 17: `WarRoomHubStatusComponent,` - App logic step.
+- Line 18: `AddCompanyModalComponent,` - App logic step.
+- Line 19: `],` - App logic step.
+- Line 20: `templateUrl: './war-room.component.html',` - Links to the layout file.
+- Line 21: `styleUrl: './war-room.component.scss',` - Links to the styling file.
+- Line 22: `})` - Ends a logic block.
+- Line 23: `export class WarRoomComponent implements OnInit, OnDestroy {` - Starts the logic class for this component.
+- Line 24: `// Inject services` - Developer comment or documentation.
+- Line 25: `private warRoomService = inject(WarRoomService);` - Retrieves a service.
+- Line 26: `private realtimeService = inject(WarRoomRealtimeService);` - Retrieves a service.
+- Line 27: `` - Blank line for readability.
+- Line 28: `// Signals from service` - Developer comment or documentation.
+- Line 29: `readonly nodes = this.warRoomService.nodes;` - App logic step.
+- Line 30: `readonly activityLogs = this.warRoomService.activityLogs;` - App logic step.
+- Line 31: `readonly networkMetrics = this.warRoomService.networkMetrics;` - App logic step.
+- Line 32: `readonly selectedCompany = this.warRoomService.selectedCompany;` - App logic step.
+- Line 33: `` - Blank line for readability.
+- Line 34: `// Activity log visibility - hidden by default` - Developer comment or documentation.
+- Line 35: `readonly activityLogVisible = signal<boolean>(false);` - Creates a reactive variable.
+- Line 36: `` - Blank line for readability.
+- Line 37: `// Hub status visibility - hidden by default` - Developer comment or documentation.
+- Line 38: `readonly hubStatusVisible = signal<boolean>(false);` - Creates a reactive variable.
+- Line 39: `` - Blank line for readability.
+- Line 40: `// Add company modal (over map)` - Developer comment or documentation.
+- Line 41: `readonly addCompanyModalVisible = signal<boolean>(false);` - Creates a reactive variable.
+- Line 42: `` - Blank line for readability.
+- Line 43: `// ViewChild reference to map component` - Developer comment or documentation.
+- Line 44: `readonly mapComponent = viewChild.required(WarRoomMapComponent);` - App logic step.
+- Line 45: `` - Blank line for readability.
+- Line 46: `readonly addCompanyModalRef = viewChild<AddCompanyModalComponent>('addCompanyModalRef');` - App logic step.
+- Line 47: `` - Blank line for readability.
+- Line 48: `// Timeout for zoom effect` - Developer comment or documentation.
+- Line 49: `private zoomTimeoutId: ReturnType<typeof setTimeout> | null = null;` - App logic step.
+- Line 50: `` - Blank line for readability.
+- Line 51: `constructor() {` - Initializes the component.
+- Line 52: `effect(() => {` - Starts a logic block.
+- Line 53: `const selectedCompany = this.selectedCompany();` - App logic step.
+- Line 54: `const map = this.mapComponent();` - App logic step.
+- Line 55: `// Clear any existing timeout` - Developer comment or documentation.
+- Line 56: `if (this.zoomTimeoutId) {` - Starts a logic block.
+- Line 57: `clearTimeout(this.zoomTimeoutId);` - App logic step.
+- Line 58: `}` - Ends a logic block.
+- Line 59: `if (selectedCompany && map) {` - Starts a logic block.
+- Line 60: `this.zoomTimeoutId = setTimeout(() => {` - Starts a logic block.
+- Line 61: `map.zoomToCompany(selectedCompany.id);` - App logic step.
+- Line 62: `this.zoomTimeoutId = null;` - App logic step.
+- Line 63: `}, 100);` - Ends a logic block.
+- Line 64: `}` - Ends a logic block.
+- Line 65: `// Cleanup function for effect` - Developer comment or documentation.
+- Line 66: `return () => {` - Starts a logic block.
+- Line 67: `if (this.zoomTimeoutId) {` - Starts a logic block.
+- Line 68: `clearTimeout(this.zoomTimeoutId);` - App logic step.
+- Line 69: `this.zoomTimeoutId = null;` - App logic step.
+- Line 70: `}` - Ends a logic block.
+- Line 71: `};` - Ends a logic block.
+- Line 72: `});` - Ends a logic block.
+- Line 73: `}` - Ends a logic block.
+- Line 74: `` - Blank line for readability.
+- Line 75: `ngOnInit(): void {` - Runs when component is ready.
+- Line 76: `// Start real-time updates` - Developer comment or documentation.
+- Line 77: `this.realtimeService.startRealTimeUpdates();` - App logic step.
+- Line 78: `}` - Ends a logic block.
+- Line 79: `` - Blank line for readability.
+- Line 80: `ngOnDestroy(): void {` - Runs before component is removed.
+- Line 81: `// Stop real-time updates` - Developer comment or documentation.
+- Line 82: `this.realtimeService.stopRealTimeUpdates();` - App logic step.
+- Line 83: `` - Blank line for readability.
+- Line 84: `// Clear zoom timeout` - Developer comment or documentation.
+- Line 85: `if (this.zoomTimeoutId) {` - Starts a logic block.
+- Line 86: `clearTimeout(this.zoomTimeoutId);` - App logic step.
+- Line 87: `this.zoomTimeoutId = null;` - App logic step.
+- Line 88: `}` - Ends a logic block.
+- Line 89: `}` - Ends a logic block.
+- Line 90: `` - Blank line for readability.
+- Line 91: `/**` - Developer comment or documentation.
+- Line 92: `* Handle company selection from activity log` - Developer comment or documentation.
+- Line 93: `*/` - Developer comment or documentation.
+- Line 94: `onCompanySelected(companyId: string): void {` - Starts a logic block.
+- Line 95: `this.warRoomService.selectCompany(companyId);` - App logic step.
+- Line 96: `` - Blank line for readability.
+- Line 97: `// Show activity log when clicking activity log` - Developer comment or documentation.
+- Line 98: `this.activityLogVisible.set(true);` - App logic step.
+- Line 99: `` - Blank line for readability.
+- Line 100: `// Zoom is handled by the effect() when selectedCompany changes` - Developer comment or documentation.
+- Line 101: `// This prevents double-zooming and race conditions` - Developer comment or documentation.
+- Line 102: `}` - Ends a logic block.
+- Line 103: `` - Blank line for readability.
+- Line 104: `/**` - Developer comment or documentation.
+- Line 105: `* Toggle activity log visibility` - Developer comment or documentation.
+- Line 106: `*/` - Developer comment or documentation.
+- Line 107: `toggleActivityLog(): void {` - Starts a logic block.
+- Line 108: `this.activityLogVisible.update(visible => !visible);` - App logic step.
+- Line 109: `}` - Ends a logic block.
+- Line 110: `` - Blank line for readability.
+- Line 111: `/**` - Developer comment or documentation.
+- Line 112: `* Toggle hub status visibility` - Developer comment or documentation.
+- Line 113: `*/` - Developer comment or documentation.
+- Line 114: `toggleHubStatus(): void {` - Starts a logic block.
+- Line 115: `this.hubStatusVisible.update(visible => !visible);` - App logic step.
+- Line 116: `}` - Ends a logic block.
+- Line 117: `` - Blank line for readability.
+- Line 118: `/**` - Developer comment or documentation.
+- Line 119: `* Handle node selection from map` - Developer comment or documentation.
+- Line 120: `*/` - Developer comment or documentation.
+- Line 121: `onNodeSelected(node: Node | undefined): void {` - Starts a logic block.
+- Line 122: `if (node) {` - Starts a logic block.
+- Line 123: `this.onCompanySelected(node.companyId);` - App logic step.
+- Line 124: `} else {` - App logic step.
+- Line 125: `this.warRoomService.selectCompany(null);` - App logic step.
+- Line 126: `}` - Ends a logic block.
+- Line 127: `}` - Ends a logic block.
+- Line 128: `` - Blank line for readability.
+- Line 129: `onAddCompanyRequested(): void {` - Starts a logic block.
+- Line 130: `this.addCompanyModalVisible.set(true);` - App logic step.
+- Line 131: `this.hubStatusVisible.set(true);` - App logic step.
+- Line 132: `}` - Ends a logic block.
+- Line 133: `` - Blank line for readability.
+- Line 134: `onAddCompanyModalClose(): void {` - Starts a logic block.
+- Line 135: `this.addCompanyModalVisible.set(false);` - App logic step.
+- Line 136: `}` - Ends a logic block.
+- Line 137: `` - Blank line for readability.
+- Line 138: `async onCompanyAdded(formData: CompanyFormData): Promise<void> {` - Starts a logic block.
+- Line 139: `if (!formData.companyName?.trim() || !formData.location?.trim()) {` - Starts a logic block.
+- Line 140: `throw new Error('Company name and location are required');` - App logic step.
+- Line 141: `}` - Ends a logic block.
+- Line 142: `const locationData = await this.warRoomService.parseLocationInput(formData.location);` - App logic step.
+- Line 143: `if (!locationData || locationData.latitude == null || locationData.longitude == null ||` - Checks a condition.
+- Line 144: `typeof locationData.latitude !== 'number' || typeof locationData.longitude !== 'number') {` - Starts a logic block.
+- Line 145: `throw new Error('Location coordinates are required. Please provide valid coordinates or a location that can be geocoded.');` - App logic step.
+- Line 146: `}` - Ends a logic block.
+- Line 147: `const companyId = this.warRoomService.generateCompanyId(formData.companyName);` - App logic step.
+- Line 148: `const nodeId = this.warRoomService.generateNodeId(formData.companyName);` - App logic step.
+- Line 149: `const locationParts = formData.location.split(',').map((p) => p.trim());` - App logic step.
+- Line 150: `const city = locationParts.length > 1 ? locationParts[0] : formData.location.trim();` - App logic step.
+- Line 151: `const fullLocation = formData.location.trim();` - App logic step.
+- Line 152: `const hubCode = this.generateHubCode(formData.companyName);` - App logic step.
+- Line 153: `const logoValue = typeof formData.logo === 'string' ? formData.logo : undefined;` - App logic step.
+- Line 154: `const newNode: Node = {` - Starts a logic block.
+- Line 155: `id: nodeId,` - App logic step.
+- Line 156: `name: city.toLowerCase().replace(/[^a-z0-9]+/g, '-'),` - App logic step.
+- Line 157: `company: formData.companyName.toUpperCase(),` - App logic step.
+- Line 158: `companyId,` - App logic step.
+- Line 159: `city: city || 'Unknown',` - App logic step.
+- Line 160: `description: formData.description?.trim() || undefined,` - App logic step.
+- Line 161: `logo: logoValue,` - App logic step.
+- Line 162: `coordinates: { latitude: locationData.latitude, longitude: locationData.longitude },` - App logic step.
+- Line 163: `type: 'Facility',` - App logic step.
+- Line 164: `status: 'ONLINE',` - App logic step.
+- Line 165: `isHub: true,` - App logic step.
+- Line 166: `hubCode,` - App logic step.
+- Line 167: `};` - Ends a logic block.
+- Line 168: `this.warRoomService.addNode(newNode);` - App logic step.
+- Line 169: `const existing = this.warRoomService.getCompanyData(companyId);` - App logic step.
+- Line 170: `if (!existing) {` - Starts a logic block.
+- Line 171: `const newCompany: CompanyData = {` - Starts a logic block.
+- Line 172: `id: companyId,` - App logic step.
+- Line 173: `name: formData.companyName.toUpperCase(),` - App logic step.
+- Line 174: `hubs: [{` - Starts a logic block.
+- Line 175: `id: 'hub-${companyId}-${Date.now()}',` - App logic step.
+- Line 176: `code: hubCode,` - App logic step.
+- Line 177: `companyId,` - App logic step.
+- Line 178: `companyName: formData.companyName.toUpperCase(),` - App logic step.
+- Line 179: `status: 'ONLINE',` - App logic step.
+- Line 180: `capacity: '100% CAP',` - App logic step.
+- Line 181: `capacityPercentage: 100,` - App logic step.
+- Line 182: `statusColor: 'text-tactical-green',` - App logic step.
+- Line 183: `capColor: 'text-tactical-green',` - App logic step.
+- Line 184: `}],` - Ends a logic block.
+- Line 185: `quantumChart: { dataPoints: [85, 88, 90, 92, 89, 91], highlightedIndex: 3 },` - App logic step.
+- Line 186: `};` - Ends a logic block.
+- Line 187: `this.warRoomService.addCompany(newCompany);` - App logic step.
+- Line 188: `}` - Ends a logic block.
+- Line 189: `const activityLog: ActivityLog = {` - Starts a logic block.
+- Line 190: `id: 'log-${nodeId}',` - App logic step.
+- Line 191: `timestamp: new Date(),` - App logic step.
+- Line 192: `company: formData.companyName.toUpperCase(),` - App logic step.
+- Line 193: `companyId,` - App logic step.
+- Line 194: `status: 'ACTIVE',` - App logic step.
+- Line 195: `title: '${formData.companyName.toUpperCase()} | ${fullLocation.toUpperCase()}',` - App logic step.
+- Line 196: `description: formData.description?.trim() || 'SYSTEM REGISTERED // NODE INITIALIZED',` - App logic step.
+- Line 197: `location: fullLocation,` - App logic step.
+- Line 198: `logo: formData.logo ?? undefined,` - App logic step.
+- Line 199: `};` - Ends a logic block.
+- Line 200: `this.warRoomService.addActivityLog(activityLog);` - App logic step.
+- Line 201: `this.warRoomService.selectCompany(companyId);` - App logic step.
+- Line 202: `this.addCompanyModalRef()?.closeAfterSuccess();` - App logic step.
+- Line 203: `}` - Ends a logic block.
+- Line 204: `` - Blank line for readability.
+- Line 205: `private generateHubCode(companyName: string): string {` - Starts a logic block.
+- Line 206: `const words = companyName.toUpperCase().split(/\s+/);` - App logic step.
+- Line 207: `if (words.length >= 2) {` - Starts a logic block.
+- Line 208: `const firstChar = words[0][0] ?? '';` - App logic step.
+- Line 209: `const secondWord = words[1];` - App logic step.
+- Line 210: `const secondChar = secondWord.charAt(0) ?? '';` - App logic step.
+- Line 211: `const thirdChar = secondWord.length > 1 ? secondWord.charAt(1) : secondWord.charAt(0);` - App logic step.
+- Line 212: `return (firstChar + secondChar + thirdChar).substring(0, 3);` - Returns a value.
+- Line 213: `}` - Ends a logic block.
+- Line 214: `return companyName.toUpperCase().substring(0, 3).padEnd(3, 'X');` - Returns a value.
+- Line 215: `}` - Ends a logic block.
+- Line 216: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/war-room.component.html
+- Line 1: `<div class="war-room-container">` - Structural container.
+- Line 2: `<!-- Main Content -->` - UI element definition.
+- Line 3: `<main class="war-room-main">` - UI element definition.
+- Line 4: `<!-- Map Area -->` - UI element definition.
+- Line 5: `<div class="war-room-map-area">` - Structural container.
+- Line 6: `<app-war-room-map [nodes]="nodes()" [selectedCompany]="selectedCompany()"` - UI element definition.
+- Line 7: `(nodeSelected)="onNodeSelected($event)"></app-war-room-map>` - UI element definition.
+- Line 8: `@if (addCompanyModalVisible()) {` - Starts a logic block.
+- Line 9: `<app-add-company-modal #addCompanyModalRef [isVisible]="true" [useMapPositioning]="true"` - UI element definition.
+- Line 10: `(companyAdded)="onCompanyAdded($event)" (close)="onAddCompanyModalClose()" />` - UI element definition.
+- Line 11: `}` - Ends a logic block.
+- Line 12: `</div>` - UI element definition.
+- Line 13: `` - Blank line for readability.
+- Line 14: `<!-- Sidebar -->` - UI element definition.
+- Line 15: `<aside class="war-room-sidebar" [class.expanded]="activityLogVisible() || hubStatusVisible()">` - UI element definition.
+- Line 16: `<!-- Activity Log Toggle Button -->` - UI element definition.
+- Line 17: `<button class="sidebar-toggle-btn activity-log-toggle bio-cell-toggle" [class.active]="activityLogVisible()"` - Clickable button.
+- Line 18: `(click)="toggleActivityLog()"` - UI element definition.
+- Line 19: `[attr.aria-label]="activityLogVisible() ? 'Hide activity log' : 'Show activity log'"` - UI element definition.
+- Line 20: `[attr.aria-expanded]="activityLogVisible()">` - UI element definition.
+- Line 21: `<span class="tactical-edge"></span>` - UI element definition.
+- Line 22: `<span class="toggle-icon" [class.expanded]="activityLogVisible()">▶</span>` - UI element definition.
+- Line 23: `<span class="toggle-text">{{ activityLogVisible() ? 'HIDE LOG' : 'SHOW LOG' }}</span>` - UI element definition.
+- Line 24: `</button>` - UI element definition.
+- Line 25: `` - Blank line for readability.
+- Line 26: `<!-- Activity Log Section -->` - UI element definition.
+- Line 27: `<div class="sidebar-section" [class.hidden]="!activityLogVisible()">` - Structural container.
+- Line 28: `<app-war-room-activity-log [activityLogs]="activityLogs()" [selectedCompanyId]="selectedCompany()?.id || null"` - UI element definition.
+- Line 29: `(companySelected)="onCompanySelected($event)"></app-war-room-activity-log>` - UI element definition.
+- Line 30: `</div>` - UI element definition.
+- Line 31: `` - Blank line for readability.
+- Line 32: `<!-- Hub Status Toggle Button -->` - UI element definition.
+- Line 33: `<button class="sidebar-toggle-btn hub-status-toggle bio-cell-toggle" [class.active]="hubStatusVisible()"` - Clickable button.
+- Line 34: `(click)="toggleHubStatus()" [attr.aria-label]="hubStatusVisible() ? 'Hide hub status' : 'Show hub status'"` - UI element definition.
+- Line 35: `[attr.aria-expanded]="hubStatusVisible()">` - UI element definition.
+- Line 36: `<span class="tactical-edge"></span>` - UI element definition.
+- Line 37: `<span class="toggle-icon" [class.expanded]="hubStatusVisible()">▶</span>` - UI element definition.
+- Line 38: `<span class="toggle-text">{{ hubStatusVisible() ? 'HIDE HUB' : 'SHOW HUB' }}</span>` - UI element definition.
+- Line 39: `</button>` - UI element definition.
+- Line 40: `` - Blank line for readability.
+- Line 41: `<!-- Hub Status Section -->` - UI element definition.
+- Line 42: `<div class="sidebar-section" [class.hidden]="!hubStatusVisible()">` - Structural container.
+- Line 43: `<app-war-room-hub-status [selectedCompany]="selectedCompany()"` - UI element definition.
+- Line 44: `(addCompanyRequested)="onAddCompanyRequested()"></app-war-room-hub-status>` - UI element definition.
+- Line 45: `</div>` - UI element definition.
+- Line 46: `</aside>` - UI element definition.
+- Line 47: `</main>` - UI element definition.
+- Line 48: `</div>` - UI element definition.
+
+## Spruha/src/app/components/apps/war-room/war-room.component.scss
+- Line 1: `@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap');` - Loads external tools or data types.
+- Line 2: `@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');` - Loads external tools or data types.
+- Line 3: `@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');` - Loads external tools or data types.
+- Line 4: `` - Blank line for readability.
+- Line 5: `// Color Variables - Using CSS custom properties for theme support` - Developer comment or documentation.
+- Line 6: `$tactical-green: #00FF41;` - Defines a visual property.
+- Line 7: `$war-gray: #ffffff;` - Defines a visual property.
+- Line 8: `$war-dark: #f5f5f5;` - Defines a visual property.
+- Line 9: `$black: #000000;` - Defines a visual property.
+- Line 10: `$zinc-100: #f4f4f5;` - Defines a visual property.
+- Line 11: `$zinc-200: #e4e4e7;` - Defines a visual property.
+- Line 12: `$zinc-300: #d4d4d8;` - Defines a visual property.
+- Line 13: `$zinc-500: #71717a;` - Defines a visual property.
+- Line 14: `$zinc-600: #52525b;` - Defines a visual property.
+- Line 15: `$zinc-700: #3f3f46;` - Defines a visual property.
+- Line 16: `$zinc-800: #27272a;` - Defines a visual property.
+- Line 17: `` - Blank line for readability.
+- Line 18: `// Cellular / bio-cell theme — using CSS variables for dynamic theming` - Developer comment or documentation.
+- Line 19: `$primary-forest: var(--primary-bg-color, #1B4332); // Falls back to default if not set` - Defines a visual property.
+- Line 20: `$secondary-forest: var(--primary05, rgba(45, 106, 79, 0.5));` - Defines a visual property.
+- Line 21: `$bg-main: var(--default-background, #F0F4F2);` - Defines a visual property.
+- Line 22: `$neural-bg: var(--primary01, rgba(27, 67, 50, 0.1));` - Defines a visual property.
+- Line 23: `$radius-cell: 12px;` - Defines a visual property.
+- Line 24: `$radius-organoid: 16px;` - Defines a visual property.
+- Line 25: `// Use CSS variables that update with theme - these will change when theme color changes` - Developer comment or documentation.
+- Line 26: `$sidebar-bg: var(--default-background, #f8faf9);` - Defines a visual property.
+- Line 27: `$card-bg: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 28: `$card-border: var(--primary02, rgba(27, 67, 50, 0.12));` - Defines a visual property.
+- Line 29: `` - Blank line for readability.
+- Line 30: `.war-room-container {` - Starts a logic block.
+- Line 31: `display: flex;` - Defines a visual property.
+- Line 32: `flex-direction: column;` - Defines a visual property.
+- Line 33: `min-height: 100vh;` - Defines a visual property.
+- Line 34: `height: 100vh;` - Defines a visual property.
+- Line 35: `font-family: 'Roboto Condensed', sans-serif;` - Defines a visual property.
+- Line 36: `background-color: $war-gray;` - Defines a visual property.
+- Line 37: `color: $black;` - Defines a visual property.
+- Line 38: `text-transform: uppercase;` - Defines a visual property.
+- Line 39: `overflow: hidden;` - Defines a visual property.
+- Line 40: `width: 100%;` - Defines a visual property.
+- Line 41: `max-width: 100vw;` - Defines a visual property.
+- Line 42: `}` - Ends a logic block.
+- Line 43: `` - Blank line for readability.
+- Line 44: `.war-room-main {` - Starts a logic block.
+- Line 45: `display: flex;` - Defines a visual property.
+- Line 46: `flex: 1;` - Defines a visual property.
+- Line 47: `overflow: hidden;` - Defines a visual property.
+- Line 48: `position: relative;` - Defines a visual property.
+- Line 49: `min-height: 320px;` - Defines a visual property.
+- Line 50: `flex-direction: row;` - Defines a visual property.
+- Line 51: `}` - Ends a logic block.
+- Line 52: `` - Blank line for readability.
+- Line 53: `.war-room-map-area {` - Starts a logic block.
+- Line 54: `flex: 1;` - Defines a visual property.
+- Line 55: `position: relative;` - Defines a visual property.
+- Line 56: `background-color: rgba(255, 255, 255, 0.5);` - Defines a visual property.
+- Line 57: `overflow: hidden;` - Defines a visual property.
+- Line 58: `min-height: 320px;` - Defines a visual property.
+- Line 59: `min-width: 0;` - Defines a visual property.
+- Line 60: `display: flex;` - Defines a visual property.
+- Line 61: `flex-direction: column;` - Defines a visual property.
+- Line 62: `}` - Ends a logic block.
+- Line 63: `` - Blank line for readability.
+- Line 64: `// ---- Hud label utility (cellular / JetBrains Mono) ----` - Developer comment or documentation.
+- Line 65: `.hud-label {` - Starts a logic block.
+- Line 66: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 67: `letter-spacing: 0.15em;` - Defines a visual property.
+- Line 68: `text-transform: uppercase;` - Defines a visual property.
+- Line 69: `font-size: 10px;` - Defines a visual property.
+- Line 70: `}` - Ends a logic block.
+- Line 71: `` - Blank line for readability.
+- Line 72: `.war-room-sidebar {` - Starts a logic block.
+- Line 73: `// Sidebar structure matching website's .app-sidebar` - Developer comment or documentation.
+- Line 74: `width: 160px;` - Defines a visual property.
+- Line 75: `min-width: 160px;` - Defines a visual property.
+- Line 76: `max-width: 160px;` - Defines a visual property.
+- Line 77: `height: 100%;` - Defines a visual property.
+- Line 78: `background: var(--menu-bg, #ffffff);` - Defines a visual property.
+- Line 79: `border-inline-end: 1px solid var(--menu-border-color, #e8e8f7);` - Defines a visual property.
+- Line 80: `display: flex;` - Defines a visual property.
+- Line 81: `flex-direction: column;` - Defines a visual property.
+- Line 82: `z-index: 40;` - Defines a visual property.
+- Line 83: `overflow-y: auto;` - Defines a visual property.
+- Line 84: `overflow-x: hidden;` - Defines a visual property.
+- Line 85: `position: relative;` - Defines a visual property.
+- Line 86: `max-height: 100%;` - Defines a visual property.
+- Line 87: `flex-shrink: 0;` - Defines a visual property.
+- Line 88: `transition: all 0.25s ease;` - Defines a visual property.
+- Line 89: `font-family: 'Plus Jakarta Sans', sans-serif;` - Defines a visual property.
+- Line 90: `padding: 0.75rem;` - Defines a visual property.
+- Line 91: `` - Blank line for readability.
+- Line 92: `&.expanded {` - Starts a logic block.
+- Line 93: `width: 320px;` - Defines a visual property.
+- Line 94: `min-width: 320px;` - Defines a visual property.
+- Line 95: `max-width: 320px;` - Defines a visual property.
+- Line 96: `}` - Ends a logic block.
+- Line 97: `` - Blank line for readability.
+- Line 98: `&::-webkit-scrollbar {` - Starts a logic block.
+- Line 99: `width: 6px;` - Defines a visual property.
+- Line 100: `}` - Ends a logic block.
+- Line 101: `` - Blank line for readability.
+- Line 102: `&::-webkit-scrollbar-track {` - Starts a logic block.
+- Line 103: `background: transparent;` - Defines a visual property.
+- Line 104: `}` - Ends a logic block.
+- Line 105: `` - Blank line for readability.
+- Line 106: `&::-webkit-scrollbar-thumb {` - Starts a logic block.
+- Line 107: `background: var(--gray-4, #8f8fb7);` - Defines a visual property.
+- Line 108: `border-radius: 0.3rem;` - Defines a visual property.
+- Line 109: `transition: background 0.3s ease;` - Defines a visual property.
+- Line 110: `` - Blank line for readability.
+- Line 111: `&:hover {` - Starts a logic block.
+- Line 112: `background: var(--gray-5, #717196);` - Defines a visual property.
+- Line 113: `}` - Ends a logic block.
+- Line 114: `}` - Ends a logic block.
+- Line 115: `` - Blank line for readability.
+- Line 116: `scrollbar-width: thin;` - Defines a visual property.
+- Line 117: `scrollbar-color: var(--gray-4, #8f8fb7) transparent;` - Defines a visual property.
+- Line 118: `}` - Ends a logic block.
+- Line 119: `` - Blank line for readability.
+- Line 120: `// ---- Toggle buttons matching website button structure ----` - Developer comment or documentation.
+- Line 121: `.sidebar-toggle-btn {` - Starts a logic block.
+- Line 122: `// Base button structure from website` - Developer comment or documentation.
+- Line 123: `position: sticky;` - Defines a visual property.
+- Line 124: `z-index: 2;` - Defines a visual property.
+- Line 125: `font-size: 0.85rem;` - Defines a visual property.
+- Line 126: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 127: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 128: `box-shadow: none;` - Defines a visual property.
+- Line 129: `font-weight: 400;` - Defines a visual property.
+- Line 130: `color: var(--gray-4, #71717a);` - Defines a visual property.
+- Line 131: `` - Blank line for readability.
+- Line 132: `// Layout and positioning` - Developer comment or documentation.
+- Line 133: `background: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 134: `border: 1px solid var(--primary02, rgba(27, 67, 50, 0.12));` - Defines a visual property.
+- Line 135: `min-height: 44px;` - Defines a visual property.
+- Line 136: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 137: `cursor: pointer;` - Defines a visual property.
+- Line 138: `display: flex;` - Defines a visual property.
+- Line 139: `align-items: center;` - Defines a visual property.
+- Line 140: `gap: 0.625rem;` - Defines a visual property.
+- Line 141: `transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 142: `width: 100%;` - Defines a visual property.
+- Line 143: `margin-bottom: 0.5rem;` - Defines a visual property.
+- Line 144: `top: 0;` - Defines a visual property.
+- Line 145: `overflow: hidden;` - Defines a visual property.
+- Line 146: `user-select: none;` - Defines a visual property.
+- Line 147: `` - Blank line for readability.
+- Line 148: `.tactical-edge {` - Starts a logic block.
+- Line 149: `position: absolute;` - Defines a visual property.
+- Line 150: `left: 0;` - Defines a visual property.
+- Line 151: `top: 20%;` - Defines a visual property.
+- Line 152: `height: 60%;` - Defines a visual property.
+- Line 153: `width: 3px;` - Defines a visual property.
+- Line 154: `background: $tactical-green;` - Defines a visual property.
+- Line 155: `border-radius: 0 2px 2px 0;` - Defines a visual property.
+- Line 156: `display: none;` - Defines a visual property.
+- Line 157: `transition: opacity 0.25s ease;` - Defines a visual property.
+- Line 158: `}` - Ends a logic block.
+- Line 159: `` - Blank line for readability.
+- Line 160: `// Hover state matching website button structure` - Developer comment or documentation.
+- Line 161: `&:hover {` - Starts a logic block.
+- Line 162: `background-color: rgba(var(--primary-rgb), 0.1) !important;` - Loads external tools or data types.
+- Line 163: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 164: `color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 165: `box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);` - Defines a visual property.
+- Line 166: `transform: translateY(-1px);` - Defines a visual property.
+- Line 167: `}` - Ends a logic block.
+- Line 168: `` - Blank line for readability.
+- Line 169: `// Active state matching website button structure` - Developer comment or documentation.
+- Line 170: `&:active,` - Defines a visual property.
+- Line 171: `&:focus {` - Starts a logic block.
+- Line 172: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 173: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 174: `color: #fff !important;` - Loads external tools or data types.
+- Line 175: `box-shadow: none;` - Defines a visual property.
+- Line 176: `outline: 0;` - Defines a visual property.
+- Line 177: `}` - Ends a logic block.
+- Line 178: `` - Blank line for readability.
+- Line 179: `// Active class state (when button is toggled on)` - Developer comment or documentation.
+- Line 180: `&.active {` - Starts a logic block.
+- Line 181: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 182: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 183: `color: #fff !important;` - Loads external tools or data types.
+- Line 184: `box-shadow: 0 0.25rem 1rem rgba(var(--primary-rgb), 0.5);` - Defines a visual property.
+- Line 185: `` - Blank line for readability.
+- Line 186: `.tactical-edge {` - Starts a logic block.
+- Line 187: `display: block;` - Defines a visual property.
+- Line 188: `background: $tactical-green;` - Defines a visual property.
+- Line 189: `}` - Ends a logic block.
+- Line 190: `` - Blank line for readability.
+- Line 191: `.toggle-icon {` - Starts a logic block.
+- Line 192: `color: $tactical-green;` - Defines a visual property.
+- Line 193: `}` - Ends a logic block.
+- Line 194: `` - Blank line for readability.
+- Line 195: `.toggle-text {` - Starts a logic block.
+- Line 196: `color: #fff !important;` - Loads external tools or data types.
+- Line 197: `font-weight: 400;` - Defines a visual property.
+- Line 198: `}` - Ends a logic block.
+- Line 199: `` - Blank line for readability.
+- Line 200: `&:hover {` - Starts a logic block.
+- Line 201: `background-color: rgba(var(--primary-rgb), 0.9) !important;` - Loads external tools or data types.
+- Line 202: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 203: `color: #fff !important;` - Loads external tools or data types.
+- Line 204: `box-shadow: 0 0.25rem 1rem rgba(var(--primary-rgb), 0.6);` - Defines a visual property.
+- Line 205: `transform: translateY(-2px);` - Defines a visual property.
+- Line 206: `}` - Ends a logic block.
+- Line 207: `` - Blank line for readability.
+- Line 208: `&:focus {` - Starts a logic block.
+- Line 209: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 210: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 211: `box-shadow: 0 0.25rem 1rem rgba(var(--primary-rgb), 0.5);` - Defines a visual property.
+- Line 212: `}` - Ends a logic block.
+- Line 213: `}` - Ends a logic block.
+- Line 214: `` - Blank line for readability.
+- Line 215: `.toggle-icon {` - Starts a logic block.
+- Line 216: `font-size: 0.625rem;` - Defines a visual property.
+- Line 217: `font-weight: 700;` - Defines a visual property.
+- Line 218: `transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease;` - Defines a visual property.
+- Line 219: `display: inline-flex;` - Defines a visual property.
+- Line 220: `align-items: center;` - Defines a visual property.
+- Line 221: `justify-content: center;` - Defines a visual property.
+- Line 222: `flex-shrink: 0;` - Defines a visual property.
+- Line 223: `width: 1rem;` - Defines a visual property.
+- Line 224: `height: 1rem;` - Defines a visual property.
+- Line 225: `color: inherit;` - Defines a visual property.
+- Line 226: `line-height: 1;` - Defines a visual property.
+- Line 227: `` - Blank line for readability.
+- Line 228: `&.expanded {` - Starts a logic block.
+- Line 229: `transform: rotate(90deg);` - Defines a visual property.
+- Line 230: `}` - Ends a logic block.
+- Line 231: `}` - Ends a logic block.
+- Line 232: `` - Blank line for readability.
+- Line 233: `.toggle-text {` - Starts a logic block.
+- Line 234: `font-size: 0.85rem;` - Defines a visual property.
+- Line 235: `font-weight: 400;` - Defines a visual property.
+- Line 236: `letter-spacing: 0.05em;` - Defines a visual property.
+- Line 237: `text-transform: uppercase;` - Defines a visual property.
+- Line 238: `color: inherit;` - Defines a visual property.
+- Line 239: `flex: 1;` - Defines a visual property.
+- Line 240: `text-align: left;` - Defines a visual property.
+- Line 241: `line-height: 1.3;` - Defines a visual property.
+- Line 242: `transition: color 0.25s ease, font-weight 0.25s ease;` - Defines a visual property.
+- Line 243: `}` - Ends a logic block.
+- Line 244: `` - Blank line for readability.
+- Line 245: `&.activity-log-toggle {` - Starts a logic block.
+- Line 246: `margin-top: 0;` - Defines a visual property.
+- Line 247: `}` - Ends a logic block.
+- Line 248: `` - Blank line for readability.
+- Line 249: `&.hub-status-toggle {` - Starts a logic block.
+- Line 250: `margin-top: 0.5rem;` - Defines a visual property.
+- Line 251: `}` - Ends a logic block.
+- Line 252: `}` - Ends a logic block.
+- Line 253: `` - Blank line for readability.
+- Line 254: `.sidebar-section {` - Starts a logic block.
+- Line 255: `position: relative;` - Defines a visual property.
+- Line 256: `z-index: 1;` - Defines a visual property.
+- Line 257: `transition: max-height 0.25s ease, opacity 0.2s ease, transform 0.2s ease;` - Defines a visual property.
+- Line 258: `max-height: none;` - Defines a visual property.
+- Line 259: `opacity: 1;` - Defines a visual property.
+- Line 260: `transform: translateX(0);` - Defines a visual property.
+- Line 261: `overflow: visible;` - Defines a visual property.
+- Line 262: `flex-shrink: 0;` - Defines a visual property.
+- Line 263: `` - Blank line for readability.
+- Line 264: `&.hidden {` - Starts a logic block.
+- Line 265: `max-height: 0;` - Defines a visual property.
+- Line 266: `opacity: 0;` - Defines a visual property.
+- Line 267: `transform: translateX(-100%);` - Defines a visual property.
+- Line 268: `pointer-events: none;` - Defines a visual property.
+- Line 269: `margin: 0;` - Defines a visual property.
+- Line 270: `padding: 0;` - Defines a visual property.
+- Line 271: `overflow: hidden;` - Defines a visual property.
+- Line 272: `}` - Ends a logic block.
+- Line 273: `}` - Ends a logic block.
+- Line 274: `` - Blank line for readability.
+- Line 275: `// -------- Responsive breakpoints --------` - Developer comment or documentation.
+- Line 276: `// Tablet: 768px–991px` - Developer comment or documentation.
+- Line 277: `@media (max-width: 991.98px) {` - Starts a logic block.
+- Line 278: `.war-room-main {` - Starts a logic block.
+- Line 279: `min-height: 400px;` - Defines a visual property.
+- Line 280: `}` - Ends a logic block.
+- Line 281: `` - Blank line for readability.
+- Line 282: `.war-room-map-area {` - Starts a logic block.
+- Line 283: `min-height: 400px;` - Defines a visual property.
+- Line 284: `}` - Ends a logic block.
+- Line 285: `` - Blank line for readability.
+- Line 286: `.war-room-sidebar {` - Starts a logic block.
+- Line 287: `width: 140px;` - Defines a visual property.
+- Line 288: `min-width: 140px;` - Defines a visual property.
+- Line 289: `max-width: 140px;` - Defines a visual property.
+- Line 290: `` - Blank line for readability.
+- Line 291: `&.expanded {` - Starts a logic block.
+- Line 292: `width: 280px;` - Defines a visual property.
+- Line 293: `min-width: 280px;` - Defines a visual property.
+- Line 294: `max-width: 280px;` - Defines a visual property.
+- Line 295: `}` - Ends a logic block.
+- Line 296: `}` - Ends a logic block.
+- Line 297: `}` - Ends a logic block.
+- Line 298: `` - Blank line for readability.
+- Line 299: `// Mobile: < 576px — stack map then sidebar` - Developer comment or documentation.
+- Line 300: `@media (max-width: 575.98px) {` - Starts a logic block.
+- Line 301: `.war-room-container {` - Starts a logic block.
+- Line 302: `min-height: 100vh;` - Defines a visual property.
+- Line 303: `height: 100%;` - Defines a visual property.
+- Line 304: `}` - Ends a logic block.
+- Line 305: `` - Blank line for readability.
+- Line 306: `.war-room-main {` - Starts a logic block.
+- Line 307: `flex-direction: column;` - Defines a visual property.
+- Line 308: `min-height: 0;` - Defines a visual property.
+- Line 309: `flex: 1;` - Defines a visual property.
+- Line 310: `overflow: auto;` - Defines a visual property.
+- Line 311: `}` - Ends a logic block.
+- Line 312: `` - Blank line for readability.
+- Line 313: `.war-room-map-area {` - Starts a logic block.
+- Line 314: `flex: 1;` - Defines a visual property.
+- Line 315: `min-height: 280px;` - Defines a visual property.
+- Line 316: `order: 1;` - Defines a visual property.
+- Line 317: `}` - Ends a logic block.
+- Line 318: `` - Blank line for readability.
+- Line 319: `.war-room-sidebar {` - Starts a logic block.
+- Line 320: `order: 2;` - Defines a visual property.
+- Line 321: `width: 100%;` - Defines a visual property.
+- Line 322: `min-width: 100%;` - Defines a visual property.
+- Line 323: `max-width: 100%;` - Defines a visual property.
+- Line 324: `max-height: 45vh;` - Defines a visual property.
+- Line 325: `min-height: 0;` - Defines a visual property.
+- Line 326: `border-left: none;` - Defines a visual property.
+- Line 327: `border-top: 1px solid rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 328: `box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 329: `flex-shrink: 0;` - Defines a visual property.
+- Line 330: `` - Blank line for readability.
+- Line 331: `&.expanded {` - Starts a logic block.
+- Line 332: `width: 100%;` - Defines a visual property.
+- Line 333: `min-width: 100%;` - Defines a visual property.
+- Line 334: `max-width: 100%;` - Defines a visual property.
+- Line 335: `max-height: 55vh;` - Defines a visual property.
+- Line 336: `}` - Ends a logic block.
+- Line 337: `}` - Ends a logic block.
+- Line 338: `` - Blank line for readability.
+- Line 339: `.sidebar-toggle-btn {` - Starts a logic block.
+- Line 340: `padding: 0.4rem 0.5rem;` - Defines a visual property.
+- Line 341: `font-size: 0.5625rem;` - Defines a visual property.
+- Line 342: `` - Blank line for readability.
+- Line 343: `.toggle-icon {` - Starts a logic block.
+- Line 344: `font-size: 0.625rem;` - Defines a visual property.
+- Line 345: `}` - Ends a logic block.
+- Line 346: `` - Blank line for readability.
+- Line 347: `.toggle-text {` - Starts a logic block.
+- Line 348: `font-size: 0.5rem;` - Defines a visual property.
+- Line 349: `}` - Ends a logic block.
+- Line 350: `}` - Ends a logic block.
+- Line 351: `}` - Ends a logic block.
+- Line 352: `` - Blank line for readability.
+- Line 353: `// Small mobile: < 400px` - Developer comment or documentation.
+- Line 354: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 355: `.war-room-map-area {` - Starts a logic block.
+- Line 356: `min-height: 240px;` - Defines a visual property.
+- Line 357: `}` - Ends a logic block.
+- Line 358: `` - Blank line for readability.
+- Line 359: `.war-room-sidebar {` - Starts a logic block.
+- Line 360: `max-height: 40vh;` - Defines a visual property.
+- Line 361: `` - Blank line for readability.
+- Line 362: `&.expanded {` - Starts a logic block.
+- Line 363: `max-height: 50vh;` - Defines a visual property.
+- Line 364: `}` - Ends a logic block.
+- Line 365: `}` - Ends a logic block.
+- Line 366: `}` - Ends a logic block.
+- Line 367: `` - Blank line for readability.
+- Line 368: `// Large screens: ensure min heights` - Developer comment or documentation.
+- Line 369: `@media (min-width: 992px) {` - Starts a logic block.
+- Line 370: `.war-room-main {` - Starts a logic block.
+- Line 371: `min-height: 500px;` - Defines a visual property.
+- Line 372: `}` - Ends a logic block.
+- Line 373: `` - Blank line for readability.
+- Line 374: `.war-room-map-area {` - Starts a logic block.
+- Line 375: `min-height: 500px;` - Defines a visual property.
+- Line 376: `}` - Ends a logic block.
+- Line 377: `}` - Ends a logic block.
+- Line 378: `` - Blank line for readability.
+- Line 379: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 380: `.war-room-main {` - Starts a logic block.
+- Line 381: `min-height: 600px;` - Defines a visual property.
+- Line 382: `}` - Ends a logic block.
+- Line 383: `` - Blank line for readability.
+- Line 384: `.war-room-map-area {` - Starts a logic block.
+- Line 385: `min-height: 600px;` - Defines a visual property.
+- Line 386: `}` - Ends a logic block.
+- Line 387: `}` - Ends a logic block.
+- Line 388: `` - Blank line for readability.
+- Line 389: `// Animations` - Developer comment or documentation.
+- Line 390: `@keyframes pulse-green {` - Starts a logic block.
+- Line 391: `0%, 100% {` - Starts a logic block.
+- Line 392: `opacity: 1;` - Defines a visual property.
+- Line 393: `}` - Ends a logic block.
+- Line 394: `50% {` - Starts a logic block.
+- Line 395: `opacity: 0.5;` - Defines a visual property.
+- Line 396: `}` - Ends a logic block.
+- Line 397: `}` - Ends a logic block.
+- Line 398: `` - Blank line for readability.
+- Line 399: `@keyframes move-chevrons {` - Starts a logic block.
+- Line 400: `from {` - Starts a logic block.
+- Line 401: `stroke-dashoffset: 72;` - Defines a visual property.
+- Line 402: `}` - Ends a logic block.
+- Line 403: `to {` - Starts a logic block.
+- Line 404: `stroke-dashoffset: 0;` - Defines a visual property.
+- Line 405: `}` - Ends a logic block.
+- Line 406: `}` - Ends a logic block.
+- Line 407: `` - Blank line for readability.
+- Line 408: `// Global styles for war room` - Developer comment or documentation.
+- Line 409: `:host {` - Starts a logic block.
+- Line 410: `display: block;` - Defines a visual property.
+- Line 411: `width: 100%;` - Defines a visual property.
+- Line 412: `height: 100%;` - Defines a visual property.
+- Line 413: `}` - Ends a logic block.
+- Line 414: `` - Blank line for readability.
+- Line 415: `// Material Icons` - Developer comment or documentation.
+- Line 416: `.material-symbols-outlined {` - Starts a logic block.
+- Line 417: `font-family: 'Material Symbols Outlined';` - Defines a visual property.
+- Line 418: `font-weight: normal;` - Defines a visual property.
+- Line 419: `font-style: normal;` - Defines a visual property.
+- Line 420: `font-size: 24px;` - Defines a visual property.
+- Line 421: `line-height: 1;` - Defines a visual property.
+- Line 422: `letter-spacing: normal;` - Defines a visual property.
+- Line 423: `text-transform: none;` - Defines a visual property.
+- Line 424: `display: inline-block;` - Defines a visual property.
+- Line 425: `white-space: nowrap;` - Defines a visual property.
+- Line 426: `word-wrap: normal;` - Defines a visual property.
+- Line 427: `direction: ltr;` - Defines a visual property.
+- Line 428: `font-feature-settings: 'liga';` - Defines a visual property.
+- Line 429: `-webkit-font-feature-settings: 'liga';` - Defines a visual property.
+- Line 430: `-webkit-font-smoothing: antialiased;` - Defines a visual property.
+- Line 431: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-map/war-room-map.component.ts
+- Line 1: `import { Component, input, output, AfterViewInit, OnDestroy, inject, effect, signal, computed, HostBinding } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { CommonModule } from '@angular/common';` - Loads external tools or data types.
+- Line 3: `import { Node as WarRoomNode, CompanyData } from '../../../../../shared/models/war-room.interface';` - Loads external tools or data types.
+- Line 4: `import { WarRoomService } from '../../../../../shared/services/war-room.service';` - Loads external tools or data types.
+- Line 5: `import { AppStateService } from '../../../../../shared/services/app-state.service';` - Loads external tools or data types.
+- Line 6: `import { toSignal } from '@angular/core/rxjs-interop';` - Loads external tools or data types.
+- Line 7: `` - Blank line for readability.
+- Line 8: `declare global {` - Starts a logic block.
+- Line 9: `interface Window {` - Starts a logic block.
+- Line 10: `jsVectorMap: any;` - App logic step.
+- Line 11: `}` - Ends a logic block.
+- Line 12: `}` - Ends a logic block.
+- Line 13: `` - Blank line for readability.
+- Line 14: `@Component({` - Marks this class as a UI component.
+- Line 15: `selector: 'app-war-room-map',` - Defines the HTML tag name for this component.
+- Line 16: `imports: [CommonModule],` - Loads external tools or data types.
+- Line 17: `templateUrl: './war-room-map.component.html',` - Links to the layout file.
+- Line 18: `styleUrls: ['./war-room-map.component.scss'],` - Links to the styling file.
+- Line 19: `})` - Ends a logic block.
+- Line 20: `export class WarRoomMapComponent implements AfterViewInit, OnDestroy {` - Starts the logic class for this component.
+- Line 21: `// Inputs` - Developer comment or documentation.
+- Line 22: `nodes = input<WarRoomNode[]>([]);` - App logic step.
+- Line 23: `selectedCompany = input<CompanyData | null>(null);` - App logic step.
+- Line 24: `` - Blank line for readability.
+- Line 25: `// Outputs` - Developer comment or documentation.
+- Line 26: `nodeSelected = output<WarRoomNode | undefined>();` - App logic step.
+- Line 27: `` - Blank line for readability.
+- Line 28: `// Helper methods for template` - Developer comment or documentation.
+- Line 29: `getSelectedNode(): WarRoomNode | undefined {` - Starts a logic block.
+- Line 30: `const selectedId = this.selectedCompany()?.id;` - App logic step.
+- Line 31: `if (!selectedId) return undefined;` - Checks a condition.
+- Line 32: `return this.nodes().find(n => n.companyId === selectedId);` - Returns a value.
+- Line 33: `}` - Ends a logic block.
+- Line 34: `` - Blank line for readability.
+- Line 35: `getSelectedNodePosition(): { top: number; left: number } {` - App logic step.
+- Line 36: `const node = this.getSelectedNode();` - App logic step.
+- Line 37: `if (!node) return { top: 0, left: 0 };` - Checks a condition.
+- Line 38: `return this.getNodePosition(node);` - Returns a value.
+- Line 39: `}` - Ends a logic block.
+- Line 40: `` - Blank line for readability.
+- Line 41: `getSelectedNodeCity(): string {` - Starts a logic block.
+- Line 42: `return this.getSelectedNode()?.city || '';` - Returns a value.
+- Line 43: `}` - Ends a logic block.
+- Line 44: `` - Blank line for readability.
+- Line 45: `private getCompanyLogoFileName(node: WarRoomNode): string | null {` - Starts a logic block.
+- Line 46: `const companyLower = node.company?.toLowerCase() || '';` - App logic step.
+- Line 47: `const companyLogos: Record<string, string> = {` - Starts a logic block.
+- Line 48: `'creative carriage': 'creative-carriage-logo.png',` - App logic step.
+- Line 49: `'alexander dennis': 'alexander-dennis.jpg',` - App logic step.
+- Line 50: `'karsan': 'KARSAN.jpg',` - App logic step.
+- Line 51: `'karzan': 'KARSAN.jpg',` - App logic step.
+- Line 52: `'arboc': 'ARBOC.jpg',` - App logic step.
+- Line 53: `'arbroc': 'ARBOC.jpg',` - App logic step.
+- Line 54: `'tam': 'tam-logo.png',` - App logic step.
+- Line 55: `'nfl': 'New-Flyer.jpg',` - App logic step.
+- Line 56: `'new flyer': 'New-Flyer.jpg',` - App logic step.
+- Line 57: `'nova': 'Nova-Bus.jpg.png',` - App logic step.
+- Line 58: `'nova bus': 'Nova-Bus.jpg.png'` - App logic step.
+- Line 59: `};` - Ends a logic block.
+- Line 60: `` - Blank line for readability.
+- Line 61: `const matchingKey = Object.keys(companyLogos).find(key => companyLower.includes(key));` - App logic step.
+- Line 62: `return matchingKey ? companyLogos[matchingKey] : null;` - Returns a value.
+- Line 63: `}` - Ends a logic block.
+- Line 64: `` - Blank line for readability.
+- Line 65: `private getCompanyLogoSource(node: WarRoomNode): string | null {` - Starts a logic block.
+- Line 66: `const customLogo = typeof node.logo === 'string' ? node.logo.trim() : '';` - App logic step.
+- Line 67: `if (customLogo) {` - Starts a logic block.
+- Line 68: `return customLogo;` - Returns a value.
+- Line 69: `}` - Ends a logic block.
+- Line 70: `return this.getCompanyLogoFileName(node);` - Returns a value.
+- Line 71: `}` - Ends a logic block.
+- Line 72: `` - Blank line for readability.
+- Line 73: `private getLogoImagePaths(logoSource: string): string[] {` - Starts a logic block.
+- Line 74: `const trimmed = logoSource.trim();` - App logic step.
+- Line 75: `if (!trimmed) return [];` - Checks a condition.
+- Line 76: `` - Blank line for readability.
+- Line 77: `if (trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {` - Starts a logic block.
+- Line 78: `return [trimmed];` - Returns a value.
+- Line 79: `}` - Ends a logic block.
+- Line 80: `` - Blank line for readability.
+- Line 81: `if (` - Checks a condition.
+- Line 82: `trimmed.startsWith('http://') ||` - App logic step.
+- Line 83: `trimmed.startsWith('https://') ||` - App logic step.
+- Line 84: `trimmed.startsWith('/') ||` - App logic step.
+- Line 85: `trimmed.startsWith('./') ||` - App logic step.
+- Line 86: `trimmed.startsWith('../')` - App logic step.
+- Line 87: `) {` - Starts a logic block.
+- Line 88: `return [trimmed];` - Returns a value.
+- Line 89: `}` - Ends a logic block.
+- Line 90: `` - Blank line for readability.
+- Line 91: `const baseUrl = window.location.origin;` - App logic step.
+- Line 92: `return [` - Returns a value.
+- Line 93: `'${baseUrl}/assets/images/${trimmed}',` - App logic step.
+- Line 94: `'/assets/images/${trimmed}',` - App logic step.
+- Line 95: `'./assets/images/${trimmed}',` - App logic step.
+- Line 96: `'assets/images/${trimmed}',` - App logic step.
+- Line 97: `];` - App logic step.
+- Line 98: `}` - Ends a logic block.
+- Line 99: `` - Blank line for readability.
+- Line 100: `private getCompanyDescription(node: WarRoomNode): string {` - Starts a logic block.
+- Line 101: `const customDescription = node.description?.trim();` - App logic step.
+- Line 102: `if (customDescription) {` - Starts a logic block.
+- Line 103: `return customDescription;` - Returns a value.
+- Line 104: `}` - Ends a logic block.
+- Line 105: `const companyLower = node.company?.toLowerCase() || '';` - App logic step.
+- Line 106: `const descriptionKey = Object.keys(this.companyDescriptions).find(key => companyLower.includes(key));` - App logic step.
+- Line 107: `if (descriptionKey) {` - Starts a logic block.
+- Line 108: `return this.companyDescriptions[descriptionKey];` - Returns a value.
+- Line 109: `}` - Ends a logic block.
+- Line 110: `const location = node.country ? '${node.city}, ${node.country}' : node.city;` - App logic step.
+- Line 111: `return '${this.getCompanyDisplayName(node)} is a transportation company located in ${location}.';` - Returns a value.
+- Line 112: `}` - Ends a logic block.
+- Line 113: `` - Blank line for readability.
+- Line 114: `private getCompanyDisplayName(node: WarRoomNode): string {` - Starts a logic block.
+- Line 115: `const companyLower = node.company?.toLowerCase() || '';` - App logic step.
+- Line 116: `if (companyLower.includes('karzan') || companyLower.includes('karsan')) {` - Starts a logic block.
+- Line 117: `return 'Karsan';` - Returns a value.
+- Line 118: `}` - Ends a logic block.
+- Line 119: `if (companyLower.includes('arboc') || companyLower.includes('arbroc')) {` - Starts a logic block.
+- Line 120: `return 'ARBOC';` - Returns a value.
+- Line 121: `}` - Ends a logic block.
+- Line 122: `if (companyLower.includes('nova')) {` - Starts a logic block.
+- Line 123: `return 'Nova Bus';` - Returns a value.
+- Line 124: `}` - Ends a logic block.
+- Line 125: `return node.company;` - Returns a value.
+- Line 126: `}` - Ends a logic block.
+- Line 127: `` - Blank line for readability.
+- Line 128: `private getCompanyLogoPath(logoSource: string | null): string {` - Starts a logic block.
+- Line 129: `const baseUrl = window.location.origin;` - App logic step.
+- Line 130: `if (!logoSource) {` - Starts a logic block.
+- Line 131: `return '${baseUrl}/assets/images/default-logo.png';` - Returns a value.
+- Line 132: `}` - Ends a logic block.
+- Line 133: `const paths = this.getLogoImagePaths(logoSource);` - App logic step.
+- Line 134: `return paths[0] || '${baseUrl}/assets/images/default-logo.png';` - Returns a value.
+- Line 135: `}` - Ends a logic block.
+- Line 136: `` - Blank line for readability.
+- Line 137: `private getLogoSizeMultiplier(node: WarRoomNode): number {` - Starts a logic block.
+- Line 138: `const companyLower = node.company?.toLowerCase() || '';` - App logic step.
+- Line 139: `if (companyLower.includes('nova')) {` - Starts a logic block.
+- Line 140: `return 2.4;` - Returns a value.
+- Line 141: `}` - Ends a logic block.
+- Line 142: `if (companyLower.includes('tam')) {` - Starts a logic block.
+- Line 143: `return 2.0;` - Returns a value.
+- Line 144: `}` - Ends a logic block.
+- Line 145: `return 1.0;` - Returns a value.
+- Line 146: `}` - Ends a logic block.
+- Line 147: `` - Blank line for readability.
+- Line 148: `private getLogoImageSize(radius: number, zoomFactor: number, sizeMultiplier: number = 1): number {` - Starts a logic block.
+- Line 149: `const baseImageSize = radius * 4.6 * sizeMultiplier;` - App logic step.
+- Line 150: `const effectiveZoom = Math.max(1, zoomFactor);` - App logic step.
+- Line 151: `const scaleFactor = Math.pow(effectiveZoom, 0.6);` - App logic step.
+- Line 152: `const responsiveImageSize = baseImageSize / scaleFactor;` - App logic step.
+- Line 153: `const minSize = radius * 2.4 * sizeMultiplier;` - App logic step.
+- Line 154: `const maxSize = radius * 8.0 * sizeMultiplier;` - App logic step.
+- Line 155: `return Math.max(minSize, Math.min(maxSize, responsiveImageSize));` - Returns a value.
+- Line 156: `}` - Ends a logic block.
+- Line 157: `` - Blank line for readability.
+- Line 158: `private showCompanyTooltipAtElement(node: WarRoomNode, target: Element, logoSource: string | null): void {` - Starts a logic block.
+- Line 159: `const description = this.getCompanyDescription(node);` - App logic step.
+- Line 160: `const displayName = this.getCompanyDisplayName(node);` - App logic step.
+- Line 161: `const logoPath = this.getCompanyLogoPath(logoSource);` - App logic step.
+- Line 162: `const rect = target.getBoundingClientRect();` - App logic step.
+- Line 163: `` - Blank line for readability.
+- Line 164: `const bounds = this.getTooltipBounds();` - App logic step.
+- Line 165: `const availableWidth = Math.max(120, bounds.right - bounds.left);` - App logic step.
+- Line 166: `const availableHeight = Math.max(120, bounds.bottom - bounds.top);` - App logic step.
+- Line 167: `const tooltipWidth = Math.min(420, Math.max(260, Math.floor(availableWidth * 0.92)));` - App logic step.
+- Line 168: `const tooltipHeight = Math.min(360, Math.max(180, Math.floor(availableHeight * 0.6)));` - App logic step.
+- Line 169: `const spacing = 12;` - App logic step.
+- Line 170: `` - Blank line for readability.
+- Line 171: `let tooltipTop = rect.top - spacing;` - App logic step.
+- Line 172: `let tooltipLeft = rect.left + (rect.width / 2);` - App logic step.
+- Line 173: `` - Blank line for readability.
+- Line 174: `if (tooltipLeft + (tooltipWidth / 2) > bounds.right) {` - Starts a logic block.
+- Line 175: `tooltipLeft = bounds.right - (tooltipWidth / 2);` - App logic step.
+- Line 176: `}` - Ends a logic block.
+- Line 177: `if (tooltipLeft - (tooltipWidth / 2) < bounds.left) {` - Starts a logic block.
+- Line 178: `tooltipLeft = bounds.left + (tooltipWidth / 2);` - App logic step.
+- Line 179: `}` - Ends a logic block.
+- Line 180: `` - Blank line for readability.
+- Line 181: `if (tooltipTop - tooltipHeight < bounds.top) {` - Starts a logic block.
+- Line 182: `tooltipTop = rect.bottom + spacing;` - App logic step.
+- Line 183: `}` - Ends a logic block.
+- Line 184: `` - Blank line for readability.
+- Line 185: `if (tooltipTop + tooltipHeight > bounds.bottom) {` - Starts a logic block.
+- Line 186: `tooltipTop = bounds.bottom - tooltipHeight;` - App logic step.
+- Line 187: `}` - Ends a logic block.
+- Line 188: `` - Blank line for readability.
+- Line 189: `this.hoveredCompanyTooltip.set({` - Starts a logic block.
+- Line 190: `node,` - App logic step.
+- Line 191: `displayName,` - App logic step.
+- Line 192: `logoPath,` - App logic step.
+- Line 193: `description,` - App logic step.
+- Line 194: `position: { top: tooltipTop, left: tooltipLeft }` - App logic step.
+- Line 195: `});` - Ends a logic block.
+- Line 196: `` - Blank line for readability.
+- Line 197: `const markerIndex = this.getNodeIndex(node);` - App logic step.
+- Line 198: `this.tooltipAnchor = { node, markerIndex, logoSource, element: target };` - App logic step.
+- Line 199: `this.scheduleTooltipClamp();` - App logic step.
+- Line 200: `}` - Ends a logic block.
+- Line 201: `` - Blank line for readability.
+- Line 202: `private getNodeIndex(node: WarRoomNode): number {` - Starts a logic block.
+- Line 203: `const nodes = this.nodes();` - App logic step.
+- Line 204: `const nodeId = node.id;` - App logic step.
+- Line 205: `if (nodeId === undefined || nodeId === null) {` - Starts a logic block.
+- Line 206: `return nodes.indexOf(node);` - Returns a value.
+- Line 207: `}` - Ends a logic block.
+- Line 208: `return nodes.findIndex((n) => n.id === nodeId);` - Returns a value.
+- Line 209: `}` - Ends a logic block.
+- Line 210: `` - Blank line for readability.
+- Line 211: `private getTooltipBounds(): { left: number; right: number; top: number; bottom: number } {` - App logic step.
+- Line 212: `const padding = 12;` - App logic step.
+- Line 213: `const viewportBounds = {` - Starts a logic block.
+- Line 214: `left: padding,` - App logic step.
+- Line 215: `top: padding,` - App logic step.
+- Line 216: `right: window.innerWidth - padding,` - App logic step.
+- Line 217: `bottom: window.innerHeight - padding` - App logic step.
+- Line 218: `};` - Ends a logic block.
+- Line 219: `` - Blank line for readability.
+- Line 220: `const mapContainer = document.getElementById('war-room-map');` - App logic step.
+- Line 221: `const container = (mapContainer ? mapContainer.closest('.war-room-map-container') : null) as HTMLElement | null;` - App logic step.
+- Line 222: `if (!container) {` - Starts a logic block.
+- Line 223: `return viewportBounds;` - Returns a value.
+- Line 224: `}` - Ends a logic block.
+- Line 225: `` - Blank line for readability.
+- Line 226: `const containerRect = container.getBoundingClientRect();` - App logic step.
+- Line 227: `const bounds = {` - Starts a logic block.
+- Line 228: `left: Math.max(viewportBounds.left, containerRect.left + padding),` - App logic step.
+- Line 229: `top: Math.max(viewportBounds.top, containerRect.top + padding),` - App logic step.
+- Line 230: `right: Math.min(viewportBounds.right, containerRect.right - padding),` - App logic step.
+- Line 231: `bottom: Math.min(viewportBounds.bottom, containerRect.bottom - padding)` - App logic step.
+- Line 232: `};` - Ends a logic block.
+- Line 233: `` - Blank line for readability.
+- Line 234: `if (bounds.right <= bounds.left || bounds.bottom <= bounds.top) {` - Starts a logic block.
+- Line 235: `return viewportBounds;` - Returns a value.
+- Line 236: `}` - Ends a logic block.
+- Line 237: `` - Blank line for readability.
+- Line 238: `return bounds;` - Returns a value.
+- Line 239: `}` - Ends a logic block.
+- Line 240: `` - Blank line for readability.
+- Line 241: `private scheduleTooltipClamp(): void {` - Starts a logic block.
+- Line 242: `if (!this.hoveredCompanyTooltip()) return;` - Checks a condition.
+- Line 243: `` - Blank line for readability.
+- Line 244: `if (this.tooltipClampRafId !== null) {` - Starts a logic block.
+- Line 245: `cancelAnimationFrame(this.tooltipClampRafId);` - App logic step.
+- Line 246: `}` - Ends a logic block.
+- Line 247: `` - Blank line for readability.
+- Line 248: `this.tooltipClampRafId = requestAnimationFrame(() => {` - Starts a logic block.
+- Line 249: `this.tooltipClampRafId = null;` - App logic step.
+- Line 250: `this.clampTooltipToBounds();` - App logic step.
+- Line 251: `});` - Ends a logic block.
+- Line 252: `}` - Ends a logic block.
+- Line 253: `` - Blank line for readability.
+- Line 254: `private clampTooltipToBounds(): void {` - Starts a logic block.
+- Line 255: `const tooltip = this.hoveredCompanyTooltip();` - App logic step.
+- Line 256: `if (!tooltip) return;` - Checks a condition.
+- Line 257: `` - Blank line for readability.
+- Line 258: `const tooltipEl = document.querySelector('.company-logo-tooltip') as HTMLElement | null;` - App logic step.
+- Line 259: `if (!tooltipEl) return;` - Checks a condition.
+- Line 260: `` - Blank line for readability.
+- Line 261: `const bounds = this.getTooltipBounds();` - App logic step.
+- Line 262: `const rect = tooltipEl.getBoundingClientRect();` - App logic step.
+- Line 263: `let deltaX = 0;` - App logic step.
+- Line 264: `let deltaY = 0;` - App logic step.
+- Line 265: `` - Blank line for readability.
+- Line 266: `if (rect.left < bounds.left) {` - Starts a logic block.
+- Line 267: `deltaX = bounds.left - rect.left;` - App logic step.
+- Line 268: `} else if (rect.right > bounds.right) {` - Checks a condition.
+- Line 269: `deltaX = bounds.right - rect.right;` - App logic step.
+- Line 270: `}` - Ends a logic block.
+- Line 271: `` - Blank line for readability.
+- Line 272: `if (rect.top < bounds.top) {` - Starts a logic block.
+- Line 273: `deltaY = bounds.top - rect.top;` - App logic step.
+- Line 274: `} else if (rect.bottom > bounds.bottom) {` - Checks a condition.
+- Line 275: `deltaY = bounds.bottom - rect.bottom;` - App logic step.
+- Line 276: `}` - Ends a logic block.
+- Line 277: `` - Blank line for readability.
+- Line 278: `if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {` - Starts a logic block.
+- Line 279: `this.hoveredCompanyTooltip.set({` - Starts a logic block.
+- Line 280: `...tooltip,` - App logic step.
+- Line 281: `position: {` - Starts a logic block.
+- Line 282: `top: tooltip.position.top + deltaY,` - App logic step.
+- Line 283: `left: tooltip.position.left + deltaX` - App logic step.
+- Line 284: `}` - Ends a logic block.
+- Line 285: `});` - Ends a logic block.
+- Line 286: `}` - Ends a logic block.
+- Line 287: `}` - Ends a logic block.
+- Line 288: `` - Blank line for readability.
+- Line 289: `private refreshTooltipPosition(): void {` - Starts a logic block.
+- Line 290: `const tooltip = this.hoveredCompanyTooltip();` - App logic step.
+- Line 291: `if (!tooltip) return;` - Checks a condition.
+- Line 292: `` - Blank line for readability.
+- Line 293: `const anchor = this.tooltipAnchor;` - App logic step.
+- Line 294: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 295: `if (!container || !anchor) {` - Starts a logic block.
+- Line 296: `this.scheduleTooltipClamp();` - App logic step.
+- Line 297: `return;` - App logic step.
+- Line 298: `}` - Ends a logic block.
+- Line 299: `` - Blank line for readability.
+- Line 300: `let target: Element | null = anchor.element;` - App logic step.
+- Line 301: `if (!target || !target.isConnected) {` - Starts a logic block.
+- Line 302: `const svg = container.querySelector('svg');` - App logic step.
+- Line 303: `if (svg && anchor.markerIndex >= 0) {` - Starts a logic block.
+- Line 304: `target =` - App logic step.
+- Line 305: `svg.querySelector('image#company-logo-image-${anchor.markerIndex}') ||` - App logic step.
+- Line 306: `svg.querySelector('circle[data-index=\"${anchor.markerIndex}\"]') ||` - App logic step.
+- Line 307: `svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*=\"jvm-marker\"]')[anchor.markerIndex] ||` - App logic step.
+- Line 308: `anchor.element ||` - App logic step.
+- Line 309: `null;` - App logic step.
+- Line 310: `}` - Ends a logic block.
+- Line 311: `}` - Ends a logic block.
+- Line 312: `` - Blank line for readability.
+- Line 313: `if (target) {` - Starts a logic block.
+- Line 314: `this.showCompanyTooltipAtElement(anchor.node, target, anchor.logoSource);` - App logic step.
+- Line 315: `} else {` - App logic step.
+- Line 316: `this.scheduleTooltipClamp();` - App logic step.
+- Line 317: `}` - Ends a logic block.
+- Line 318: `}` - Ends a logic block.
+- Line 319: `` - Blank line for readability.
+- Line 320: `private resetMapToFullWorldView(): void {` - Starts a logic block.
+- Line 321: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 322: `if (!container) return;` - Checks a condition.
+- Line 323: `` - Blank line for readability.
+- Line 324: `const svg = container.querySelector('svg');` - App logic step.
+- Line 325: `if (!svg) return;` - Checks a condition.
+- Line 326: `` - Blank line for readability.
+- Line 327: `const fullWorldViewBox = '0 0 950 550';` - App logic step.
+- Line 328: `svg.setAttribute('viewBox', fullWorldViewBox);` - App logic step.
+- Line 329: `` - Blank line for readability.
+- Line 330: `const mapAny = this.mapInstance as any;` - App logic step.
+- Line 331: `if (mapAny) {` - Starts a logic block.
+- Line 332: `try {` - Starts a logic block.
+- Line 333: `if (typeof mapAny.updateSize === 'function') {` - Starts a logic block.
+- Line 334: `mapAny.updateSize();` - App logic step.
+- Line 335: `}` - Ends a logic block.
+- Line 336: `} catch (e) {` - App logic step.
+- Line 337: `console.warn('updateSize failed:', e);` - App logic step.
+- Line 338: `}` - Ends a logic block.
+- Line 339: `try {` - Starts a logic block.
+- Line 340: `if (typeof mapAny.setFocus === 'function') {` - Starts a logic block.
+- Line 341: `mapAny.setFocus({ lat: 0, lng: 0, scale: 1, animate: false });` - App logic step.
+- Line 342: `}` - Ends a logic block.
+- Line 343: `} catch (e) {` - App logic step.
+- Line 344: `console.warn('setFocus reset failed:', e);` - App logic step.
+- Line 345: `}` - Ends a logic block.
+- Line 346: `try {` - Starts a logic block.
+- Line 347: `if (typeof mapAny.setZoom === 'function') {` - Starts a logic block.
+- Line 348: `mapAny.setZoom(1);` - App logic step.
+- Line 349: `}` - Ends a logic block.
+- Line 350: `} catch (e) {` - App logic step.
+- Line 351: `console.warn('setZoom reset failed:', e);` - App logic step.
+- Line 352: `}` - Ends a logic block.
+- Line 353: `try {` - Starts a logic block.
+- Line 354: `if (typeof mapAny._applyTransform === 'function' && mapAny._baseScale !== undefined) {` - Starts a logic block.
+- Line 355: `mapAny.scale = mapAny._baseScale;` - App logic step.
+- Line 356: `if (mapAny._baseTransX !== undefined) {` - Starts a logic block.
+- Line 357: `mapAny.transX = mapAny._baseTransX;` - App logic step.
+- Line 358: `}` - Ends a logic block.
+- Line 359: `if (mapAny._baseTransY !== undefined) {` - Starts a logic block.
+- Line 360: `mapAny.transY = mapAny._baseTransY;` - App logic step.
+- Line 361: `}` - Ends a logic block.
+- Line 362: `mapAny._applyTransform();` - App logic step.
+- Line 363: `}` - Ends a logic block.
+- Line 364: `} catch (e) {` - App logic step.
+- Line 365: `console.warn('internal transform reset failed:', e);` - App logic step.
+- Line 366: `}` - Ends a logic block.
+- Line 367: `}` - Ends a logic block.
+- Line 368: `` - Blank line for readability.
+- Line 369: `this.updateLabelPositions();` - App logic step.
+- Line 370: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 371: `}` - Ends a logic block.
+- Line 372: `` - Blank line for readability.
+- Line 373: `private clearCompanyTooltip(): void {` - Starts a logic block.
+- Line 374: `this.hoveredCompanyTooltip.set(null);` - App logic step.
+- Line 375: `this.tooltipAnchor = null;` - App logic step.
+- Line 376: `if (this.tooltipClampRafId !== null) {` - Starts a logic block.
+- Line 377: `cancelAnimationFrame(this.tooltipClampRafId);` - App logic step.
+- Line 378: `this.tooltipClampRafId = null;` - App logic step.
+- Line 379: `}` - Ends a logic block.
+- Line 380: `}` - Ends a logic block.
+- Line 381: `` - Blank line for readability.
+- Line 382: `onPopupClose(event: Event): void {` - Starts a logic block.
+- Line 383: `event.stopPropagation();` - App logic step.
+- Line 384: `this.nodeSelected.emit(undefined);` - App logic step.
+- Line 385: `}` - Ends a logic block.
+- Line 386: `` - Blank line for readability.
+- Line 387: `onPopupViewDetails(event: Event): void {` - Starts a logic block.
+- Line 388: `event.stopPropagation();` - App logic step.
+- Line 389: `const node = this.getSelectedNode();` - App logic step.
+- Line 390: `if (node) {` - Starts a logic block.
+- Line 391: `this.nodeSelected.emit(node);` - App logic step.
+- Line 392: `}` - Ends a logic block.
+- Line 393: `}` - Ends a logic block.
+- Line 394: `` - Blank line for readability.
+- Line 395: `onLogoError(event: Event): void {` - Starts a logic block.
+- Line 396: `const img = event.target as HTMLImageElement | null;` - App logic step.
+- Line 397: `if (!img) return;` - Checks a condition.
+- Line 398: `if (img.src.endsWith('/assets/images/default-logo.png')) return;` - Checks a condition.
+- Line 399: `img.src = '/assets/images/default-logo.png';` - App logic step.
+- Line 400: `}` - Ends a logic block.
+- Line 401: `` - Blank line for readability.
+- Line 402: `// ...` - Developer comment or documentation.
+- Line 403: `` - Blank line for readability.
+- Line 404: `` - Blank line for readability.
+- Line 405: `` - Blank line for readability.
+- Line 406: `// Services` - Developer comment or documentation.
+- Line 407: `private warRoomService = inject(WarRoomService);` - Retrieves a service.
+- Line 408: `private appStateService = inject(AppStateService);` - Retrieves a service.
+- Line 409: `` - Blank line for readability.
+- Line 410: `// Theme management` - Developer comment or documentation.
+- Line 411: `private appState = toSignal(this.appStateService.state$, {` - Starts a logic block.
+- Line 412: `initialValue: {` - Starts a logic block.
+- Line 413: `theme: 'light',` - App logic step.
+- Line 414: `direction: 'ltr',` - App logic step.
+- Line 415: `navigationStyles: 'vertical',` - App logic step.
+- Line 416: `menuStyles: '',` - App logic step.
+- Line 417: `layoutStyles: 'default',` - App logic step.
+- Line 418: `pageStyles: 'regular',` - App logic step.
+- Line 419: `widthStyles: 'fullwidth',` - App logic step.
+- Line 420: `menuPosition: 'fixed',` - App logic step.
+- Line 421: `headerPosition: 'fixed',` - App logic step.
+- Line 422: `menuColor: 'dark',` - App logic step.
+- Line 423: `headerColor: 'light',` - App logic step.
+- Line 424: `themePrimary: '',` - App logic step.
+- Line 425: `themeBackground: '',` - App logic step.
+- Line 426: `backgroundImage: ''` - App logic step.
+- Line 427: `}` - Ends a logic block.
+- Line 428: `});` - Ends a logic block.
+- Line 429: `currentTheme = computed(() => (this.appState()?.theme || 'light') as 'light' | 'dark');` - App logic step.
+- Line 430: `` - Blank line for readability.
+- Line 431: `// Host binding for theme-aware CSS` - Developer comment or documentation.
+- Line 432: `@HostBinding('attr.data-theme-mode') get themeMode(): string {` - Starts a logic block.
+- Line 433: `return this.currentTheme();` - Returns a value.
+- Line 434: `}` - Ends a logic block.
+- Line 435: `` - Blank line for readability.
+- Line 436: `// Color schemes for light and dark themes` - Developer comment or documentation.
+- Line 437: `private readonly colorSchemes = {` - Starts a logic block.
+- Line 438: `light: {` - Starts a logic block.
+- Line 439: `backgroundColor: '#f5f5f5',` - App logic step.
+- Line 440: `regionFill: '#e0e0e0',` - App logic step.
+- Line 441: `regionStroke: '#d0d0d0',` - App logic step.
+- Line 442: `regionHoverFill: '#d5d5d5',` - App logic step.
+- Line 443: `regionFillOpacity: 0.8,` - App logic step.
+- Line 444: `},` - Ends a logic block.
+- Line 445: `dark: {` - Starts a logic block.
+- Line 446: `backgroundColor: '#1a1a1a',` - App logic step.
+- Line 447: `regionFill: '#2d2d2d',` - App logic step.
+- Line 448: `regionStroke: '#3d3d3d',` - App logic step.
+- Line 449: `regionHoverFill: '#404040',` - App logic step.
+- Line 450: `regionFillOpacity: 0.7,` - App logic step.
+- Line 451: `}` - Ends a logic block.
+- Line 452: `};` - Ends a logic block.
+- Line 453: `` - Blank line for readability.
+- Line 454: `// Company descriptions - single source of truth` - Developer comment or documentation.
+- Line 455: `private readonly companyDescriptions: Record<string, string> = {` - Starts a logic block.
+- Line 456: `'creative carriage': 'Creative Carriage has been a leader in wheelchair accessible vehicle manufacturing and conversions since 1988, when they built Canada's first fully-compliant wheelchair accessible taxi. Based near Brantford, Ontario, they specialize in custom, low-floor van conversions and serve as the exclusive Ontario dealer for six major US manufacturers of accessible and specialty vehicles. Their mission is to improve design and safety standards for wheelchair accessible vehicles.',` - App logic step.
+- Line 457: `'alexander dennis': 'Alexander Dennis is a world-class bus manufacturer with over 130 years of heritage in design and engineering excellence. Operating 16 facilities across 10 countries and operating North America's only double-deck bus facility in Las Vegas, they lead the industry's transition to zero-emission mobility with 3,000+ electric buses delivered globally.',` - App logic step.
+- Line 458: `'karsan': 'Karsan is a leading Turkish commercial vehicle manufacturer with over 58 years of industry experience. We specialize in innovative public transportation solutions, including electric buses like the e-JEST and e-ATAK, as well as hydrogen-powered and autonomous vehicles. As Turkey's only independent multi-brand vehicle manufacturer, we manage the entire value chain from R&D to after-sales service. Our state-of-the-art manufacturing facilities in Bursa can produce up to 20,000 vehicles annually.',` - App logic step.
+- Line 459: `'karzan': 'Karsan is a leading Turkish commercial vehicle manufacturer with over 58 years of industry experience. We specialize in innovative public transportation solutions, including electric buses like the e-JEST and e-ATAK, as well as hydrogen-powered and autonomous vehicles. As Turkey's only independent multi-brand vehicle manufacturer, we manage the entire value chain from R&D to after-sales service. Our state-of-the-art manufacturing facilities in Bursa can produce up to 20,000 vehicles annually.',` - App logic step.
+- Line 460: `'arboc': 'ARBOC Specialty Vehicles is North America's pioneer and industry leader in low-floor cutaway bus technology, founded in 2008 and based in Middlebury, Indiana. With 5,000+ buses produced and a 70% market share in Canada and the US, they specialize in fully accessible paratransit, transit, and shuttle vehicles that exceed federal fuel economy and accessibility standards.',` - App logic step.
+- Line 461: `'arbroc': 'ARBOC Specialty Vehicles is North America's pioneer and industry leader in low-floor cutaway bus technology, founded in 2008 and based in Middlebury, Indiana. With 5,000+ buses produced and a 70% market share in Canada and the US, they specialize in fully accessible paratransit, transit, and shuttle vehicles that exceed federal fuel economy and accessibility standards.',` - App logic step.
+- Line 462: `'tam': 'TAM-Europe is a leading bus and commercial vehicle manufacturer founded in 1947 and based in Maribor, Slovenia. With over 77 years of experience, they specialize in airport buses (VivAir with 40% global market share), electric city buses, and coaches serving markets globally, with strong commitment to product efficiency and environmental sustainability.',` - App logic step.
+- Line 463: `'nfl': 'New Flyer is North America's largest transit bus manufacturer, founded in 1930 and headquartered in Winnipeg, Manitoba. Operating under parent company NFI Group, they offer the advanced Xcelsior family of buses including battery-electric (Xcelsior CHARGE NG™), hydrogen fuel cell (Xcelsior CHARGE FC™), and hybrid options, with 35,000+ buses in service globally and 265+ million zero-emission miles traveled.',` - App logic step.
+- Line 464: `'new flyer': 'New Flyer is North America's largest transit bus manufacturer, founded in 1930 and headquartered in Winnipeg, Manitoba. Operating under parent company NFI Group, they offer the advanced Xcelsior family of buses including battery-electric (Xcelsior CHARGE NG™), hydrogen fuel cell (Xcelsior CHARGE FC™), and hybrid options, with 35,000+ buses in service globally and 265+ million zero-emission miles traveled.',` - App logic step.
+- Line 465: `'nova': 'Nova Bus is Canada's leading transit bus manufacturer, founded in 1993 and based in Saint-Eustache, Quebec. As part of the Volvo Group, they deliver innovative mobility solutions including the 100% electric LFSe+ bus with dual charging options, CNG, diesel-electric hybrid, and conventional vehicles, supporting transit agencies across North America with proven expertise and industry-leading parts and service support.',` - App logic step.
+- Line 466: `'nova bus': 'Nova Bus is Canada's leading transit bus manufacturer, founded in 1993 and based in Saint-Eustache, Quebec. As part of the Volvo Group, they deliver innovative mobility solutions including the 100% electric LFSe+ bus with dual charging options, CNG, diesel-electric hybrid, and conventional vehicles, supporting transit agencies across North America with proven expertise and industry-leading parts and service support.'` - App logic step.
+- Line 467: `};` - Ends a logic block.
+- Line 468: `` - Blank line for readability.
+- Line 469: `// Private properties` - Developer comment or documentation.
+- Line 470: `private mapInstance: any = null;` - App logic step.
+- Line 471: `private scriptsLoaded = false;` - App logic step.
+- Line 472: `private labelPositions = new Map<string, { x: number; y: number }>();` - App logic step.
+- Line 473: `private updateLabelsRAFId: number | null = null;` - App logic step.
+- Line 474: `private labelsUpdateDirty: boolean = false;` - App logic step.
+- Line 475: `private mapReadyRetryInterval: ReturnType<typeof setInterval> | null = null;` - App logic step.
+- Line 476: `private isFullscreen = false;` - App logic step.
+- Line 477: `private destroyed = false;` - App logic step.
+- Line 478: `private labelObserver: MutationObserver | null = null;` - App logic step.
+- Line 479: `private nodeObserver: MutationObserver | null = null;` - App logic step.
+- Line 480: `private viewBoxObserver: MutationObserver | null = null;` - App logic step.
+- Line 481: `private boundFullscreenHandler: (() => void) | null = null;` - App logic step.
+- Line 482: `private boundResizeHandler: (() => void) | null = null;` - App logic step.
+- Line 483: `private boundWheelHandler: ((e: WheelEvent) => void) | null = null;` - App logic step.
+- Line 484: `private boundPanSyncMouseDownHandler: ((e: MouseEvent) => void) | null = null;` - App logic step.
+- Line 485: `private boundPanSyncMouseMoveHandler: ((e: MouseEvent) => void) | null = null;` - App logic step.
+- Line 486: `private boundPanSyncMouseUpHandler: ((e: MouseEvent) => void) | null = null;` - App logic step.
+- Line 487: `private boundDragMouseMoveHandler: ((e: MouseEvent) => void) | null = null;` - App logic step.
+- Line 488: `private boundDragMouseUpHandler: ((e: MouseEvent) => void) | null = null;` - App logic step.
+- Line 489: `private maintainFullWorldView: boolean = true; // Flag to maintain full world view by default` - App logic step.
+- Line 490: `private zoomTimeoutId: ReturnType<typeof setTimeout> | null = null;` - App logic step.
+- Line 491: `private isDragging: boolean = false;` - App logic step.
+- Line 492: `private dragStartX: number = 0;` - App logic step.
+- Line 493: `private dragStartY: number = 0;` - App logic step.
+- Line 494: `private dragStartViewBoxX: number = 0;` - App logic step.
+- Line 495: `private dragStartViewBoxY: number = 0;` - App logic step.
+- Line 496: `private currentPopup: HTMLElement | null = null;` - App logic step.
+- Line 497: `private closePopupHandler: ((e: MouseEvent) => void) | null = null;` - App logic step.
+- Line 498: `private closePopupTimer: ReturnType<typeof setTimeout> | null = null;` - App logic step.
+- Line 499: `private updateMarkersTimeoutId: ReturnType<typeof setTimeout> | null = null;` - App logic step.
+- Line 500: `private mapInitAttempts = 0;` - App logic step.
+- Line 501: `private readonly maxMapInitRetries = 10;` - App logic step.
+- Line 502: `` - Blank line for readability.
+- Line 503: `// Hover tooltip state` - Developer comment or documentation.
+- Line 504: `hoveredCompanyTooltip = signal<{` - Creates a reactive variable.
+- Line 505: `node: WarRoomNode;` - App logic step.
+- Line 506: `displayName: string;` - App logic step.
+- Line 507: `logoPath: string;` - App logic step.
+- Line 508: `description: string;` - App logic step.
+- Line 509: `position: { top: number; left: number };` - App logic step.
+- Line 510: `} | null>(null);` - Ends a logic block.
+- Line 511: `private tooltipTimeoutId: ReturnType<typeof setTimeout> | null = null;` - App logic step.
+- Line 512: `private tooltipClampRafId: number | null = null;` - App logic step.
+- Line 513: `private tooltipAnchor: {` - Starts a logic block.
+- Line 514: `node: WarRoomNode;` - App logic step.
+- Line 515: `markerIndex: number;` - App logic step.
+- Line 516: `logoSource: string | null;` - App logic step.
+- Line 517: `element: Element;` - App logic step.
+- Line 518: `} | null = null;` - Ends a logic block.
+- Line 519: `/** Cache for map elements to improve performance during drag/zoom */` - Developer comment or documentation.
+- Line 520: `private elementCache = new Map<string, Element | null>();` - App logic step.
+- Line 521: `/** Queued company id to zoom to when map becomes ready (avoids "map not available" race). */` - Developer comment or documentation.
+- Line 522: `private pendingZoomCompanyId: string | null = null;` - App logic step.
+- Line 523: `/** Track if user has manually zoomed (to prevent auto-reset) */` - Developer comment or documentation.
+- Line 524: `private userHasZoomed: boolean = false;` - App logic step.
+- Line 525: `/** Flag to track initialization phase to ignore automated layout shifts */` - Developer comment or documentation.
+- Line 526: `private isInitializing: boolean = false;` - App logic step.
+- Line 527: `` - Blank line for readability.
+- Line 528: `constructor() {` - Initializes the component.
+- Line 529: `// Effect to zoom to selected company location when it changes` - Developer comment or documentation.
+- Line 530: `effect(() => {` - Starts a logic block.
+- Line 531: `const selected = this.selectedCompany();` - App logic step.
+- Line 532: `if (this.mapInstance && this.scriptsLoaded) {` - Starts a logic block.
+- Line 533: `this.updateSelectedMarkerStyles();` - App logic step.
+- Line 534: `}` - Ends a logic block.
+- Line 535: `if (selected && this.mapInstance) {` - Starts a logic block.
+- Line 536: `// Clear any existing timeout` - Developer comment or documentation.
+- Line 537: `if (this.zoomTimeoutId) {` - Starts a logic block.
+- Line 538: `clearTimeout(this.zoomTimeoutId);` - App logic step.
+- Line 539: `}` - Ends a logic block.
+- Line 540: `this.zoomTimeoutId = setTimeout(() => {` - Starts a logic block.
+- Line 541: `if (!this.destroyed) {` - Starts a logic block.
+- Line 542: `this.zoomToCompany(selected.id);` - App logic step.
+- Line 543: `}` - Ends a logic block.
+- Line 544: `this.zoomTimeoutId = null;` - App logic step.
+- Line 545: `}, 200);` - Ends a logic block.
+- Line 546: `}` - Ends a logic block.
+- Line 547: `// Cleanup function for effect` - Developer comment or documentation.
+- Line 548: `return () => {` - Starts a logic block.
+- Line 549: `if (this.zoomTimeoutId) {` - Starts a logic block.
+- Line 550: `clearTimeout(this.zoomTimeoutId);` - App logic step.
+- Line 551: `this.zoomTimeoutId = null;` - App logic step.
+- Line 552: `}` - Ends a logic block.
+- Line 553: `};` - Ends a logic block.
+- Line 554: `});` - Ends a logic block.
+- Line 555: `` - Blank line for readability.
+- Line 556: `effect(() => {` - Starts a logic block.
+- Line 557: `const nodes = this.nodes();` - App logic step.
+- Line 558: `if (this.mapInstance && nodes.length > 0 && this.scriptsLoaded) {` - Starts a logic block.
+- Line 559: `// Clear any existing timeout` - Developer comment or documentation.
+- Line 560: `if (this.updateMarkersTimeoutId) {` - Starts a logic block.
+- Line 561: `clearTimeout(this.updateMarkersTimeoutId);` - App logic step.
+- Line 562: `}` - Ends a logic block.
+- Line 563: `this.updateMarkersTimeoutId = setTimeout(() => {` - Starts a logic block.
+- Line 564: `if (!this.destroyed) {` - Starts a logic block.
+- Line 565: `this.updateMapMarkers();` - App logic step.
+- Line 566: `}` - Ends a logic block.
+- Line 567: `this.updateMarkersTimeoutId = null;` - App logic step.
+- Line 568: `}, 500);` - Ends a logic block.
+- Line 569: `}` - Ends a logic block.
+- Line 570: `// Cleanup function for effect` - Developer comment or documentation.
+- Line 571: `return () => {` - Starts a logic block.
+- Line 572: `if (this.updateMarkersTimeoutId) {` - Starts a logic block.
+- Line 573: `clearTimeout(this.updateMarkersTimeoutId);` - App logic step.
+- Line 574: `this.updateMarkersTimeoutId = null;` - App logic step.
+- Line 575: `}` - Ends a logic block.
+- Line 576: `};` - Ends a logic block.
+- Line 577: `});` - Ends a logic block.
+- Line 578: `` - Blank line for readability.
+- Line 579: `effect(() => {` - Starts a logic block.
+- Line 580: `const selected = this.selectedCompany();` - App logic step.
+- Line 581: `if (!selected && this.mapInstance && this.scriptsLoaded) {` - Starts a logic block.
+- Line 582: `// When no company is selected, ensure full world view is visible.` - Developer comment or documentation.
+- Line 583: `this.userHasZoomed = false;` - App logic step.
+- Line 584: `this.resetToFullWorldView();` - App logic step.
+- Line 585: `}` - Ends a logic block.
+- Line 586: `});` - Ends a logic block.
+- Line 587: `` - Blank line for readability.
+- Line 588: `// Effect to update map colors when theme changes` - Developer comment or documentation.
+- Line 589: `effect(() => {` - Starts a logic block.
+- Line 590: `const theme = this.currentTheme();` - App logic step.
+- Line 591: `if (this.mapInstance && !this.destroyed) {` - Starts a logic block.
+- Line 592: `this.updateMapColors(theme);` - App logic step.
+- Line 593: `}` - Ends a logic block.
+- Line 594: `});` - Ends a logic block.
+- Line 595: `}` - Ends a logic block.
+- Line 596: `` - Blank line for readability.
+- Line 597: `ngAfterViewInit(): void {` - Starts a logic block.
+- Line 598: `// Wait for view to be fully initialized` - Developer comment or documentation.
+- Line 599: `setTimeout(() => {` - Starts a logic block.
+- Line 600: `this.loadScripts()` - App logic step.
+- Line 601: `.then(() => {` - Starts a logic block.
+- Line 602: `this.initializeMap();` - App logic step.
+- Line 603: `})` - Ends a logic block.
+- Line 604: `.catch((error) => {` - Starts a logic block.
+- Line 605: `console.error('Failed to load map scripts:', error);` - App logic step.
+- Line 606: `});` - Ends a logic block.
+- Line 607: `}, 200);` - Ends a logic block.
+- Line 608: `}` - Ends a logic block.
+- Line 609: `` - Blank line for readability.
+- Line 610: `ngOnDestroy(): void {` - Runs before component is removed.
+- Line 611: `// Cleanup tooltip` - Developer comment or documentation.
+- Line 612: `if (this.tooltipTimeoutId) {` - Starts a logic block.
+- Line 613: `clearTimeout(this.tooltipTimeoutId);` - App logic step.
+- Line 614: `this.tooltipTimeoutId = null;` - App logic step.
+- Line 615: `}` - Ends a logic block.
+- Line 616: `this.clearCompanyTooltip();` - App logic step.
+- Line 617: `this.destroyed = true;` - App logic step.
+- Line 618: `this.pendingZoomCompanyId = null;` - App logic step.
+- Line 619: `` - Blank line for readability.
+- Line 620: `// Remove resize listener` - Developer comment or documentation.
+- Line 621: `// Clear timeouts` - Developer comment or documentation.
+- Line 622: `if (this.zoomTimeoutId) {` - Starts a logic block.
+- Line 623: `clearTimeout(this.zoomTimeoutId);` - App logic step.
+- Line 624: `this.zoomTimeoutId = null;` - App logic step.
+- Line 625: `}` - Ends a logic block.
+- Line 626: `if (this.updateMarkersTimeoutId) {` - Starts a logic block.
+- Line 627: `clearTimeout(this.updateMarkersTimeoutId);` - App logic step.
+- Line 628: `this.updateMarkersTimeoutId = null;` - App logic step.
+- Line 629: `}` - Ends a logic block.
+- Line 630: `if (this.tooltipTimeoutId) {` - Starts a logic block.
+- Line 631: `clearTimeout(this.tooltipTimeoutId);` - App logic step.
+- Line 632: `this.tooltipTimeoutId = null;` - App logic step.
+- Line 633: `}` - Ends a logic block.
+- Line 634: `` - Blank line for readability.
+- Line 635: `// Cancel RAF loop` - Developer comment or documentation.
+- Line 636: `if (this.updateLabelsRAFId !== null) {` - Starts a logic block.
+- Line 637: `cancelAnimationFrame(this.updateLabelsRAFId);` - App logic step.
+- Line 638: `this.updateLabelsRAFId = null;` - App logic step.
+- Line 639: `}` - Ends a logic block.
+- Line 640: `if (this.mapReadyRetryInterval) {` - Starts a logic block.
+- Line 641: `clearInterval(this.mapReadyRetryInterval);` - App logic step.
+- Line 642: `this.mapReadyRetryInterval = null;` - App logic step.
+- Line 643: `}` - Ends a logic block.
+- Line 644: `` - Blank line for readability.
+- Line 645: `// Remove popup if it exists (this will also clean up the click listener)` - Developer comment or documentation.
+- Line 646: `this.hideMarkerPopup();` - App logic step.
+- Line 647: `` - Blank line for readability.
+- Line 648: `// Disconnect MutationObservers` - Developer comment or documentation.
+- Line 649: `if (this.labelObserver) {` - Starts a logic block.
+- Line 650: `this.labelObserver.disconnect();` - App logic step.
+- Line 651: `this.labelObserver = null;` - App logic step.
+- Line 652: `}` - Ends a logic block.
+- Line 653: `if (this.nodeObserver) {` - Starts a logic block.
+- Line 654: `this.nodeObserver.disconnect();` - App logic step.
+- Line 655: `this.nodeObserver = null;` - App logic step.
+- Line 656: `}` - Ends a logic block.
+- Line 657: `if (this.viewBoxObserver) {` - Starts a logic block.
+- Line 658: `this.viewBoxObserver.disconnect();` - App logic step.
+- Line 659: `this.viewBoxObserver = null;` - App logic step.
+- Line 660: `}` - Ends a logic block.
+- Line 661: `` - Blank line for readability.
+- Line 662: `// Remove event listeners` - Developer comment or documentation.
+- Line 663: `if (this.boundFullscreenHandler) {` - Starts a logic block.
+- Line 664: `document.removeEventListener('fullscreenchange', this.boundFullscreenHandler);` - App logic step.
+- Line 665: `document.removeEventListener('webkitfullscreenchange', this.boundFullscreenHandler);` - App logic step.
+- Line 666: `document.removeEventListener('msfullscreenchange', this.boundFullscreenHandler);` - App logic step.
+- Line 667: `this.boundFullscreenHandler = null;` - App logic step.
+- Line 668: `}` - Ends a logic block.
+- Line 669: `if (this.boundResizeHandler) {` - Starts a logic block.
+- Line 670: `window.removeEventListener('resize', this.boundResizeHandler);` - App logic step.
+- Line 671: `this.boundResizeHandler = null;` - App logic step.
+- Line 672: `}` - Ends a logic block.
+- Line 673: `if (this.boundPanSyncMouseDownHandler) {` - Starts a logic block.
+- Line 674: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 675: `if (container) {` - Starts a logic block.
+- Line 676: `container.removeEventListener('mousedown', this.boundPanSyncMouseDownHandler);` - App logic step.
+- Line 677: `}` - Ends a logic block.
+- Line 678: `this.boundPanSyncMouseDownHandler = null;` - App logic step.
+- Line 679: `}` - Ends a logic block.
+- Line 680: `if (this.boundPanSyncMouseMoveHandler) {` - Starts a logic block.
+- Line 681: `document.removeEventListener('mousemove', this.boundPanSyncMouseMoveHandler);` - App logic step.
+- Line 682: `this.boundPanSyncMouseMoveHandler = null;` - App logic step.
+- Line 683: `}` - Ends a logic block.
+- Line 684: `if (this.boundPanSyncMouseUpHandler) {` - Starts a logic block.
+- Line 685: `document.removeEventListener('mouseup', this.boundPanSyncMouseUpHandler);` - App logic step.
+- Line 686: `this.boundPanSyncMouseUpHandler = null;` - App logic step.
+- Line 687: `}` - Ends a logic block.
+- Line 688: `` - Blank line for readability.
+- Line 689: `if (this.isFullscreen) {` - Starts a logic block.
+- Line 690: `this.exitFullscreen();` - App logic step.
+- Line 691: `}` - Ends a logic block.
+- Line 692: `this.mapInstance = null;` - App logic step.
+- Line 693: `}` - Ends a logic block.
+- Line 694: `` - Blank line for readability.
+- Line 695: `private loadScripts(): Promise<void> {` - Starts a logic block.
+- Line 696: `// Check if scripts are already loaded (via angular.json)` - Developer comment or documentation.
+- Line 697: `if (this.scriptsLoaded || (window as any).jsVectorMap) {` - Starts a logic block.
+- Line 698: `this.scriptsLoaded = true;` - App logic step.
+- Line 699: `// Wait longer for world map data to be available` - Developer comment or documentation.
+- Line 700: `return new Promise((resolve) => setTimeout(resolve, 500));` - Returns a value.
+- Line 701: `}` - Ends a logic block.
+- Line 702: `` - Blank line for readability.
+- Line 703: `// Fallback: dynamically load scripts if not loaded via angular.json` - Developer comment or documentation.
+- Line 704: `return new Promise((resolve, reject) => {` - Starts a logic block.
+- Line 705: `// Load CSS specifically for jsVectorMap` - Developer comment or documentation.
+- Line 706: `const link = document.createElement('link');` - App logic step.
+- Line 707: `link.rel = 'stylesheet';` - App logic step.
+- Line 708: `link.href = '/assets/libs/jsvectormap/css/jsvectormap.min.css';` - App logic step.
+- Line 709: `document.head.appendChild(link);` - App logic step.
+- Line 710: `` - Blank line for readability.
+- Line 711: `// Load jsVectorMap library` - Developer comment or documentation.
+- Line 712: `const script1 = document.createElement('script');` - App logic step.
+- Line 713: `script1.src = '/assets/libs/jsvectormap/js/jsvectormap.min.js';` - App logic step.
+- Line 714: `script1.onload = () => {` - Starts a logic block.
+- Line 715: `if (this.destroyed) {` - Starts a logic block.
+- Line 716: `reject(new Error('Component destroyed before scripts loaded'));` - App logic step.
+- Line 717: `return;` - App logic step.
+- Line 718: `}` - Ends a logic block.
+- Line 719: `// Load world map data` - Developer comment or documentation.
+- Line 720: `const script2 = document.createElement('script');` - App logic step.
+- Line 721: `script2.src = '/assets/libs/jsvectormap/maps/world.js';` - App logic step.
+- Line 722: `script2.onload = () => {` - Starts a logic block.
+- Line 723: `if (this.destroyed) {` - Starts a logic block.
+- Line 724: `reject(new Error('Component destroyed before scripts loaded'));` - App logic step.
+- Line 725: `return;` - App logic step.
+- Line 726: `}` - Ends a logic block.
+- Line 727: `this.scriptsLoaded = true;` - App logic step.
+- Line 728: `// Wait a bit more for the map data to be fully processed` - Developer comment or documentation.
+- Line 729: `setTimeout(() => {` - Starts a logic block.
+- Line 730: `if (!this.destroyed) {` - Starts a logic block.
+- Line 731: `resolve();` - App logic step.
+- Line 732: `}` - Ends a logic block.
+- Line 733: `}, 300);` - Ends a logic block.
+- Line 734: `};` - Ends a logic block.
+- Line 735: `script2.onerror = () => reject(new Error('Failed to load world map data'));` - App logic step.
+- Line 736: `document.head.appendChild(script2);` - App logic step.
+- Line 737: `};` - Ends a logic block.
+- Line 738: `script1.onerror = () => reject(new Error('Failed to load jsVectorMap library'));` - App logic step.
+- Line 739: `document.head.appendChild(script1);` - App logic step.
+- Line 740: `});` - Ends a logic block.
+- Line 741: `}` - Ends a logic block.
+- Line 742: `` - Blank line for readability.
+- Line 743: `private initializeMap(): void {` - Starts a logic block.
+- Line 744: `if (!window.jsVectorMap) {` - Starts a logic block.
+- Line 745: `console.error('jsVectorMap library not loaded');` - App logic step.
+- Line 746: `return;` - App logic step.
+- Line 747: `}` - Ends a logic block.
+- Line 748: `` - Blank line for readability.
+- Line 749: `// Check if container exists` - Developer comment or documentation.
+- Line 750: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 751: `if (!container) {` - Starts a logic block.
+- Line 752: `console.error('Map container #war-room-map not found');` - App logic step.
+- Line 753: `this.mapInitAttempts++;` - App logic step.
+- Line 754: `if (this.mapInitAttempts < this.maxMapInitRetries) {` - Starts a logic block.
+- Line 755: `setTimeout(() => {` - Starts a logic block.
+- Line 756: `if (!this.destroyed) {` - Starts a logic block.
+- Line 757: `this.initializeMap();` - App logic step.
+- Line 758: `}` - Ends a logic block.
+- Line 759: `}, 200); // Retry after 200ms` - Ends a logic block.
+- Line 760: `} else {` - App logic step.
+- Line 761: `console.error('Max retry attempts reached for map initialization');` - App logic step.
+- Line 762: `}` - Ends a logic block.
+- Line 763: `return;` - App logic step.
+- Line 764: `}` - Ends a logic block.
+- Line 765: `` - Blank line for readability.
+- Line 766: `// Check if container has dimensions, if not set a minimum` - Developer comment or documentation.
+- Line 767: `const rect = container.getBoundingClientRect();` - App logic step.
+- Line 768: `if (rect.width === 0 || rect.height === 0) {` - Starts a logic block.
+- Line 769: `console.warn('Map container has no dimensions, setting minimum...', rect);` - App logic step.
+- Line 770: `// Set explicit dimensions if parent doesn't provide them` - Developer comment or documentation.
+- Line 771: `const parent = container.parentElement;` - App logic step.
+- Line 772: `if (parent) {` - Starts a logic block.
+- Line 773: `const parentRect = parent.getBoundingClientRect();` - App logic step.
+- Line 774: `if (parentRect.height === 0 || rect.height === 0) {` - Starts a logic block.
+- Line 775: `// Set explicit height on both container and parent if needed` - Developer comment or documentation.
+- Line 776: `if (rect.height === 0) {` - Starts a logic block.
+- Line 777: `container.style.height = '600px';` - App logic step.
+- Line 778: `console.log('Set container height to 600px');` - App logic step.
+- Line 779: `}` - Ends a logic block.
+- Line 780: `if (parentRect.height === 0 && parent) {` - Starts a logic block.
+- Line 781: `parent.style.height = '600px';` - App logic step.
+- Line 782: `console.log('Set parent height to 600px');` - App logic step.
+- Line 783: `}` - Ends a logic block.
+- Line 784: `}` - Ends a logic block.
+- Line 785: `if (parentRect.width === 0 || rect.width === 0) {` - Starts a logic block.
+- Line 786: `container.style.width = '100%';` - App logic step.
+- Line 787: `if (parent) {` - Starts a logic block.
+- Line 788: `parent.style.width = '100%';` - App logic step.
+- Line 789: `}` - Ends a logic block.
+- Line 790: `console.log('Set container width to 100%');` - App logic step.
+- Line 791: `}` - Ends a logic block.
+- Line 792: `}` - Ends a logic block.
+- Line 793: `// Wait a bit for styles to apply, then retry` - Developer comment or documentation.
+- Line 794: `this.mapInitAttempts++;` - App logic step.
+- Line 795: `if (this.mapInitAttempts < this.maxMapInitRetries) {` - Starts a logic block.
+- Line 796: `setTimeout(() => {` - Starts a logic block.
+- Line 797: `if (!this.destroyed) {` - Starts a logic block.
+- Line 798: `this.initializeMap();` - App logic step.
+- Line 799: `}` - Ends a logic block.
+- Line 800: `}, 150);` - Ends a logic block.
+- Line 801: `} else {` - App logic step.
+- Line 802: `console.error('Max retry attempts reached for map dimension initialization');` - App logic step.
+- Line 803: `}` - Ends a logic block.
+- Line 804: `return;` - App logic step.
+- Line 805: `}` - Ends a logic block.
+- Line 806: `` - Blank line for readability.
+- Line 807: `// Reset attempt counter on successful initialization` - Developer comment or documentation.
+- Line 808: `this.mapInitAttempts = 0;` - App logic step.
+- Line 809: `` - Blank line for readability.
+- Line 810: `// Set initializing flag` - Developer comment or documentation.
+- Line 811: `this.isInitializing = true;` - App logic step.
+- Line 812: `` - Blank line for readability.
+- Line 813: `console.log('Map container dimensions:', rect.width, 'x', rect.height);` - App logic step.
+- Line 814: `` - Blank line for readability.
+- Line 815: `const nodes = this.nodes();` - App logic step.
+- Line 816: `if (nodes.length === 0) {` - Starts a logic block.
+- Line 817: `console.warn('No nodes available for map initialization');` - App logic step.
+- Line 818: `return;` - App logic step.
+- Line 819: `}` - Ends a logic block.
+- Line 820: `` - Blank line for readability.
+- Line 821: `console.log('Initializing map with', nodes.length, 'nodes');` - App logic step.
+- Line 822: `` - Blank line for readability.
+- Line 823: `// Clean up any existing map instance without removing the container.` - Developer comment or documentation.
+- Line 824: `// Removing the container causes "Container disappeared before initialization" when` - Developer comment or documentation.
+- Line 825: `// reinitializing (e.g. after adding a company) because the DOM node is gone.` - Developer comment or documentation.
+- Line 826: `if (this.mapInstance) {` - Starts a logic block.
+- Line 827: `try {` - Starts a logic block.
+- Line 828: `const el = document.getElementById('war-room-map');` - App logic step.
+- Line 829: `if (el) {` - Starts a logic block.
+- Line 830: `el.innerHTML = '';` - App logic step.
+- Line 831: `}` - Ends a logic block.
+- Line 832: `} catch (e) {` - App logic step.
+- Line 833: `console.warn('Error cleaning up existing map:', e);` - App logic step.
+- Line 834: `}` - Ends a logic block.
+- Line 835: `this.mapInstance = null;` - App logic step.
+- Line 836: `}` - Ends a logic block.
+- Line 837: `` - Blank line for readability.
+- Line 838: `// Clear element cache` - Developer comment or documentation.
+- Line 839: `this.elementCache.clear();` - App logic step.
+- Line 840: `` - Blank line for readability.
+- Line 841: `setTimeout(() => {` - Starts a logic block.
+- Line 842: `try {` - Starts a logic block.
+- Line 843: `if (this.destroyed) return;` - Checks a condition.
+- Line 844: `const finalCheck = document.getElementById('war-room-map');` - App logic step.
+- Line 845: `if (!finalCheck) return;` - Checks a condition.
+- Line 846: `` - Blank line for readability.
+- Line 847: `const finalRect = finalCheck.getBoundingClientRect();` - App logic step.
+- Line 848: `if (finalRect.width === 0 || finalRect.height === 0) {` - Starts a logic block.
+- Line 849: `console.error('Container still has no dimensions:', finalRect);` - App logic step.
+- Line 850: `// Force dimensions` - Developer comment or documentation.
+- Line 851: `finalCheck.style.width = '100%';` - App logic step.
+- Line 852: `finalCheck.style.height = '600px';` - App logic step.
+- Line 853: `console.log('Forced container dimensions');` - App logic step.
+- Line 854: `}` - Ends a logic block.
+- Line 855: `` - Blank line for readability.
+- Line 856: `// Convert nodes to jsVectorMap markers format` - Developer comment or documentation.
+- Line 857: `// jsVectorMap typically expects [latitude, longitude] format for both coords and latLng` - Developer comment or documentation.
+- Line 858: `const allMarkers = nodes.map((node) => ({` - Starts a logic block.
+- Line 859: `name: node.name,` - App logic step.
+- Line 860: `coords: [node.coordinates.latitude, node.coordinates.longitude] as [number, number], // [lat, lng]` - App logic step.
+- Line 861: `latLng: [node.coordinates.latitude, node.coordinates.longitude] as [number, number], // [lat, lng]` - App logic step.
+- Line 862: `}));` - Ends a logic block.
+- Line 863: `` - Blank line for readability.
+- Line 864: `// Get transit routes from service` - Developer comment or documentation.
+- Line 865: `// COMMENTED OUT: Lines removed from map` - Developer comment or documentation.
+- Line 866: `// const transitRoutes = this.warRoomService.transitRoutes();` - Developer comment or documentation.
+- Line 867: `// const lines = transitRoutes.map((route) => ({` - Developer comment or documentation.
+- Line 868: `//   from: route.from,` - Developer comment or documentation.
+- Line 869: `//   to: route.to,` - Developer comment or documentation.
+- Line 870: `// }));` - Developer comment or documentation.
+- Line 871: `const lines: any[] = []; // Empty array to prevent lines from being added` - App logic step.
+- Line 872: `` - Blank line for readability.
+- Line 873: `// Get current theme for initial map colors` - Developer comment or documentation.
+- Line 874: `const currentTheme = this.currentTheme();` - App logic step.
+- Line 875: `const colors = this.colorSchemes[currentTheme] || this.colorSchemes.dark;` - App logic step.
+- Line 876: `` - Blank line for readability.
+- Line 877: `// Initialize the map with proper configuration` - Developer comment or documentation.
+- Line 878: `const mapConfig: any = {` - Starts a logic block.
+- Line 879: `selector: '#war-room-map',` - Defines the HTML tag name for this component.
+- Line 880: `map: 'world',` - App logic step.
+- Line 881: `zoomButtons: false, // use custom zoom in/out in .map-controls` - App logic step.
+- Line 882: `backgroundColor: colors.backgroundColor,` - App logic step.
+- Line 883: `// Enable scroll zoom` - Developer comment or documentation.
+- Line 884: `zoomOnScroll: true, // Enable scroll zoom` - App logic step.
+- Line 885: `zoomMin: 1, // Minimum zoom level (full world view)` - App logic step.
+- Line 886: `zoomMax: 15, // Maximum zoom level` - App logic step.
+- Line 887: `// Enable pan/drag functionality` - Developer comment or documentation.
+- Line 888: `panOnDrag: true, // Enable dragging to pan the map` - App logic step.
+- Line 889: `markers: allMarkers,` - App logic step.
+- Line 890: `markerStyle: {` - Starts a logic block.
+- Line 891: `initial: {` - Starts a logic block.
+- Line 892: `fill: '#00FF41', // Tactical green` - App logic step.
+- Line 893: `stroke: '#ffffff',` - App logic step.
+- Line 894: `strokeWidth: 2,` - App logic step.
+- Line 895: `r: 6,` - App logic step.
+- Line 896: `},` - Ends a logic block.
+- Line 897: `hover: {` - Starts a logic block.
+- Line 898: `fill: '#00FF41',` - App logic step.
+- Line 899: `stroke: '#ffffff',` - App logic step.
+- Line 900: `strokeWidth: 2,` - App logic step.
+- Line 901: `r: 8,` - App logic step.
+- Line 902: `},` - Ends a logic block.
+- Line 903: `},` - Ends a logic block.
+- Line 904: `regionStyle: {` - Starts a logic block.
+- Line 905: `initial: {` - Starts a logic block.
+- Line 906: `fill: colors.regionFill,` - App logic step.
+- Line 907: `fillOpacity: colors.regionFillOpacity,` - App logic step.
+- Line 908: `stroke: colors.regionStroke,` - App logic step.
+- Line 909: `strokeWidth: 0.5,` - App logic step.
+- Line 910: `},` - Ends a logic block.
+- Line 911: `hover: {` - Starts a logic block.
+- Line 912: `fill: colors.regionHoverFill,` - App logic step.
+- Line 913: `},` - Ends a logic block.
+- Line 914: `},` - Ends a logic block.
+- Line 915: `// Use custom tooltip only (prevents duplicate tooltips)` - Developer comment or documentation.
+- Line 916: `showTooltip: false,` - App logic step.
+- Line 917: `};` - Ends a logic block.
+- Line 918: `` - Blank line for readability.
+- Line 919: `// Add lines if supported` - Developer comment or documentation.
+- Line 920: `// COMMENTED OUT: Lines removed from map` - Developer comment or documentation.
+- Line 921: `// if (lines.length > 0) {` - Developer comment or documentation.
+- Line 922: `//   mapConfig.lines = lines;` - Developer comment or documentation.
+- Line 923: `//   mapConfig.lineStyle = {` - Developer comment or documentation.
+- Line 924: `//     stroke: '#00FF41', // Tactical green` - Developer comment or documentation.
+- Line 925: `//     strokeWidth: 3,` - Developer comment or documentation.
+- Line 926: `//     strokeDasharray: '0', // Solid lines` - Developer comment or documentation.
+- Line 927: `//     strokeOpacity: 0.8,` - Developer comment or documentation.
+- Line 928: `//   };` - Developer comment or documentation.
+- Line 929: `// }` - Developer comment or documentation.
+- Line 930: `` - Blank line for readability.
+- Line 931: `// Add tooltip handler - ensure it works for Creative Carriage` - Developer comment or documentation.
+- Line 932: `mapConfig.onMarkerTipShow = (event: any, label: any, index: number) => {` - Starts a logic block.
+- Line 933: `const node = nodes[index];` - App logic step.
+- Line 934: `if (!node) return;` - Checks a condition.
+- Line 935: `` - Blank line for readability.
+- Line 936: `console.log('Tooltip show for node:', node.company, 'index:', index);` - App logic step.
+- Line 937: `` - Blank line for readability.
+- Line 938: `const companyLower = node.company?.toLowerCase() || '';` - App logic step.
+- Line 939: `const hasDescription = Object.keys(this.companyDescriptions).some(key => companyLower.includes(key));` - App logic step.
+- Line 940: `` - Blank line for readability.
+- Line 941: `// Debug logging for Karsan/Karzan tooltip` - Developer comment or documentation.
+- Line 942: `if (companyLower.includes('karsan') || companyLower.includes('karzan')) {` - Starts a logic block.
+- Line 943: `console.log('[KARSAN/KARZAN Tooltip Debug] Company: "${node.company}", Lowercase: "${companyLower}", Has description: ${hasDescription}');` - App logic step.
+- Line 944: `}` - Ends a logic block.
+- Line 945: `` - Blank line for readability.
+- Line 946: `if (hasDescription) {` - Starts a logic block.
+- Line 947: `const descriptionKey = Object.keys(this.companyDescriptions).find(key => companyLower.includes(key));` - App logic step.
+- Line 948: `const description = descriptionKey ? this.companyDescriptions[descriptionKey] : '';` - App logic step.
+- Line 949: `` - Blank line for readability.
+- Line 950: `if (companyLower.includes('karsan') || companyLower.includes('karzan')) {` - Starts a logic block.
+- Line 951: `console.log('[KARSAN/KARZAN Tooltip] Description key: "${descriptionKey}", Description length: ${description.length}');` - App logic step.
+- Line 952: `}` - Ends a logic block.
+- Line 953: `` - Blank line for readability.
+- Line 954: `const tooltipHtml = '<div style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #00FF41;">${node.company}</div>` - App logic step.
+- Line 955: `<div style="font-size: 11px; color: #6c757d; margin-bottom: 6px;">${node.city}</div>` - App logic step.
+- Line 956: `<div style="font-size: 11px; color: #888; line-height: 1.4; max-width: 300px;">${description}</div>';` - App logic step.
+- Line 957: `` - Blank line for readability.
+- Line 958: `// Try multiple methods to set tooltip content` - Developer comment or documentation.
+- Line 959: `if (label && typeof label.html === 'function') {` - Starts a logic block.
+- Line 960: `label.html(tooltipHtml);` - App logic step.
+- Line 961: `if (companyLower.includes('karsan')) {` - Starts a logic block.
+- Line 962: `console.log('[KARSAN Tooltip] Set via label.html() method');` - App logic step.
+- Line 963: `}` - Ends a logic block.
+- Line 964: `} else if (label && label.innerHTML !== undefined) {` - Checks a condition.
+- Line 965: `label.innerHTML = tooltipHtml;` - App logic step.
+- Line 966: `if (companyLower.includes('karsan')) {` - Starts a logic block.
+- Line 967: `console.log('[KARSAN Tooltip] Set via label.innerHTML');` - App logic step.
+- Line 968: `}` - Ends a logic block.
+- Line 969: `} else if (label && label.textContent !== undefined) {` - Checks a condition.
+- Line 970: `// Fallback: create a div and append` - Developer comment or documentation.
+- Line 971: `const tempDiv = document.createElement('div');` - App logic step.
+- Line 972: `tempDiv.innerHTML = tooltipHtml;` - App logic step.
+- Line 973: `if (label.appendChild) {` - Starts a logic block.
+- Line 974: `label.innerHTML = '';` - App logic step.
+- Line 975: `label.appendChild(tempDiv);` - App logic step.
+- Line 976: `if (companyLower.includes('karsan')) {` - Starts a logic block.
+- Line 977: `console.log('[KARSAN Tooltip] Set via appendChild fallback');` - App logic step.
+- Line 978: `}` - Ends a logic block.
+- Line 979: `}` - Ends a logic block.
+- Line 980: `}` - Ends a logic block.
+- Line 981: `console.log('${node.company} tooltip set');` - App logic step.
+- Line 982: `} else {` - App logic step.
+- Line 983: `const tooltipHtml = '<div style="font-weight: 600; margin-bottom: 4px;">${node.company}</div><div style="font-size: 12px; color: #6c757d;">${node.city}</div>';` - App logic step.
+- Line 984: `if (label && typeof label.html === 'function') {` - Starts a logic block.
+- Line 985: `label.html(tooltipHtml);` - App logic step.
+- Line 986: `} else if (label && label.innerHTML !== undefined) {` - Checks a condition.
+- Line 987: `label.innerHTML = tooltipHtml;` - App logic step.
+- Line 988: `}` - Ends a logic block.
+- Line 989: `if (companyLower.includes('karsan')) {` - Starts a logic block.
+- Line 990: `console.warn('[KARSAN Tooltip] No description found! Company: "${node.company}", Lowercase: "${companyLower}"');` - App logic step.
+- Line 991: `}` - Ends a logic block.
+- Line 992: `}` - Ends a logic block.
+- Line 993: `};` - Ends a logic block.
+- Line 994: `` - Blank line for readability.
+- Line 995: `// Add click handler with zoom functionality` - Developer comment or documentation.
+- Line 996: `mapConfig.onMarkerClick = (event: any, index: number) => {` - Starts a logic block.
+- Line 997: `const node = nodes[index];` - App logic step.
+- Line 998: `console.log('Marker clicked via jsVectorMap handler:', node);` - App logic step.
+- Line 999: `this.nodeSelected.emit(node);` - App logic step.
+- Line 1000: `};` - Ends a logic block.
+- Line 1001: `` - Blank line for readability.
+- Line 1002: `// Add event handlers for zoom/pan to update label positions` - Developer comment or documentation.
+- Line 1003: `mapConfig.onViewportChange = () => {` - Starts a logic block.
+- Line 1004: `// Mark that user has interacted with the map (zoomed/panned)` - Developer comment or documentation.
+- Line 1005: `// Only if we're not in the initialization phase where many automatic layout shifts happen` - Developer comment or documentation.
+- Line 1006: `if (!this.isInitializing) {` - Starts a logic block.
+- Line 1007: `this.userHasZoomed = true;` - App logic step.
+- Line 1008: `}` - Ends a logic block.
+- Line 1009: `` - Blank line for readability.
+- Line 1010: `this.updateLabelPositions();` - App logic step.
+- Line 1011: `// Update logo and label positions when viewport changes - ensure text sticks to circle` - Developer comment or documentation.
+- Line 1012: `// Use requestAnimationFrame for smoother updates, but also call directly for immediate response` - Developer comment or documentation.
+- Line 1013: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 1014: `this.refreshTooltipPosition();` - App logic step.
+- Line 1015: `requestAnimationFrame(() => {` - Starts a logic block.
+- Line 1016: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 1017: `// Re-apply logos and labels in case they were lost` - Developer comment or documentation.
+- Line 1018: `this.addCompanyLogosAndLabels();` - App logic step.
+- Line 1019: `});` - Ends a logic block.
+- Line 1020: `};` - Ends a logic block.
+- Line 1021: `` - Blank line for readability.
+- Line 1022: `// Initialize the map` - Developer comment or documentation.
+- Line 1023: `console.log('Creating jsVectorMap instance with config:', mapConfig);` - App logic step.
+- Line 1024: `console.log('Container element:', finalCheck);` - App logic step.
+- Line 1025: `console.log('Container dimensions:', finalCheck.getBoundingClientRect());` - App logic step.
+- Line 1026: `` - Blank line for readability.
+- Line 1027: `try {` - Starts a logic block.
+- Line 1028: `this.mapInstance = new window.jsVectorMap(mapConfig);` - App logic step.
+- Line 1029: `console.log('Map instance created successfully:', this.mapInstance);` - App logic step.
+- Line 1030: `` - Blank line for readability.
+- Line 1031: `// Immediately after map creation, set to full world view` - Developer comment or documentation.
+- Line 1032: `// Do this before any other operations` - Developer comment or documentation.
+- Line 1033: `setTimeout(() => {` - Starts a logic block.
+- Line 1034: `if (!this.destroyed && !this.pendingZoomCompanyId) {` - Starts a logic block.
+- Line 1035: `this.resetToFullWorldView();` - App logic step.
+- Line 1036: `}` - Ends a logic block.
+- Line 1037: `}, 50);` - Ends a logic block.
+- Line 1038: `` - Blank line for readability.
+- Line 1039: `setTimeout(() => {` - Starts a logic block.
+- Line 1040: `if (this.destroyed) return;` - Checks a condition.
+- Line 1041: `this.updateLabelPositions();` - App logic step.
+- Line 1042: `this.startLabelPositionUpdates();` - App logic step.
+- Line 1043: `this.attachMarkerClickHandlers();` - App logic step.
+- Line 1044: `this.attachMarkerHoverHandlers(); // Add hover handlers for tooltips` - App logic step.
+- Line 1045: `const pending = this.pendingZoomCompanyId;` - App logic step.
+- Line 1046: `this.pendingZoomCompanyId = null;` - App logic step.
+- Line 1047: `if (pending) this.zoomToCompany(pending, 12);` - Checks a condition.
+- Line 1048: `` - Blank line for readability.
+- Line 1049: `// Remove lines group from DOM if it exists` - Developer comment or documentation.
+- Line 1050: `const svg = finalCheck.querySelector('svg');` - App logic step.
+- Line 1051: `if (svg) {` - Starts a logic block.
+- Line 1052: `const linesGroup = svg.querySelector('#jvm-lines-group');` - App logic step.
+- Line 1053: `if (linesGroup) {` - Starts a logic block.
+- Line 1054: `linesGroup.remove();` - App logic step.
+- Line 1055: `console.log('Removed lines group from map');` - App logic step.
+- Line 1056: `}` - Ends a logic block.
+- Line 1057: `}` - Ends a logic block.
+- Line 1058: `` - Blank line for readability.
+- Line 1059: `// Add logos and company names to Creative Carriage markers` - Developer comment or documentation.
+- Line 1060: `this.addCompanyLogosAndLabels();` - App logic step.
+- Line 1061: `` - Blank line for readability.
+- Line 1062: `// Reset to full world view by default (after logos are added)` - Developer comment or documentation.
+- Line 1063: `// Only if no pending zoom is queued` - Developer comment or documentation.
+- Line 1064: `if (!pending) {` - Starts a logic block.
+- Line 1065: `// Call immediately and also after a delay to ensure it sticks` - Developer comment or documentation.
+- Line 1066: `this.resetToFullWorldView();` - App logic step.
+- Line 1067: `setTimeout(() => {` - Starts a logic block.
+- Line 1068: `if (!this.destroyed) {` - Starts a logic block.
+- Line 1069: `this.resetToFullWorldView();` - App logic step.
+- Line 1070: `}` - Ends a logic block.
+- Line 1071: `}, 500);` - Ends a logic block.
+- Line 1072: `setTimeout(() => {` - Starts a logic block.
+- Line 1073: `if (!this.destroyed) {` - Starts a logic block.
+- Line 1074: `this.resetToFullWorldView();` - App logic step.
+- Line 1075: `// Initialization complete - allow user interactions to be tracked` - Developer comment or documentation.
+- Line 1076: `this.isInitializing = false;` - App logic step.
+- Line 1077: `console.log('Map initialization complete - user interactions enabled');` - App logic step.
+- Line 1078: `}` - Ends a logic block.
+- Line 1079: `}, 2500); // Give plenty of time for all layout shifts to settle` - Ends a logic block.
+- Line 1080: `} else {` - App logic step.
+- Line 1081: `// If there was a pending zoom, we're done initializing` - Developer comment or documentation.
+- Line 1082: `this.isInitializing = false;` - App logic step.
+- Line 1083: `}` - Ends a logic block.
+- Line 1084: `}, 1000);` - Ends a logic block.
+- Line 1085: `` - Blank line for readability.
+- Line 1086: `// Listen for fullscreen changes` - Developer comment or documentation.
+- Line 1087: `this.setupFullscreenListeners();` - App logic step.
+- Line 1088: `` - Blank line for readability.
+- Line 1089: `// Verify map was created` - Developer comment or documentation.
+- Line 1090: `if (!this.mapInstance) {` - Starts a logic block.
+- Line 1091: `console.error('Map instance is null after creation');` - App logic step.
+- Line 1092: `} else {` - App logic step.
+- Line 1093: `// Verify SVG was created` - Developer comment or documentation.
+- Line 1094: `setTimeout(() => {` - Starts a logic block.
+- Line 1095: `const svg = finalCheck.querySelector('svg');` - App logic step.
+- Line 1096: `if (svg) {` - Starts a logic block.
+- Line 1097: `console.log('Map SVG found:', svg);` - App logic step.
+- Line 1098: `console.log('SVG dimensions:', svg.getBoundingClientRect());` - App logic step.
+- Line 1099: `console.log('SVG viewBox:', svg.getAttribute('viewBox'));` - App logic step.
+- Line 1100: `` - Blank line for readability.
+- Line 1101: `// Fix missing viewBox if needed (common issue)` - Developer comment or documentation.
+- Line 1102: `if (!svg.getAttribute('viewBox')) {` - Starts a logic block.
+- Line 1103: `console.warn('SVG missing viewBox, forcing default...');` - App logic step.
+- Line 1104: `svg.setAttribute('viewBox', '0 0 950 550'); // Standard world map dimensions` - App logic step.
+- Line 1105: `}` - Ends a logic block.
+- Line 1106: `` - Blank line for readability.
+- Line 1107: `// Ensure SVG is responsive - remove fixed width/height attributes` - Developer comment or documentation.
+- Line 1108: `svg.removeAttribute('width');` - App logic step.
+- Line 1109: `svg.removeAttribute('height');` - App logic step.
+- Line 1110: `svg.style.width = '100%';` - App logic step.
+- Line 1111: `svg.style.height = '100%';` - App logic step.
+- Line 1112: `svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'); // Show entire map, maintain aspect ratio` - App logic step.
+- Line 1113: `` - Blank line for readability.
+- Line 1114: `// Immediately set to full world view` - Developer comment or documentation.
+- Line 1115: `svg.setAttribute('viewBox', '0 0 950 550');` - App logic step.
+- Line 1116: `` - Blank line for readability.
+- Line 1117: `// Check if SVG has content` - Developer comment or documentation.
+- Line 1118: `const hasContent = svg.children.length > 0;` - App logic step.
+- Line 1119: `console.log('SVG has content:', hasContent, 'children:', svg.children.length);` - App logic step.
+- Line 1120: `` - Blank line for readability.
+- Line 1121: `if (!hasContent) {` - Starts a logic block.
+- Line 1122: `console.warn('SVG exists but has no content - map may not have rendered');` - App logic step.
+- Line 1123: `} else {` - App logic step.
+- Line 1124: `// Log SVG structure` - Developer comment or documentation.
+- Line 1125: `console.log('SVG children:', Array.from(svg.children).map((child: any) => ({` - Starts a logic block.
+- Line 1126: `tagName: child.tagName,` - App logic step.
+- Line 1127: `id: child.id,` - App logic step.
+- Line 1128: `className: child.className,` - App logic step.
+- Line 1129: `})));` - Ends a logic block.
+- Line 1130: `}` - Ends a logic block.
+- Line 1131: `} else {` - App logic step.
+- Line 1132: `console.error('Map SVG not found - map initialization may have failed');` - App logic step.
+- Line 1133: `// Log container contents for debugging` - Developer comment or documentation.
+- Line 1134: `console.log('Container innerHTML length:', finalCheck.innerHTML.length);` - App logic step.
+- Line 1135: `console.log('Container children:', Array.from(finalCheck.children).map((child: any) => ({` - Starts a logic block.
+- Line 1136: `tagName: child.tagName,` - App logic step.
+- Line 1137: `id: child.id,` - App logic step.
+- Line 1138: `className: child.className,` - App logic step.
+- Line 1139: `})));` - Ends a logic block.
+- Line 1140: `}` - Ends a logic block.
+- Line 1141: `` - Blank line for readability.
+- Line 1142: `// Check for regions` - Developer comment or documentation.
+- Line 1143: `const regions = finalCheck.querySelectorAll('#jvm-regions-group path');` - App logic step.
+- Line 1144: `console.log('Number of region paths found:', regions.length);` - App logic step.
+- Line 1145: `if (regions.length === 0) {` - Starts a logic block.
+- Line 1146: `console.warn('No region paths found - map regions may not have rendered');` - App logic step.
+- Line 1147: `}` - Ends a logic block.
+- Line 1148: `` - Blank line for readability.
+- Line 1149: `// Ensure SVG is responsive` - Developer comment or documentation.
+- Line 1150: `this.ensureSvgResponsive();` - App logic step.
+- Line 1151: `` - Blank line for readability.
+- Line 1152: `// Reset to full world view by default (zoom out to show entire map)` - Developer comment or documentation.
+- Line 1153: `// Only if no pending zoom is queued` - Developer comment or documentation.
+- Line 1154: `if (!this.pendingZoomCompanyId) {` - Starts a logic block.
+- Line 1155: `this.resetToFullWorldView();` - App logic step.
+- Line 1156: `}` - Ends a logic block.
+- Line 1157: `` - Blank line for readability.
+- Line 1158: `// Setup resize handler to keep SVG responsive` - Developer comment or documentation.
+- Line 1159: `this.setupResizeHandler();` - App logic step.
+- Line 1160: `` - Blank line for readability.
+- Line 1161: `// Setup viewBox observer to maintain full world view` - Developer comment or documentation.
+- Line 1162: `this.setupViewBoxObserver();` - App logic step.
+- Line 1163: `` - Blank line for readability.
+- Line 1164: `// Setup wheel/scroll zoom handler` - Developer comment or documentation.
+- Line 1165: `this.setupWheelZoomHandler();` - App logic step.
+- Line 1166: `// Keep logo overlays synced while dragging the map` - Developer comment or documentation.
+- Line 1167: `this.setupPanSyncHandlers();` - App logic step.
+- Line 1168: `` - Blank line for readability.
+- Line 1169: `// Check for markers` - Developer comment or documentation.
+- Line 1170: `const markers = finalCheck.querySelectorAll('.jvm-marker, circle[class*="marker"], circle[data-index]');` - App logic step.
+- Line 1171: `console.log('Number of markers found:', markers.length);` - App logic step.
+- Line 1172: `if (markers.length === 0) {` - Starts a logic block.
+- Line 1173: `console.warn('No markers found - map markers may not have rendered');` - App logic step.
+- Line 1174: `} else {` - App logic step.
+- Line 1175: `console.log('Markers:', Array.from(markers).map((m: any) => ({` - Starts a logic block.
+- Line 1176: `cx: m.getAttribute('cx'),` - App logic step.
+- Line 1177: `cy: m.getAttribute('cy'),` - App logic step.
+- Line 1178: `fill: m.getAttribute('fill'),` - App logic step.
+- Line 1179: `})));` - Ends a logic block.
+- Line 1180: `}` - Ends a logic block.
+- Line 1181: `}, 500);` - Ends a logic block.
+- Line 1182: `}` - Ends a logic block.
+- Line 1183: `} catch (initError) {` - App logic step.
+- Line 1184: `console.error('Error during map initialization:', initError);` - App logic step.
+- Line 1185: `throw initError;` - App logic step.
+- Line 1186: `}` - Ends a logic block.
+- Line 1187: `` - Blank line for readability.
+- Line 1188: `// If lines need to be added after initialization, use addLines method` - Developer comment or documentation.
+- Line 1189: `// COMMENTED OUT: Lines removed from map` - Developer comment or documentation.
+- Line 1190: `// if (this.mapInstance && this.mapInstance.addLines && lines.length > 0) {` - Developer comment or documentation.
+- Line 1191: `//   setTimeout(() => {` - Developer comment or documentation.
+- Line 1192: `//     try {` - Developer comment or documentation.
+- Line 1193: `//       this.mapInstance.addLines(lines.map((line: any) => ({` - Developer comment or documentation.
+- Line 1194: `//         ...line,` - Developer comment or documentation.
+- Line 1195: `//         style: {` - Developer comment or documentation.
+- Line 1196: `//           stroke: '#00FF41', // Tactical green` - Developer comment or documentation.
+- Line 1197: `//           strokeWidth: 3,` - Developer comment or documentation.
+- Line 1198: `//           strokeDasharray: '0',` - Developer comment or documentation.
+- Line 1199: `//           strokeOpacity: 0.8,` - Developer comment or documentation.
+- Line 1200: `//         },` - Developer comment or documentation.
+- Line 1201: `//       })));` - Developer comment or documentation.
+- Line 1202: `//       console.log('Lines added to map');` - Developer comment or documentation.
+- Line 1203: `//     } catch (error) {` - Developer comment or documentation.
+- Line 1204: `//       console.warn('Could not add lines via addLines method:', error);` - Developer comment or documentation.
+- Line 1205: `//     }` - Developer comment or documentation.
+- Line 1206: `//   }, 500);` - Developer comment or documentation.
+- Line 1207: `// }` - Developer comment or documentation.
+- Line 1208: `} catch (error) {` - App logic step.
+- Line 1209: `console.error('Error initializing map:', error);` - App logic step.
+- Line 1210: `console.error('Error details:', error);` - App logic step.
+- Line 1211: `}` - Ends a logic block.
+- Line 1212: `}, 300);` - Ends a logic block.
+- Line 1213: `}` - Ends a logic block.
+- Line 1214: `` - Blank line for readability.
+- Line 1215: `/**` - Developer comment or documentation.
+- Line 1216: `* Get node display name` - Developer comment or documentation.
+- Line 1217: `*/` - Developer comment or documentation.
+- Line 1218: `getNodeDisplayName(node: WarRoomNode): string {` - Starts a logic block.
+- Line 1219: `const displayName = this.getCompanyDisplayName(node).toUpperCase();` - App logic step.
+- Line 1220: `return '${node.city.toUpperCase()} (${node.hubCode || displayName})';` - Returns a value.
+- Line 1221: `}` - Ends a logic block.
+- Line 1222: `` - Blank line for readability.
+- Line 1223: `/**` - Developer comment or documentation.
+- Line 1224: `* Check if node is selected` - Developer comment or documentation.
+- Line 1225: `*/` - Developer comment or documentation.
+- Line 1226: `isNodeSelected(node: WarRoomNode): boolean {` - Starts a logic block.
+- Line 1227: `const selected = this.selectedCompany();` - App logic step.
+- Line 1228: `return selected?.id === node.companyId;` - Returns a value.
+- Line 1229: `}` - Ends a logic block.
+- Line 1230: `` - Blank line for readability.
+- Line 1231: `/**` - Developer comment or documentation.
+- Line 1232: `* Check if node is hub` - Developer comment or documentation.
+- Line 1233: `*/` - Developer comment or documentation.
+- Line 1234: `isHub(node: WarRoomNode): boolean {` - Starts a logic block.
+- Line 1235: `return node.isHub || node.type === 'Hub';` - Returns a value.
+- Line 1236: `}` - Ends a logic block.
+- Line 1237: `` - Blank line for readability.
+- Line 1238: `/**` - Developer comment or documentation.
+- Line 1239: `* Hide and remove the current marker popup if it exists` - Developer comment or documentation.
+- Line 1240: `*/` - Developer comment or documentation.
+- Line 1241: `private hideMarkerPopup(): void {` - Starts a logic block.
+- Line 1242: `if (this.currentPopup) {` - Starts a logic block.
+- Line 1243: `this.currentPopup.remove();` - App logic step.
+- Line 1244: `this.currentPopup = null;` - App logic step.
+- Line 1245: `}` - Ends a logic block.
+- Line 1246: `}` - Ends a logic block.
+- Line 1247: `` - Blank line for readability.
+- Line 1248: `/**` - Developer comment or documentation.
+- Line 1249: `* Show a popup with company details when a marker is clicked` - Developer comment or documentation.
+- Line 1250: `*/` - Developer comment or documentation.
+- Line 1251: `private showMarkerPopup(node: WarRoomNode, marker: HTMLElement, event: MouseEvent): void {` - Starts a logic block.
+- Line 1252: `// Remove any existing popup first` - Developer comment or documentation.
+- Line 1253: `this.hideMarkerPopup();` - App logic step.
+- Line 1254: `` - Blank line for readability.
+- Line 1255: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1256: `if (!container) return;` - Checks a condition.
+- Line 1257: `` - Blank line for readability.
+- Line 1258: `const companyLower = node.company?.toLowerCase() || '';` - App logic step.
+- Line 1259: `const descriptionKey = Object.keys(this.companyDescriptions).find(key => companyLower.includes(key));` - App logic step.
+- Line 1260: `const description = descriptionKey ? this.companyDescriptions[descriptionKey] : null;` - App logic step.
+- Line 1261: `` - Blank line for readability.
+- Line 1262: `// Create popup element` - Developer comment or documentation.
+- Line 1263: `const popup = document.createElement('div');` - App logic step.
+- Line 1264: `popup.className = 'marker-popup';` - App logic step.
+- Line 1265: `popup.style.position = 'absolute';` - App logic step.
+- Line 1266: `popup.style.zIndex = '1000';` - App logic step.
+- Line 1267: `popup.style.pointerEvents = 'auto';` - App logic step.
+- Line 1268: `` - Blank line for readability.
+- Line 1269: `// Build popup content` - Developer comment or documentation.
+- Line 1270: `if (description) {` - Starts a logic block.
+- Line 1271: `popup.innerHTML = '` - App logic step.
+- Line 1272: `<div style="background-color: rgba(26, 26, 26, 0.95); border: 1px solid #00FF41; border-radius: 4px; padding: 12px; max-width: 350px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);">` - App logic step.
+- Line 1273: `<div style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #00FF41;">${node.company}</div>` - App logic step.
+- Line 1274: `<div style="font-size: 11px; color: #6c757d; margin-bottom: 6px;">${node.city}</div>` - App logic step.
+- Line 1275: `<div style="font-size: 11px; color: #888; line-height: 1.4;">${description}</div>` - App logic step.
+- Line 1276: `</div>` - App logic step.
+- Line 1277: `';` - App logic step.
+- Line 1278: `} else {` - App logic step.
+- Line 1279: `popup.innerHTML = '` - App logic step.
+- Line 1280: `<div style="background-color: rgba(26, 26, 26, 0.95); border: 1px solid #00FF41; border-radius: 4px; padding: 8px;">` - App logic step.
+- Line 1281: `<div style="font-weight: 600; margin-bottom: 4px; color: #00FF41;">${node.company}</div>` - App logic step.
+- Line 1282: `<div style="font-size: 12px; color: #6c757d;">${node.city}</div>` - App logic step.
+- Line 1283: `</div>` - App logic step.
+- Line 1284: `';` - App logic step.
+- Line 1285: `}` - Ends a logic block.
+- Line 1286: `` - Blank line for readability.
+- Line 1287: `// Position popup near the marker` - Developer comment or documentation.
+- Line 1288: `const rect = marker.getBoundingClientRect();` - App logic step.
+- Line 1289: `const containerRect = container.getBoundingClientRect();` - App logic step.
+- Line 1290: `popup.style.left = (rect.left - containerRect.left + rect.width / 2) + 'px';` - App logic step.
+- Line 1291: `popup.style.top = (rect.top - containerRect.top - 10) + 'px';` - App logic step.
+- Line 1292: `popup.style.transform = 'translate(-50%, -100%)';` - App logic step.
+- Line 1293: `` - Blank line for readability.
+- Line 1294: `// Append to container` - Developer comment or documentation.
+- Line 1295: `container.appendChild(popup);` - App logic step.
+- Line 1296: `this.currentPopup = popup;` - App logic step.
+- Line 1297: `` - Blank line for readability.
+- Line 1298: `// Add click handler to close popup when clicking outside` - Developer comment or documentation.
+- Line 1299: `this.closePopupHandler = (e: MouseEvent) => {` - Starts a logic block.
+- Line 1300: `if (popup && !popup.contains(e.target as Node) && !marker.contains(e.target as Node)) {` - Starts a logic block.
+- Line 1301: `this.hideMarkerPopup();` - App logic step.
+- Line 1302: `}` - Ends a logic block.
+- Line 1303: `};` - Ends a logic block.
+- Line 1304: `` - Blank line for readability.
+- Line 1305: `// Use setTimeout to avoid immediate closure` - Developer comment or documentation.
+- Line 1306: `this.closePopupTimer = setTimeout(() => {` - Starts a logic block.
+- Line 1307: `if (this.closePopupHandler) {` - Starts a logic block.
+- Line 1308: `document.addEventListener('click', this.closePopupHandler);` - App logic step.
+- Line 1309: `}` - Ends a logic block.
+- Line 1310: `this.closePopupTimer = null;` - App logic step.
+- Line 1311: `}, 0);` - Ends a logic block.
+- Line 1312: `}` - Ends a logic block.
+- Line 1313: `` - Blank line for readability.
+- Line 1314: `/**` - Developer comment or documentation.
+- Line 1315: `* Convert latitude/longitude to pixel coordinates on the map` - Developer comment or documentation.
+- Line 1316: `* Uses Mercator projection similar to jsVectorMap` - Developer comment or documentation.
+- Line 1317: `*/` - Developer comment or documentation.
+- Line 1318: `private latLngToPixel(lat: number, lng: number, containerWidth: number, containerHeight: number): { x: number; y: number } {` - App logic step.
+- Line 1319: `// Try to use jsVectorMap's internal coordinate conversion if available` - Developer comment or documentation.
+- Line 1320: `if (this.mapInstance && this.mapInstance.latLngToPoint) {` - Starts a logic block.
+- Line 1321: `try {` - Starts a logic block.
+- Line 1322: `const point = this.mapInstance.latLngToPoint([lat, lng]);` - App logic step.
+- Line 1323: `return { x: point.x, y: point.y };` - Returns a value.
+- Line 1324: `} catch (e) {` - App logic step.
+- Line 1325: `console.warn('Could not use map instance coordinate conversion:', e);` - App logic step.
+- Line 1326: `}` - Ends a logic block.
+- Line 1327: `}` - Ends a logic block.
+- Line 1328: `` - Blank line for readability.
+- Line 1329: `// Fallback: Manual Mercator projection` - Developer comment or documentation.
+- Line 1330: `// jsVectorMap typically uses a world map with these dimensions` - Developer comment or documentation.
+- Line 1331: `const mapWidth = 1000; // Base map width` - App logic step.
+- Line 1332: `const mapHeight = 500; // Base map height` - App logic step.
+- Line 1333: `` - Blank line for readability.
+- Line 1334: `// Convert longitude to x (0 to 360 degrees, centered at 0)` - Developer comment or documentation.
+- Line 1335: `const x = ((lng + 180) / 360) * mapWidth;` - App logic step.
+- Line 1336: `` - Blank line for readability.
+- Line 1337: `// Convert latitude to y using Mercator projection` - Developer comment or documentation.
+- Line 1338: `const latRad = (lat * Math.PI) / 180;` - App logic step.
+- Line 1339: `const mercN = Math.log(Math.tan(Math.PI / 4 + latRad / 2));` - App logic step.
+- Line 1340: `const y = mapHeight / 2 - (mapWidth * mercN) / (2 * Math.PI);` - App logic step.
+- Line 1341: `` - Blank line for readability.
+- Line 1342: `// Get actual SVG dimensions to account for zoom/pan` - Developer comment or documentation.
+- Line 1343: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1344: `if (container) {` - Starts a logic block.
+- Line 1345: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1346: `if (svg) {` - Starts a logic block.
+- Line 1347: `const svgRect = svg.getBoundingClientRect();` - App logic step.
+- Line 1348: `const viewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 1349: `` - Blank line for readability.
+- Line 1350: `if (viewBox) {` - Starts a logic block.
+- Line 1351: `const [vbX, vbY, vbWidth, vbHeight] = viewBox.split(' ').map(Number);` - App logic step.
+- Line 1352: `const scaleX = svgRect.width / vbWidth;` - App logic step.
+- Line 1353: `const scaleY = svgRect.height / vbHeight;` - App logic step.
+- Line 1354: `` - Blank line for readability.
+- Line 1355: `// Adjust for viewBox offset` - Developer comment or documentation.
+- Line 1356: `const adjustedX = (x - vbX) * scaleX;` - App logic step.
+- Line 1357: `const adjustedY = (y - vbY) * scaleY;` - App logic step.
+- Line 1358: `` - Blank line for readability.
+- Line 1359: `return { x: adjustedX, y: adjustedY };` - Returns a value.
+- Line 1360: `}` - Ends a logic block.
+- Line 1361: `}` - Ends a logic block.
+- Line 1362: `}` - Ends a logic block.
+- Line 1363: `` - Blank line for readability.
+- Line 1364: `// Scale to container size (fallback)` - Developer comment or documentation.
+- Line 1365: `const scaleX = containerWidth / mapWidth;` - App logic step.
+- Line 1366: `const scaleY = containerHeight / mapHeight;` - App logic step.
+- Line 1367: `` - Blank line for readability.
+- Line 1368: `return {` - Starts a logic block.
+- Line 1369: `x: x * scaleX,` - App logic step.
+- Line 1370: `y: y * scaleY` - App logic step.
+- Line 1371: `};` - Ends a logic block.
+- Line 1372: `}` - Ends a logic block.
+- Line 1373: `` - Blank line for readability.
+- Line 1374: `/**` - Developer comment or documentation.
+- Line 1375: `* Update label positions based on current map state` - Developer comment or documentation.
+- Line 1376: `*/` - Developer comment or documentation.
+- Line 1377: `private updateLabelPositions(): void {` - Starts a logic block.
+- Line 1378: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1379: `if (!container || !this.mapInstance) return;` - Checks a condition.
+- Line 1380: `` - Blank line for readability.
+- Line 1381: `const rect = container.getBoundingClientRect();` - App logic step.
+- Line 1382: `if (rect.width === 0 || rect.height === 0) return;` - Checks a condition.
+- Line 1383: `` - Blank line for readability.
+- Line 1384: `const nodes = this.nodes();` - App logic step.
+- Line 1385: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1386: `` - Blank line for readability.
+- Line 1387: `nodes.forEach((node) => {` - Starts a logic block.
+- Line 1388: `// Try to find the actual marker element in the SVG` - Developer comment or documentation.
+- Line 1389: `let pixelPos: { x: number; y: number } | null = null;` - App logic step.
+- Line 1390: `` - Blank line for readability.
+- Line 1391: `if (svg) {` - Starts a logic block.
+- Line 1392: `// Look for marker circles or elements with the node's coordinates` - Developer comment or documentation.
+- Line 1393: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], .jvm-marker');` - App logic step.
+- Line 1394: `markers.forEach((marker: any, index: number) => {` - Starts a logic block.
+- Line 1395: `if (index < nodes.length && nodes[index].id === node.id) {` - Starts a logic block.
+- Line 1396: `const cx = parseFloat(marker.getAttribute('cx') || '0');` - App logic step.
+- Line 1397: `const cy = parseFloat(marker.getAttribute('cy') || '0');` - App logic step.
+- Line 1398: `` - Blank line for readability.
+- Line 1399: `// Get SVG transform to account for zoom/pan` - Developer comment or documentation.
+- Line 1400: `const svgRect = svg.getBoundingClientRect();` - App logic step.
+- Line 1401: `const viewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 1402: `` - Blank line for readability.
+- Line 1403: `if (viewBox) {` - Starts a logic block.
+- Line 1404: `const [vbX, vbY, vbWidth, vbHeight] = viewBox.split(' ').map(Number);` - App logic step.
+- Line 1405: `const scaleX = svgRect.width / vbWidth;` - App logic step.
+- Line 1406: `const scaleY = svgRect.height / vbHeight;` - App logic step.
+- Line 1407: `` - Blank line for readability.
+- Line 1408: `// Convert SVG coordinates to container coordinates` - Developer comment or documentation.
+- Line 1409: `pixelPos = {` - Starts a logic block.
+- Line 1410: `x: (cx - vbX) * scaleX,` - App logic step.
+- Line 1411: `y: (cy - vbY) * scaleY` - App logic step.
+- Line 1412: `};` - Ends a logic block.
+- Line 1413: `} else {` - App logic step.
+- Line 1414: `// No viewBox, use direct coordinates` - Developer comment or documentation.
+- Line 1415: `pixelPos = { x: cx, y: cy };` - App logic step.
+- Line 1416: `}` - Ends a logic block.
+- Line 1417: `}` - Ends a logic block.
+- Line 1418: `});` - Ends a logic block.
+- Line 1419: `}` - Ends a logic block.
+- Line 1420: `` - Blank line for readability.
+- Line 1421: `// Fallback to coordinate conversion if marker not found` - Developer comment or documentation.
+- Line 1422: `if (!pixelPos) {` - Starts a logic block.
+- Line 1423: `pixelPos = this.latLngToPixel(` - App logic step.
+- Line 1424: `node.coordinates.latitude,` - App logic step.
+- Line 1425: `node.coordinates.longitude,` - App logic step.
+- Line 1426: `rect.width,` - App logic step.
+- Line 1427: `rect.height` - App logic step.
+- Line 1428: `);` - App logic step.
+- Line 1429: `}` - Ends a logic block.
+- Line 1430: `` - Blank line for readability.
+- Line 1431: `this.labelPositions.set(node.id, pixelPos);` - App logic step.
+- Line 1432: `});` - Ends a logic block.
+- Line 1433: `}` - Ends a logic block.
+- Line 1434: `` - Blank line for readability.
+- Line 1435: `/**` - Developer comment or documentation.
+- Line 1436: `* Start updating label positions using requestAnimationFrame` - Developer comment or documentation.
+- Line 1437: `*/` - Developer comment or documentation.
+- Line 1438: `private startLabelPositionUpdates(): void {` - Starts a logic block.
+- Line 1439: `// RAF-based update loop` - Developer comment or documentation.
+- Line 1440: `const updateLoop = () => {` - Starts a logic block.
+- Line 1441: `if (this.destroyed) return;` - Checks a condition.
+- Line 1442: `` - Blank line for readability.
+- Line 1443: `if (this.labelsUpdateDirty || this.isDragging) {` - Starts a logic block.
+- Line 1444: `this.updateLabelPositions();` - App logic step.
+- Line 1445: `// Also update company logos and labels to ensure they stick to circles and are responsive` - Developer comment or documentation.
+- Line 1446: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 1447: `// Re-apply logos to ensure they're always positioned correctly` - Developer comment or documentation.
+- Line 1448: `this.addCompanyLogosAndLabels();` - App logic step.
+- Line 1449: `this.labelsUpdateDirty = false;` - App logic step.
+- Line 1450: `}` - Ends a logic block.
+- Line 1451: `` - Blank line for readability.
+- Line 1452: `// Continue RAF loop only if dirty or map is animating` - Developer comment or documentation.
+- Line 1453: `if (this.labelsUpdateDirty || this.isDragging) {` - Starts a logic block.
+- Line 1454: `this.updateLabelsRAFId = requestAnimationFrame(updateLoop);` - App logic step.
+- Line 1455: `} else {` - App logic step.
+- Line 1456: `this.updateLabelsRAFId = null;` - App logic step.
+- Line 1457: `}` - Ends a logic block.
+- Line 1458: `};` - Ends a logic block.
+- Line 1459: `` - Blank line for readability.
+- Line 1460: `// Start the RAF loop` - Developer comment or documentation.
+- Line 1461: `this.updateLabelsRAFId = requestAnimationFrame(updateLoop);` - App logic step.
+- Line 1462: `` - Blank line for readability.
+- Line 1463: `// Also try to listen to map events if available` - Developer comment or documentation.
+- Line 1464: `if (this.mapInstance) {` - Starts a logic block.
+- Line 1465: `// Try to attach event listeners for zoom/pan` - Developer comment or documentation.
+- Line 1466: `try {` - Starts a logic block.
+- Line 1467: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1468: `if (container) {` - Starts a logic block.
+- Line 1469: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1470: `if (svg) {` - Starts a logic block.
+- Line 1471: `// Listen to transform changes on the SVG` - Developer comment or documentation.
+- Line 1472: `this.labelObserver = new MutationObserver(() => {` - Starts a logic block.
+- Line 1473: `if (!this.destroyed) {` - Starts a logic block.
+- Line 1474: `this.labelsUpdateDirty = true;` - App logic step.
+- Line 1475: `// Restart RAF loop if it's not running` - Developer comment or documentation.
+- Line 1476: `if (this.updateLabelsRAFId === null) {` - Starts a logic block.
+- Line 1477: `this.updateLabelsRAFId = requestAnimationFrame(updateLoop);` - App logic step.
+- Line 1478: `}` - Ends a logic block.
+- Line 1479: `}` - Ends a logic block.
+- Line 1480: `});` - Ends a logic block.
+- Line 1481: `this.labelObserver.observe(svg, {` - Starts a logic block.
+- Line 1482: `attributes: true,` - App logic step.
+- Line 1483: `attributeFilter: ['transform', 'viewBox']` - App logic step.
+- Line 1484: `});` - Ends a logic block.
+- Line 1485: `}` - Ends a logic block.
+- Line 1486: `}` - Ends a logic block.
+- Line 1487: `} catch (e) {` - App logic step.
+- Line 1488: `console.warn('Could not set up map event listeners:', e);` - App logic step.
+- Line 1489: `}` - Ends a logic block.
+- Line 1490: `}` - Ends a logic block.
+- Line 1491: `}` - Ends a logic block.
+- Line 1492: `` - Blank line for readability.
+- Line 1493: `/**` - Developer comment or documentation.
+- Line 1494: `* Mark labels as dirty and trigger update` - Developer comment or documentation.
+- Line 1495: `*/` - Developer comment or documentation.
+- Line 1496: `private markLabelsDirty(): void {` - Starts a logic block.
+- Line 1497: `this.labelsUpdateDirty = true;` - App logic step.
+- Line 1498: `if (this.updateLabelsRAFId === null && !this.destroyed) {` - Starts a logic block.
+- Line 1499: `const updateLoop = () => {` - Starts a logic block.
+- Line 1500: `if (this.destroyed) return;` - Checks a condition.
+- Line 1501: `` - Blank line for readability.
+- Line 1502: `if (this.labelsUpdateDirty || this.isDragging) {` - Starts a logic block.
+- Line 1503: `this.updateLabelPositions();` - App logic step.
+- Line 1504: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 1505: `this.addCompanyLogosAndLabels();` - App logic step.
+- Line 1506: `this.refreshTooltipPosition();` - App logic step.
+- Line 1507: `this.labelsUpdateDirty = false;` - App logic step.
+- Line 1508: `}` - Ends a logic block.
+- Line 1509: `` - Blank line for readability.
+- Line 1510: `if (this.labelsUpdateDirty || this.isDragging) {` - Starts a logic block.
+- Line 1511: `this.updateLabelsRAFId = requestAnimationFrame(updateLoop);` - App logic step.
+- Line 1512: `} else {` - App logic step.
+- Line 1513: `this.updateLabelsRAFId = null;` - App logic step.
+- Line 1514: `}` - Ends a logic block.
+- Line 1515: `};` - Ends a logic block.
+- Line 1516: `this.updateLabelsRAFId = requestAnimationFrame(updateLoop);` - App logic step.
+- Line 1517: `}` - Ends a logic block.
+- Line 1518: `}` - Ends a logic block.
+- Line 1519: `` - Blank line for readability.
+- Line 1520: `/**` - Developer comment or documentation.
+- Line 1521: `* Update map markers when nodes change dynamically` - Developer comment or documentation.
+- Line 1522: `*/` - Developer comment or documentation.
+- Line 1523: `private updateMapMarkers(): void {` - Starts a logic block.
+- Line 1524: `if (this.destroyed || !this.mapInstance) return;` - Checks a condition.
+- Line 1525: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1526: `if (!container) return;` - Checks a condition.
+- Line 1527: `const nodes = this.nodes();` - App logic step.
+- Line 1528: `` - Blank line for readability.
+- Line 1529: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1530: `if (!svg) {` - Starts a logic block.
+- Line 1531: `console.warn('SVG not found for marker update');` - App logic step.
+- Line 1532: `return;` - App logic step.
+- Line 1533: `}` - Ends a logic block.
+- Line 1534: `` - Blank line for readability.
+- Line 1535: `// Get current markers from SVG` - Developer comment or documentation.
+- Line 1536: `const existingMarkers = svg.querySelectorAll('circle.jvm-marker, circle[data-index]');` - App logic step.
+- Line 1537: `const existingMarkerCount = existingMarkers.length;` - App logic step.
+- Line 1538: `console.log('Existing markers: ${existingMarkerCount}, New nodes: ${nodes.length}');` - App logic step.
+- Line 1539: `` - Blank line for readability.
+- Line 1540: `if (nodes.length !== existingMarkerCount || nodes.length > existingMarkerCount) {` - Starts a logic block.
+- Line 1541: `const sel = this.selectedCompany();` - App logic step.
+- Line 1542: `if (sel?.id) {` - Starts a logic block.
+- Line 1543: `this.pendingZoomCompanyId = sel.id;` - App logic step.
+- Line 1544: `}` - Ends a logic block.
+- Line 1545: `this.initializeMap();` - App logic step.
+- Line 1546: `} else {` - App logic step.
+- Line 1547: `// Just update label positions if markers are already correct` - Developer comment or documentation.
+- Line 1548: `console.log('Node count unchanged, updating label positions only');` - App logic step.
+- Line 1549: `this.updateLabelPositions();` - App logic step.
+- Line 1550: `this.attachMarkerClickHandlers();` - App logic step.
+- Line 1551: `// Re-add logos and labels in case markers were repositioned` - Developer comment or documentation.
+- Line 1552: `setTimeout(() => {` - Starts a logic block.
+- Line 1553: `this.addCompanyLogosAndLabels();` - App logic step.
+- Line 1554: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 1555: `}, 200);` - Ends a logic block.
+- Line 1556: `}` - Ends a logic block.
+- Line 1557: `}` - Ends a logic block.
+- Line 1558: `` - Blank line for readability.
+- Line 1559: `/**` - Developer comment or documentation.
+- Line 1560: `* Attach explicit click handlers to SVG markers for better reliability` - Developer comment or documentation.
+- Line 1561: `* This ensures markers are clickable even if the jsVectorMap onMarkerClick handler fails` - Developer comment or documentation.
+- Line 1562: `*/` - Developer comment or documentation.
+- Line 1563: `private attachMarkerClickHandlers(): void {` - Starts a logic block.
+- Line 1564: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1565: `if (!container) {` - Starts a logic block.
+- Line 1566: `console.warn('Container not found for attaching marker click handlers');` - App logic step.
+- Line 1567: `return;` - App logic step.
+- Line 1568: `}` - Ends a logic block.
+- Line 1569: `` - Blank line for readability.
+- Line 1570: `const nodes = this.nodes();` - App logic step.
+- Line 1571: `if (nodes.length === 0) {` - Starts a logic block.
+- Line 1572: `console.warn('No nodes available for marker click handlers');` - App logic step.
+- Line 1573: `return;` - App logic step.
+- Line 1574: `}` - Ends a logic block.
+- Line 1575: `` - Blank line for readability.
+- Line 1576: `// Wait a bit for markers to be fully rendered` - Developer comment or documentation.
+- Line 1577: `setTimeout(() => {` - Starts a logic block.
+- Line 1578: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1579: `if (!svg) {` - Starts a logic block.
+- Line 1580: `console.warn('SVG not found for attaching marker click handlers');` - App logic step.
+- Line 1581: `return;` - App logic step.
+- Line 1582: `}` - Ends a logic block.
+- Line 1583: `` - Blank line for readability.
+- Line 1584: `// Find all marker circles in the SVG` - Developer comment or documentation.
+- Line 1585: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');` - App logic step.
+- Line 1586: `console.log('Found ${markers.length} markers to attach click handlers to');` - App logic step.
+- Line 1587: `` - Blank line for readability.
+- Line 1588: `markers.forEach((marker: any, index: number) => {` - Starts a logic block.
+- Line 1589: `if (index < nodes.length && !marker.hasAttribute('data-click-handler')) {` - Starts a logic block.
+- Line 1590: `const node = nodes[index];` - App logic step.
+- Line 1591: `` - Blank line for readability.
+- Line 1592: `// Mark marker as having a click handler to prevent duplicates` - Developer comment or documentation.
+- Line 1593: `marker.setAttribute('data-click-handler', 'true');` - App logic step.
+- Line 1594: `` - Blank line for readability.
+- Line 1595: `// Ensure marker is clickable` - Developer comment or documentation.
+- Line 1596: `marker.style.cursor = 'pointer';` - App logic step.
+- Line 1597: `marker.style.pointerEvents = 'auto';` - App logic step.
+- Line 1598: `` - Blank line for readability.
+- Line 1599: `// Add click handler` - Developer comment or documentation.
+- Line 1600: `marker.addEventListener('click', (event: MouseEvent) => {` - Starts a logic block.
+- Line 1601: `event.stopPropagation(); // Prevent event bubbling` - App logic step.
+- Line 1602: `event.preventDefault(); // Prevent default behavior` - App logic step.
+- Line 1603: `console.log('Marker ${index} clicked directly:', node);` - App logic step.
+- Line 1604: `this.clearCompanyTooltip();` - App logic step.
+- Line 1605: `this.nodeSelected.emit(node);` - App logic step.
+- Line 1606: `this.hideMarkerPopup();` - App logic step.
+- Line 1607: `}, true); // Use capture phase for better reliability` - Ends a logic block.
+- Line 1608: `` - Blank line for readability.
+- Line 1609: `// Also add mousedown as backup` - Developer comment or documentation.
+- Line 1610: `marker.addEventListener('mousedown', (event: MouseEvent) => {` - Starts a logic block.
+- Line 1611: `event.stopPropagation();` - App logic step.
+- Line 1612: `}, true);` - Ends a logic block.
+- Line 1613: `` - Blank line for readability.
+- Line 1614: `console.log('Attached click handler to marker ${index} for node:', node.city);` - App logic step.
+- Line 1615: `}` - Ends a logic block.
+- Line 1616: `});` - Ends a logic block.
+- Line 1617: `` - Blank line for readability.
+- Line 1618: `// Also listen for new markers that might be added dynamically` - Developer comment or documentation.
+- Line 1619: `this.nodeObserver = new MutationObserver(() => {` - Starts a logic block.
+- Line 1620: `if (!this.destroyed) {` - Starts a logic block.
+- Line 1621: `// Re-attach handlers if new markers are added` - Developer comment or documentation.
+- Line 1622: `const newMarkers = svg.querySelectorAll('circle.jvm-marker:not([data-click-handler]), circle[data-index]:not([data-click-handler])');` - App logic step.
+- Line 1623: `if (newMarkers.length > 0) {` - Starts a logic block.
+- Line 1624: `console.log('Found ${newMarkers.length} new markers, attaching handlers');` - App logic step.
+- Line 1625: `this.attachMarkerClickHandlers();` - App logic step.
+- Line 1626: `}` - Ends a logic block.
+- Line 1627: `}` - Ends a logic block.
+- Line 1628: `});` - Ends a logic block.
+- Line 1629: `` - Blank line for readability.
+- Line 1630: `this.nodeObserver.observe(svg, {` - Starts a logic block.
+- Line 1631: `childList: true,` - App logic step.
+- Line 1632: `subtree: true` - App logic step.
+- Line 1633: `});` - Ends a logic block.
+- Line 1634: `}, 500);` - Ends a logic block.
+- Line 1635: `}` - Ends a logic block.
+- Line 1636: `` - Blank line for readability.
+- Line 1637: `/**` - Developer comment or documentation.
+- Line 1638: `* Attach hover handlers to markers for tooltip display` - Developer comment or documentation.
+- Line 1639: `* This ensures tooltips work even if jsVectorMap's built-in tooltip doesn't` - Developer comment or documentation.
+- Line 1640: `*/` - Developer comment or documentation.
+- Line 1641: `private attachMarkerHoverHandlers(): void {` - Starts a logic block.
+- Line 1642: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1643: `if (!container) {` - Starts a logic block.
+- Line 1644: `console.warn('Container not found for attaching marker hover handlers');` - App logic step.
+- Line 1645: `return;` - App logic step.
+- Line 1646: `}` - Ends a logic block.
+- Line 1647: `` - Blank line for readability.
+- Line 1648: `const nodes = this.nodes();` - App logic step.
+- Line 1649: `if (nodes.length === 0) {` - Starts a logic block.
+- Line 1650: `console.warn('No nodes available for marker hover handlers');` - App logic step.
+- Line 1651: `return;` - App logic step.
+- Line 1652: `}` - Ends a logic block.
+- Line 1653: `` - Blank line for readability.
+- Line 1654: `// Wait a bit for markers to be fully rendered` - Developer comment or documentation.
+- Line 1655: `setTimeout(() => {` - Starts a logic block.
+- Line 1656: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1657: `if (!svg) {` - Starts a logic block.
+- Line 1658: `console.warn('SVG not found for attaching marker hover handlers');` - App logic step.
+- Line 1659: `return;` - App logic step.
+- Line 1660: `}` - Ends a logic block.
+- Line 1661: `` - Blank line for readability.
+- Line 1662: `// Find all marker circles in the SVG` - Developer comment or documentation.
+- Line 1663: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');` - App logic step.
+- Line 1664: `console.log('Found ${markers.length} markers to attach hover handlers to');` - App logic step.
+- Line 1665: `` - Blank line for readability.
+- Line 1666: `markers.forEach((marker: Element, index: number) => {` - Starts a logic block.
+- Line 1667: `if (index < nodes.length && !marker.hasAttribute('data-hover-handler')) {` - Starts a logic block.
+- Line 1668: `const node = nodes[index];` - App logic step.
+- Line 1669: `const logoSource = this.getCompanyLogoSource(node);` - App logic step.
+- Line 1670: `` - Blank line for readability.
+- Line 1671: `// Mark marker as having a hover handler to prevent duplicates` - Developer comment or documentation.
+- Line 1672: `marker.setAttribute('data-hover-handler', 'true');` - App logic step.
+- Line 1673: `` - Blank line for readability.
+- Line 1674: `const handleMouseEnter: EventListener = (event) => {` - Starts a logic block.
+- Line 1675: `if (this.destroyed) return;` - Checks a condition.
+- Line 1676: `` - Blank line for readability.
+- Line 1677: `if (this.tooltipTimeoutId) {` - Starts a logic block.
+- Line 1678: `clearTimeout(this.tooltipTimeoutId);` - App logic step.
+- Line 1679: `this.tooltipTimeoutId = null;` - App logic step.
+- Line 1680: `}` - Ends a logic block.
+- Line 1681: `` - Blank line for readability.
+- Line 1682: `const mouseEvent = event as MouseEvent;` - App logic step.
+- Line 1683: `this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);` - App logic step.
+- Line 1684: `};` - Ends a logic block.
+- Line 1685: `` - Blank line for readability.
+- Line 1686: `const handleMouseLeave: EventListener = () => {` - Starts a logic block.
+- Line 1687: `if (this.destroyed) return;` - Checks a condition.
+- Line 1688: `` - Blank line for readability.
+- Line 1689: `if (this.tooltipTimeoutId) {` - Starts a logic block.
+- Line 1690: `clearTimeout(this.tooltipTimeoutId);` - App logic step.
+- Line 1691: `this.tooltipTimeoutId = null;` - App logic step.
+- Line 1692: `}` - Ends a logic block.
+- Line 1693: `` - Blank line for readability.
+- Line 1694: `this.clearCompanyTooltip();` - App logic step.
+- Line 1695: `};` - Ends a logic block.
+- Line 1696: `` - Blank line for readability.
+- Line 1697: `const handleMouseMove: EventListener = (event) => {` - Starts a logic block.
+- Line 1698: `if (this.destroyed || !this.hoveredCompanyTooltip()) return;` - Checks a condition.
+- Line 1699: `const mouseEvent = event as MouseEvent;` - App logic step.
+- Line 1700: `this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);` - App logic step.
+- Line 1701: `};` - Ends a logic block.
+- Line 1702: `` - Blank line for readability.
+- Line 1703: `marker.addEventListener('mouseenter', handleMouseEnter, true);` - App logic step.
+- Line 1704: `marker.addEventListener('mouseleave', handleMouseLeave, true);` - App logic step.
+- Line 1705: `marker.addEventListener('mousemove', handleMouseMove, true);` - App logic step.
+- Line 1706: `` - Blank line for readability.
+- Line 1707: `console.log('Attached hover handler to marker ${index} for node:', node.company);` - App logic step.
+- Line 1708: `}` - Ends a logic block.
+- Line 1709: `});` - Ends a logic block.
+- Line 1710: `}, 600);` - Ends a logic block.
+- Line 1711: `}` - Ends a logic block.
+- Line 1712: `` - Blank line for readability.
+- Line 1713: `/**` - Developer comment or documentation.
+- Line 1714: `* Get node position in pixels for absolute positioning on the map` - Developer comment or documentation.
+- Line 1715: `*/` - Developer comment or documentation.
+- Line 1716: `getNodePosition(node: WarRoomNode): { top: number; left: number } {` - App logic step.
+- Line 1717: `const position = this.labelPositions.get(node.id);` - App logic step.
+- Line 1718: `if (position) {` - Starts a logic block.
+- Line 1719: `return { top: position.y, left: position.x };` - Returns a value.
+- Line 1720: `}` - Ends a logic block.
+- Line 1721: `` - Blank line for readability.
+- Line 1722: `// Fallback to percentage-based positioning if coordinates not available yet` - Developer comment or documentation.
+- Line 1723: `const positions: Record<string, { top: number; left: number }> = {` - App logic step.
+- Line 1724: `'winnipeg': { top: 30, left: 15 },` - App logic step.
+- Line 1725: `'indianapolis': { top: 45, left: 25 },` - App logic step.
+- Line 1726: `'st-eustache': { top: 35, left: 35 },` - App logic step.
+- Line 1727: `'las-vegas': { top: 60, left: 20 },` - App logic step.
+- Line 1728: `'paris-ontario': { top: 40, left: 50 },` - App logic step.
+- Line 1729: `'turkey': { top: 55, left: 65 },` - App logic step.
+- Line 1730: `'nanjing': { top: 45, left: 80 },` - App logic step.
+- Line 1731: `};` - Ends a logic block.
+- Line 1732: `` - Blank line for readability.
+- Line 1733: `const fallback = positions[node.name] || { top: 50, left: 50 };` - App logic step.
+- Line 1734: `// Convert percentage to pixels (approximate)` - Developer comment or documentation.
+- Line 1735: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1736: `if (container) {` - Starts a logic block.
+- Line 1737: `const rect = container.getBoundingClientRect();` - App logic step.
+- Line 1738: `return {` - Starts a logic block.
+- Line 1739: `top: (fallback.top / 100) * rect.height,` - App logic step.
+- Line 1740: `left: (fallback.left / 100) * rect.width` - App logic step.
+- Line 1741: `};` - Ends a logic block.
+- Line 1742: `}` - Ends a logic block.
+- Line 1743: `` - Blank line for readability.
+- Line 1744: `return { top: 0, left: 0 };` - Returns a value.
+- Line 1745: `}` - Ends a logic block.
+- Line 1746: `` - Blank line for readability.
+- Line 1747: `/**` - Developer comment or documentation.
+- Line 1748: `* Zoom to a specific location on the map` - Developer comment or documentation.
+- Line 1749: `* @param latitude - Latitude coordinate` - Developer comment or documentation.
+- Line 1750: `* @param longitude - Longitude coordinate` - Developer comment or documentation.
+- Line 1751: `* @param scale - Zoom scale (higher = more zoomed in, typically 1-15)` - Developer comment or documentation.
+- Line 1752: `*                🔧 ZOOM LEVEL ADJUSTMENT: Change default value (5) here to adjust default zoom` - Developer comment or documentation.
+- Line 1753: `*` - Developer comment or documentation.
+- Line 1754: `*                📊 ZOOM SCALE GUIDE - Try these values:` - Developer comment or documentation.
+- Line 1755: `*                ============================================` - Developer comment or documentation.
+- Line 1756: `*                Scale 1  = 1x zoom      (2^0)   - Very wide view, see entire world` - Developer comment or documentation.
+- Line 1757: `*                Scale 2  = 2x zoom      (2^1)   - Wide view, see continents` - Developer comment or documentation.
+- Line 1758: `*                Scale 3  = 4x zoom      (2^2)   - Country level view` - Developer comment or documentation.
+- Line 1759: `*                Scale 4  = 8x zoom      (2^3)   - Regional view` - Developer comment or documentation.
+- Line 1760: `*                Scale 5  = 16x zoom     (2^4)   - State/Province level (DEFAULT)` - Developer comment or documentation.
+- Line 1761: `*                Scale 6  = 32x zoom     (2^5)   - Large city area` - Developer comment or documentation.
+- Line 1762: `*                Scale 7  = 64x zoom     (2^6)   - City level` - Developer comment or documentation.
+- Line 1763: `*                Scale 8  = 128x zoom    (2^7)   - City district` - Developer comment or documentation.
+- Line 1764: `*                Scale 9  = 256x zoom    (2^8)   - Neighborhood level` - Developer comment or documentation.
+- Line 1765: `*                Scale 10 = 512x zoom    (2^9)   - Street level` - Developer comment or documentation.
+- Line 1766: `*                Scale 11 = 1024x zoom   (2^10)  - Very close street view` - Developer comment or documentation.
+- Line 1767: `*                Scale 12 = 2048x zoom   (2^11)  - Very high zoom (CURRENT)` - Developer comment or documentation.
+- Line 1768: `*                Scale 13 = 4096x zoom   (2^12)  - Extreme zoom` - Developer comment or documentation.
+- Line 1769: `*                Scale 14 = 8192x zoom   (2^13)  - Maximum practical zoom` - Developer comment or documentation.
+- Line 1770: `*                Scale 15 = 16384x zoom  (2^14)  - Maximum zoom (may be too close)` - Developer comment or documentation.
+- Line 1771: `*` - Developer comment or documentation.
+- Line 1772: `*                💡 RECOMMENDED VALUES:` - Developer comment or documentation.
+- Line 1773: `*                - For activity log clicks: 10-12 (good balance)` - Developer comment or documentation.
+- Line 1774: `*                - For marker clicks: 10-12 (shows marker clearly)` - Developer comment or documentation.
+- Line 1775: `*                - For smooth experience: 8-10 (less jarring)` - Developer comment or documentation.
+- Line 1776: `*                - For maximum detail: 12-14 (very close)` - Developer comment or documentation.
+- Line 1777: `*/` - Developer comment or documentation.
+- Line 1778: `zoomToLocation(latitude: number, longitude: number, scale: number = 5): void {` - Starts a logic block.
+- Line 1779: `console.log('zoomToLocation called: lat=${latitude}, lng=${longitude}, scale=${scale}');` - App logic step.
+- Line 1780: `` - Blank line for readability.
+- Line 1781: `if (!this.mapInstance) {` - Starts a logic block.
+- Line 1782: `let retryCount = 0;` - App logic step.
+- Line 1783: `const maxRetries = 25;` - App logic step.
+- Line 1784: `// Clear any existing retry interval` - Developer comment or documentation.
+- Line 1785: `if (this.mapReadyRetryInterval) {` - Starts a logic block.
+- Line 1786: `clearInterval(this.mapReadyRetryInterval);` - App logic step.
+- Line 1787: `}` - Ends a logic block.
+- Line 1788: `this.mapReadyRetryInterval = setInterval(() => {` - Starts a logic block.
+- Line 1789: `retryCount++;` - App logic step.
+- Line 1790: `if (this.mapInstance) {` - Starts a logic block.
+- Line 1791: `clearInterval(this.mapReadyRetryInterval!);` - App logic step.
+- Line 1792: `this.mapReadyRetryInterval = null;` - App logic step.
+- Line 1793: `this.zoomToLocation(latitude, longitude, scale);` - App logic step.
+- Line 1794: `} else if (retryCount >= maxRetries) {` - Checks a condition.
+- Line 1795: `clearInterval(this.mapReadyRetryInterval!);` - App logic step.
+- Line 1796: `this.mapReadyRetryInterval = null;` - App logic step.
+- Line 1797: `}` - Ends a logic block.
+- Line 1798: `}, 200);` - Ends a logic block.
+- Line 1799: `return;` - App logic step.
+- Line 1800: `}` - Ends a logic block.
+- Line 1801: `` - Blank line for readability.
+- Line 1802: `try {` - Starts a logic block.
+- Line 1803: `// jsVectorMap API methods - try multiple approaches` - Developer comment or documentation.
+- Line 1804: `// Method 1: Try setFocus (most common)` - Developer comment or documentation.
+- Line 1805: `if (typeof this.mapInstance.setFocus === 'function') {` - Starts a logic block.
+- Line 1806: `console.log('Using setFocus method');` - App logic step.
+- Line 1807: `this.mapInstance.setFocus({` - Starts a logic block.
+- Line 1808: `animate: true,` - App logic step.
+- Line 1809: `lat: latitude,` - App logic step.
+- Line 1810: `lng: longitude,` - App logic step.
+- Line 1811: `scale: scale,` - App logic step.
+- Line 1812: `});` - Ends a logic block.
+- Line 1813: `console.log('✓ Zoomed to location: ${latitude}, ${longitude} at scale ${scale}');` - App logic step.
+- Line 1814: `setTimeout(() => this.updateLabelPositions(), 500);` - App logic step.
+- Line 1815: `return;` - App logic step.
+- Line 1816: `}` - Ends a logic block.
+- Line 1817: `` - Blank line for readability.
+- Line 1818: `// Method 2: Try focusOn` - Developer comment or documentation.
+- Line 1819: `if (typeof this.mapInstance.focusOn === 'function') {` - Starts a logic block.
+- Line 1820: `console.log('Using focusOn method');` - App logic step.
+- Line 1821: `this.mapInstance.focusOn({` - Starts a logic block.
+- Line 1822: `animate: true,` - App logic step.
+- Line 1823: `latLng: [latitude, longitude],` - App logic step.
+- Line 1824: `scale: scale,` - App logic step.
+- Line 1825: `});` - Ends a logic block.
+- Line 1826: `console.log('✓ Zoomed to location using focusOn: ${latitude}, ${longitude} at scale ${scale}');` - App logic step.
+- Line 1827: `setTimeout(() => this.updateLabelPositions(), 500);` - App logic step.
+- Line 1828: `return;` - App logic step.
+- Line 1829: `}` - Ends a logic block.
+- Line 1830: `` - Blank line for readability.
+- Line 1831: `// Method 3: Try setCenter + setZoom` - Developer comment or documentation.
+- Line 1832: `if (typeof this.mapInstance.setCenter === 'function') {` - Starts a logic block.
+- Line 1833: `console.log('Using setCenter + setZoom method');` - App logic step.
+- Line 1834: `this.mapInstance.setCenter(latitude, longitude);` - App logic step.
+- Line 1835: `if (typeof this.mapInstance.setZoom === 'function') {` - Starts a logic block.
+- Line 1836: `this.mapInstance.setZoom(scale);` - App logic step.
+- Line 1837: `}` - Ends a logic block.
+- Line 1838: `console.log('✓ Zoomed to location using setCenter: ${latitude}, ${longitude}');` - App logic step.
+- Line 1839: `setTimeout(() => this.updateLabelPositions(), 500);` - App logic step.
+- Line 1840: `return;` - App logic step.
+- Line 1841: `}` - Ends a logic block.
+- Line 1842: `` - Blank line for readability.
+- Line 1843: `// Method 4: Try internal map object and transform methods` - Developer comment or documentation.
+- Line 1844: `const mapInternal = (this.mapInstance as any).map;` - App logic step.
+- Line 1845: `if (mapInternal) {` - Starts a logic block.
+- Line 1846: `if (typeof mapInternal.setFocus === 'function') {` - Starts a logic block.
+- Line 1847: `console.log('Using internal map.setFocus');` - App logic step.
+- Line 1848: `mapInternal.setFocus({` - Starts a logic block.
+- Line 1849: `animate: true,` - App logic step.
+- Line 1850: `lat: latitude,` - App logic step.
+- Line 1851: `lng: longitude,` - App logic step.
+- Line 1852: `scale: scale,` - App logic step.
+- Line 1853: `});` - Ends a logic block.
+- Line 1854: `setTimeout(() => this.updateLabelPositions(), 500);` - App logic step.
+- Line 1855: `return;` - App logic step.
+- Line 1856: `}` - Ends a logic block.
+- Line 1857: `if (typeof mapInternal.focusOn === 'function') {` - Starts a logic block.
+- Line 1858: `console.log('Using internal map.focusOn');` - App logic step.
+- Line 1859: `mapInternal.focusOn({` - Starts a logic block.
+- Line 1860: `animate: true,` - App logic step.
+- Line 1861: `latLng: [latitude, longitude],` - App logic step.
+- Line 1862: `scale: scale,` - App logic step.
+- Line 1863: `});` - Ends a logic block.
+- Line 1864: `setTimeout(() => this.updateLabelPositions(), 500);` - App logic step.
+- Line 1865: `return;` - App logic step.
+- Line 1866: `}` - Ends a logic block.
+- Line 1867: `// Try transform methods if available` - Developer comment or documentation.
+- Line 1868: `if (mapInternal.setScale && mapInternal.setFocus) {` - Starts a logic block.
+- Line 1869: `console.log('Using internal map.setScale and setFocus');` - App logic step.
+- Line 1870: `mapInternal.setFocus(latitude, longitude);` - App logic step.
+- Line 1871: `mapInternal.setScale(scale);` - App logic step.
+- Line 1872: `setTimeout(() => this.updateLabelPositions(), 500);` - App logic step.
+- Line 1873: `return;` - App logic step.
+- Line 1874: `}` - Ends a logic block.
+- Line 1875: `}` - Ends a logic block.
+- Line 1876: `` - Blank line for readability.
+- Line 1877: `// Method 4.5: Try accessing SVG transform directly via map instance` - Developer comment or documentation.
+- Line 1878: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1879: `if (container) {` - Starts a logic block.
+- Line 1880: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1881: `const mapGroup = svg?.querySelector('g#jvm-regions-group, g[class*="regions"]');` - App logic step.
+- Line 1882: `if (mapGroup && this.mapInstance) {` - Starts a logic block.
+- Line 1883: `// Try to get current transform and modify it` - Developer comment or documentation.
+- Line 1884: `const currentTransform = mapGroup.getAttribute('transform');` - App logic step.
+- Line 1885: `console.log('Current map transform:', currentTransform);` - App logic step.
+- Line 1886: `// If we can manipulate transform, we can pan and scale` - Developer comment or documentation.
+- Line 1887: `}` - Ends a logic block.
+- Line 1888: `}` - Ends a logic block.
+- Line 1889: `` - Blank line for readability.
+- Line 1890: `// Method 5: Direct viewBox manipulation as fallback - find marker and center on it` - Developer comment or documentation.
+- Line 1891: `console.warn('No standard zoom method available, trying viewBox manipulation with marker position');` - App logic step.
+- Line 1892: `// Reuse container variable from Method 4.5 above` - Developer comment or documentation.
+- Line 1893: `if (container) {` - Starts a logic block.
+- Line 1894: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1895: `if (svg) {` - Starts a logic block.
+- Line 1896: `// Get current viewBox` - Developer comment or documentation.
+- Line 1897: `const currentViewBox = svg.viewBox.baseVal;` - App logic step.
+- Line 1898: `const currentWidth = currentViewBox.width || 950;` - App logic step.
+- Line 1899: `const currentHeight = currentViewBox.height || 550;` - App logic step.
+- Line 1900: `` - Blank line for readability.
+- Line 1901: `// Find the marker for this location by checking all markers` - Developer comment or documentation.
+- Line 1902: `const nodes = this.nodes();` - App logic step.
+- Line 1903: `const targetNode = nodes.find(n =>` - App logic step.
+- Line 1904: `Math.abs(n.coordinates.latitude - latitude) < 0.1 &&` - App logic step.
+- Line 1905: `Math.abs(n.coordinates.longitude - longitude) < 0.1` - App logic step.
+- Line 1906: `);` - App logic step.
+- Line 1907: `` - Blank line for readability.
+- Line 1908: `if (targetNode) {` - Starts a logic block.
+- Line 1909: `// Find the marker element in the SVG` - Developer comment or documentation.
+- Line 1910: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index]');` - App logic step.
+- Line 1911: `const nodeIndex = nodes.findIndex(n => n.id === targetNode.id);` - App logic step.
+- Line 1912: `const marker = markers[nodeIndex] as SVGCircleElement;` - App logic step.
+- Line 1913: `` - Blank line for readability.
+- Line 1914: `if (marker) {` - Starts a logic block.
+- Line 1915: `// Get marker's current position in SVG coordinates` - Developer comment or documentation.
+- Line 1916: `const markerX = parseFloat(marker.getAttribute('cx') || '0');` - App logic step.
+- Line 1917: `const markerY = parseFloat(marker.getAttribute('cy') || '0');` - App logic step.
+- Line 1918: `` - Blank line for readability.
+- Line 1919: `// Calculate zoom factor (scale 12 = very high zoom, scale 1 = low zoom)` - Developer comment or documentation.
+- Line 1920: `// 🔧 ZOOM LEVEL ADJUSTMENT: The zoom factor is calculated as 2^(scale-1)` - Developer comment or documentation.
+- Line 1921: `// See zoomToLocation() method documentation above for full zoom scale guide` - Developer comment or documentation.
+- Line 1922: `const zoomFactor = Math.pow(2, scale - 1);` - App logic step.
+- Line 1923: `const newWidth = currentWidth / zoomFactor;` - App logic step.
+- Line 1924: `const newHeight = currentHeight / zoomFactor;` - App logic step.
+- Line 1925: `` - Blank line for readability.
+- Line 1926: `// Center viewBox on marker` - Developer comment or documentation.
+- Line 1927: `const newX = Math.max(0, Math.min(currentWidth - newWidth, markerX - newWidth / 2));` - App logic step.
+- Line 1928: `const newY = Math.max(0, Math.min(currentHeight - newHeight, markerY - newHeight / 2));` - App logic step.
+- Line 1929: `` - Blank line for readability.
+- Line 1930: `// Apply smooth transition` - Developer comment or documentation.
+- Line 1931: `svg.style.transition = 'viewBox 0.5s ease-in-out';` - App logic step.
+- Line 1932: `svg.setAttribute('viewBox', '${newX} ${newY} ${newWidth} ${newHeight}');` - App logic step.
+- Line 1933: `console.log('✓ Zoomed using viewBox manipulation to marker at (${markerX}, ${markerY}): ${latitude}, ${longitude}');` - App logic step.
+- Line 1934: `setTimeout(() => {` - Starts a logic block.
+- Line 1935: `this.updateLabelPositions();` - App logic step.
+- Line 1936: `svg.style.transition = ''; // Remove transition after animation` - App logic step.
+- Line 1937: `}, 500);` - Ends a logic block.
+- Line 1938: `return;` - App logic step.
+- Line 1939: `}` - Ends a logic block.
+- Line 1940: `}` - Ends a logic block.
+- Line 1941: `` - Blank line for readability.
+- Line 1942: `// Fallback: Use Mercator projection calculation` - Developer comment or documentation.
+- Line 1943: `console.log('Marker not found, using Mercator projection calculation');` - App logic step.
+- Line 1944: `const viewBoxWidth = currentWidth;` - App logic step.
+- Line 1945: `const viewBoxHeight = currentHeight;` - App logic step.
+- Line 1946: `// Convert lat/lng to SVG coordinates using Mercator projection approximation` - Developer comment or documentation.
+- Line 1947: `const centerX = ((longitude + 180) / 360) * viewBoxWidth;` - App logic step.
+- Line 1948: `const centerY = ((90 - latitude) / 180) * viewBoxHeight;` - App logic step.
+- Line 1949: `const zoomFactor = Math.pow(2, scale - 1);` - App logic step.
+- Line 1950: `const newWidth = viewBoxWidth / zoomFactor;` - App logic step.
+- Line 1951: `const newHeight = viewBoxHeight / zoomFactor;` - App logic step.
+- Line 1952: `const newX = Math.max(0, Math.min(viewBoxWidth - newWidth, centerX - newWidth / 2));` - App logic step.
+- Line 1953: `const newY = Math.max(0, Math.min(viewBoxHeight - newHeight, centerY - newHeight / 2));` - App logic step.
+- Line 1954: `` - Blank line for readability.
+- Line 1955: `svg.style.transition = 'viewBox 0.5s ease-in-out';` - App logic step.
+- Line 1956: `svg.setAttribute('viewBox', '${newX} ${newY} ${newWidth} ${newHeight}');` - App logic step.
+- Line 1957: `console.log('✓ Zoomed using Mercator projection: ${latitude}, ${longitude}');` - App logic step.
+- Line 1958: `setTimeout(() => {` - Starts a logic block.
+- Line 1959: `this.updateLabelPositions();` - App logic step.
+- Line 1960: `svg.style.transition = '';` - App logic step.
+- Line 1961: `}, 500);` - Ends a logic block.
+- Line 1962: `return;` - App logic step.
+- Line 1963: `}` - Ends a logic block.
+- Line 1964: `}` - Ends a logic block.
+- Line 1965: `` - Blank line for readability.
+- Line 1966: `console.error('No zoom method found on map instance and viewBox fallback failed');` - App logic step.
+- Line 1967: `} catch (error) {` - App logic step.
+- Line 1968: `console.error('Error zooming to location:', error);` - App logic step.
+- Line 1969: `// Try alternative approach with direct coordinate manipulation` - Developer comment or documentation.
+- Line 1970: `try {` - Starts a logic block.
+- Line 1971: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 1972: `if (container) {` - Starts a logic block.
+- Line 1973: `const svg = container.querySelector('svg');` - App logic step.
+- Line 1974: `if (svg && svg.viewBox) {` - Starts a logic block.
+- Line 1975: `// This is a fallback - might not work perfectly but worth trying` - Developer comment or documentation.
+- Line 1976: `console.warn('Attempting fallback zoom method');` - App logic step.
+- Line 1977: `}` - Ends a logic block.
+- Line 1978: `}` - Ends a logic block.
+- Line 1979: `} catch (fallbackError) {` - App logic step.
+- Line 1980: `console.error('Fallback zoom method also failed:', fallbackError);` - App logic step.
+- Line 1981: `}` - Ends a logic block.
+- Line 1982: `}` - Ends a logic block.
+- Line 1983: `}` - Ends a logic block.
+- Line 1984: `` - Blank line for readability.
+- Line 1985: `/**` - Developer comment or documentation.
+- Line 1986: `* Zoom to a specific node by node ID` - Developer comment or documentation.
+- Line 1987: `* @param nodeId - The ID of the node to zoom to` - Developer comment or documentation.
+- Line 1988: `*/` - Developer comment or documentation.
+- Line 1989: `zoomToNode(nodeId: string): void {` - Starts a logic block.
+- Line 1990: `const nodes = this.nodes();` - App logic step.
+- Line 1991: `const node = nodes.find((n) => n.id === nodeId);` - App logic step.
+- Line 1992: `if (node) {` - Starts a logic block.
+- Line 1993: `this.zoomToLocation(node.coordinates.latitude, node.coordinates.longitude, 4);` - App logic step.
+- Line 1994: `} else {` - App logic step.
+- Line 1995: `console.warn('Node with ID ${nodeId} not found');` - App logic step.
+- Line 1996: `}` - Ends a logic block.
+- Line 1997: `}` - Ends a logic block.
+- Line 1998: `` - Blank line for readability.
+- Line 1999: `/**` - Developer comment or documentation.
+- Line 2000: `* Zoom to a specific company's location` - Developer comment or documentation.
+- Line 2001: `* @param companyId - The company ID to zoom to` - Developer comment or documentation.
+- Line 2002: `* @param zoomScale - Optional zoom scale (default: 12 for more prominent zoom to show marker clearly)` - Developer comment or documentation.
+- Line 2003: `*                    🔧 ZOOM LEVEL ADJUSTMENT: Change default value here to adjust default zoom` - Developer comment or documentation.
+- Line 2004: `*                    Higher number = more zoom (e.g., 10 = medium, 12 = high, 15 = very high)` - Developer comment or documentation.
+- Line 2005: `*/` - Developer comment or documentation.
+- Line 2006: `zoomToCompany(companyId: string, zoomScale: number = 12): void {` - Starts a logic block.
+- Line 2007: `// Mark that we're programmatically zooming (not user manual zoom)` - Developer comment or documentation.
+- Line 2008: `// This allows the zoom to happen without interference` - Developer comment or documentation.
+- Line 2009: `const nodes = this.nodes();` - App logic step.
+- Line 2010: `` - Blank line for readability.
+- Line 2011: `if (nodes.length === 0) {` - Starts a logic block.
+- Line 2012: `this.pendingZoomCompanyId = companyId;` - App logic step.
+- Line 2013: `return;` - App logic step.
+- Line 2014: `}` - Ends a logic block.
+- Line 2015: `` - Blank line for readability.
+- Line 2016: `if (!this.mapInstance) {` - Starts a logic block.
+- Line 2017: `this.pendingZoomCompanyId = companyId;` - App logic step.
+- Line 2018: `return;` - App logic step.
+- Line 2019: `}` - Ends a logic block.
+- Line 2020: `` - Blank line for readability.
+- Line 2021: `const node = nodes.find((n) => n.companyId === companyId);` - App logic step.
+- Line 2022: `if (node) {` - Starts a logic block.
+- Line 2023: `this.zoomToLocation(node.coordinates.latitude, node.coordinates.longitude, zoomScale);` - App logic step.
+- Line 2024: `setTimeout(() => this.highlightMarker(node.id), 600);` - App logic step.
+- Line 2025: `} else {` - App logic step.
+- Line 2026: `this.pendingZoomCompanyId = companyId;` - App logic step.
+- Line 2027: `}` - Ends a logic block.
+- Line 2028: `}` - Ends a logic block.
+- Line 2029: `` - Blank line for readability.
+- Line 2030: `/**` - Developer comment or documentation.
+- Line 2031: `* Highlight a marker by node ID` - Developer comment or documentation.
+- Line 2032: `* @param nodeId - The node ID to highlight` - Developer comment or documentation.
+- Line 2033: `*/` - Developer comment or documentation.
+- Line 2034: `private highlightMarker(nodeId: string): void {` - Starts a logic block.
+- Line 2035: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2036: `if (!container) return;` - Checks a condition.
+- Line 2037: `` - Blank line for readability.
+- Line 2038: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2039: `if (!svg) return;` - Checks a condition.
+- Line 2040: `` - Blank line for readability.
+- Line 2041: `// Find the marker for this node` - Developer comment or documentation.
+- Line 2042: `const nodes = this.nodes();` - App logic step.
+- Line 2043: `const nodeIndex = nodes.findIndex((n) => n.id === nodeId);` - App logic step.
+- Line 2044: `if (nodeIndex === -1) {` - Starts a logic block.
+- Line 2045: `console.warn('Node ${nodeId} not found for highlighting');` - App logic step.
+- Line 2046: `return;` - App logic step.
+- Line 2047: `}` - Ends a logic block.
+- Line 2048: `` - Blank line for readability.
+- Line 2049: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index]');` - App logic step.
+- Line 2050: `const marker = markers[nodeIndex] as SVGCircleElement;` - App logic step.
+- Line 2051: `` - Blank line for readability.
+- Line 2052: `if (marker) {` - Starts a logic block.
+- Line 2053: `// Store original radius` - Developer comment or documentation.
+- Line 2054: `const originalRadius = marker.getAttribute('r') || '8';` - App logic step.
+- Line 2055: `` - Blank line for readability.
+- Line 2056: `// Add a pulsing animation or highlight effect` - Developer comment or documentation.
+- Line 2057: `marker.style.transition = 'all 0.3s ease';` - App logic step.
+- Line 2058: `marker.setAttribute('r', '14'); // Make it larger temporarily` - App logic step.
+- Line 2059: `marker.setAttribute('stroke-width', '4'); // Thicker stroke` - App logic step.
+- Line 2060: `marker.setAttribute('stroke', '#02270B'); // Dark green stroke to match selected border` - App logic step.
+- Line 2061: `` - Blank line for readability.
+- Line 2062: `// Reset after animation` - Developer comment or documentation.
+- Line 2063: `setTimeout(() => {` - Starts a logic block.
+- Line 2064: `marker.setAttribute('r', originalRadius);` - App logic step.
+- Line 2065: `marker.setAttribute('stroke-width', '2');` - App logic step.
+- Line 2066: `marker.setAttribute('stroke', '#ffffff');` - App logic step.
+- Line 2067: `}, 1500);` - Ends a logic block.
+- Line 2068: `` - Blank line for readability.
+- Line 2069: `console.log('Highlighted marker for node: ${nodeId}');` - App logic step.
+- Line 2070: `} else {` - App logic step.
+- Line 2071: `console.warn('Marker not found for node index ${nodeIndex}');` - App logic step.
+- Line 2072: `}` - Ends a logic block.
+- Line 2073: `}` - Ends a logic block.
+- Line 2074: `` - Blank line for readability.
+- Line 2075: `/**` - Developer comment or documentation.
+- Line 2076: `* Apply selected styles to markers, logos, and labels based on selectedCompany.` - Developer comment or documentation.
+- Line 2077: `*/` - Developer comment or documentation.
+- Line 2078: `private updateSelectedMarkerStyles(): void {` - Starts a logic block.
+- Line 2079: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2080: `if (!container) return;` - Checks a condition.
+- Line 2081: `` - Blank line for readability.
+- Line 2082: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2083: `if (!svg) return;` - Checks a condition.
+- Line 2084: `` - Blank line for readability.
+- Line 2085: `const nodes = this.nodes();` - App logic step.
+- Line 2086: `const selectedId = this.selectedCompany()?.id || null;` - App logic step.
+- Line 2087: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');` - App logic step.
+- Line 2088: `const markersGroup = svg.querySelector('#jvm-markers-group') || svg;` - App logic step.
+- Line 2089: `` - Blank line for readability.
+- Line 2090: `nodes.forEach((node, index) => {` - Starts a logic block.
+- Line 2091: `let marker = svg.querySelector('circle[data-index="${index}"]') as SVGCircleElement | null;` - App logic step.
+- Line 2092: `if (!marker && index < markers.length) {` - Starts a logic block.
+- Line 2093: `marker = markers[index] as SVGCircleElement;` - App logic step.
+- Line 2094: `}` - Ends a logic block.
+- Line 2095: `` - Blank line for readability.
+- Line 2096: `if (!marker) return;` - Checks a condition.
+- Line 2097: `` - Blank line for readability.
+- Line 2098: `const isSelected = !!selectedId && node.companyId === selectedId;` - App logic step.
+- Line 2099: `` - Blank line for readability.
+- Line 2100: `if (isSelected) {` - Starts a logic block.
+- Line 2101: `marker.classList.add('selected-marker');` - App logic step.
+- Line 2102: `} else {` - App logic step.
+- Line 2103: `marker.classList.remove('selected-marker');` - App logic step.
+- Line 2104: `}` - Ends a logic block.
+- Line 2105: `` - Blank line for readability.
+- Line 2106: `const logoImage = markersGroup.querySelector('image[id="company-logo-image-${index}"]') as SVGImageElement | null;` - App logic step.
+- Line 2107: `if (logoImage) {` - Starts a logic block.
+- Line 2108: `if (isSelected) {` - Starts a logic block.
+- Line 2109: `logoImage.setAttribute('data-selected', 'true');` - App logic step.
+- Line 2110: `} else {` - App logic step.
+- Line 2111: `logoImage.removeAttribute('data-selected');` - App logic step.
+- Line 2112: `}` - Ends a logic block.
+- Line 2113: `}` - Ends a logic block.
+- Line 2114: `` - Blank line for readability.
+- Line 2115: `const label = markersGroup.querySelector('text[data-marker-index="${index}"]') as SVGTextElement | null;` - App logic step.
+- Line 2116: `if (label) {` - Starts a logic block.
+- Line 2117: `if (isSelected) {` - Starts a logic block.
+- Line 2118: `label.setAttribute('data-selected', 'true');` - App logic step.
+- Line 2119: `} else {` - App logic step.
+- Line 2120: `label.removeAttribute('data-selected');` - App logic step.
+- Line 2121: `}` - Ends a logic block.
+- Line 2122: `}` - Ends a logic block.
+- Line 2123: `});` - Ends a logic block.
+- Line 2124: `}` - Ends a logic block.
+- Line 2125: `` - Blank line for readability.
+- Line 2126: `/**` - Developer comment or documentation.
+- Line 2127: `* Toggle fullscreen mode for the map` - Developer comment or documentation.
+- Line 2128: `*/` - Developer comment or documentation.
+- Line 2129: `toggleFullscreen(): void {` - Starts a logic block.
+- Line 2130: `// Check current fullscreen state first` - Developer comment or documentation.
+- Line 2131: `const currentState = this.getFullscreenState();` - App logic step.
+- Line 2132: `` - Blank line for readability.
+- Line 2133: `if (!currentState) {` - Starts a logic block.
+- Line 2134: `const container = document.querySelector('.war-room-map-container') as HTMLElement;` - App logic step.
+- Line 2135: `if (container) {` - Starts a logic block.
+- Line 2136: `this.enterFullscreen(container);` - App logic step.
+- Line 2137: `} else {` - App logic step.
+- Line 2138: `console.warn('Map container not found for fullscreen');` - App logic step.
+- Line 2139: `}` - Ends a logic block.
+- Line 2140: `} else {` - App logic step.
+- Line 2141: `// Exit fullscreen` - Developer comment or documentation.
+- Line 2142: `this.exitFullscreen();` - App logic step.
+- Line 2143: `}` - Ends a logic block.
+- Line 2144: `}` - Ends a logic block.
+- Line 2145: `` - Blank line for readability.
+- Line 2146: `/**` - Developer comment or documentation.
+- Line 2147: `* Enter fullscreen mode` - Developer comment or documentation.
+- Line 2148: `*/` - Developer comment or documentation.
+- Line 2149: `private enterFullscreen(element?: HTMLElement): void {` - Starts a logic block.
+- Line 2150: `const container = (element || document.querySelector('.war-room-map-container')) as HTMLElement;` - App logic step.
+- Line 2151: `if (!container) return;` - Checks a condition.
+- Line 2152: `` - Blank line for readability.
+- Line 2153: `// Add fallback class immediately` - Developer comment or documentation.
+- Line 2154: `container.classList.add('fullscreen-fallback-active');` - App logic step.
+- Line 2155: `this.isFullscreen = true;` - App logic step.
+- Line 2156: `` - Blank line for readability.
+- Line 2157: `try {` - Starts a logic block.
+- Line 2158: `if (container.requestFullscreen) {` - Starts a logic block.
+- Line 2159: `container.requestFullscreen().catch(err => {` - Starts a logic block.
+- Line 2160: `console.error('Error attempting to enable fullscreen: ${err.message} (${err.name})');` - App logic step.
+- Line 2161: `// If native fullscreen fails, we still have the class set for CSS fallback` - Developer comment or documentation.
+- Line 2162: `});` - Ends a logic block.
+- Line 2163: `} else if ((container as any).webkitRequestFullscreen) {` - Checks a condition.
+- Line 2164: `(container as any).webkitRequestFullscreen();` - App logic step.
+- Line 2165: `} else if ((container as any).msRequestFullscreen) {` - Checks a condition.
+- Line 2166: `(container as any).msRequestFullscreen();` - App logic step.
+- Line 2167: `}` - Ends a logic block.
+- Line 2168: `} catch (e) {` - App logic step.
+- Line 2169: `console.error('Fullscreen request exception:', e);` - App logic step.
+- Line 2170: `}` - Ends a logic block.
+- Line 2171: `}` - Ends a logic block.
+- Line 2172: `` - Blank line for readability.
+- Line 2173: `/**` - Developer comment or documentation.
+- Line 2174: `* Exit fullscreen mode` - Developer comment or documentation.
+- Line 2175: `*/` - Developer comment or documentation.
+- Line 2176: `private exitFullscreen(): void {` - Starts a logic block.
+- Line 2177: `const container = document.querySelector('.war-room-map-container') as HTMLElement;` - App logic step.
+- Line 2178: `if (container) {` - Starts a logic block.
+- Line 2179: `container.classList.remove('fullscreen-fallback-active');` - App logic step.
+- Line 2180: `}` - Ends a logic block.
+- Line 2181: `` - Blank line for readability.
+- Line 2182: `this.isFullscreen = false;` - App logic step.
+- Line 2183: `` - Blank line for readability.
+- Line 2184: `if (document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement) {` - Starts a logic block.
+- Line 2185: `try {` - Starts a logic block.
+- Line 2186: `if (document.exitFullscreen) {` - Starts a logic block.
+- Line 2187: `document.exitFullscreen().catch(e => console.warn('Exit fullscreen error:', e));` - App logic step.
+- Line 2188: `} else if ((document as any).webkitExitFullscreen) {` - Checks a condition.
+- Line 2189: `(document as any).webkitExitFullscreen();` - App logic step.
+- Line 2190: `} else if ((document as any).msExitFullscreen) {` - Checks a condition.
+- Line 2191: `(document as any).msExitFullscreen();` - App logic step.
+- Line 2192: `}` - Ends a logic block.
+- Line 2193: `} catch (e) {` - App logic step.
+- Line 2194: `console.warn('Exit fullscreen exception:', e);` - App logic step.
+- Line 2195: `}` - Ends a logic block.
+- Line 2196: `}` - Ends a logic block.
+- Line 2197: `}` - Ends a logic block.
+- Line 2198: `` - Blank line for readability.
+- Line 2199: `/**` - Developer comment or documentation.
+- Line 2200: `* Check if currently in fullscreen mode` - Developer comment or documentation.
+- Line 2201: `*/` - Developer comment or documentation.
+- Line 2202: `getFullscreenState(): boolean {` - Starts a logic block.
+- Line 2203: `// Check actual DOM state first, then fallback to flag` - Developer comment or documentation.
+- Line 2204: `const fullscreenElement =` - App logic step.
+- Line 2205: `document.fullscreenElement ||` - App logic step.
+- Line 2206: `(document as any).webkitFullscreenElement ||` - App logic step.
+- Line 2207: `(document as any).msFullscreenElement;` - App logic step.
+- Line 2208: `` - Blank line for readability.
+- Line 2209: `// Update internal flag to match actual state` - Developer comment or documentation.
+- Line 2210: `if (fullscreenElement) {` - Starts a logic block.
+- Line 2211: `this.isFullscreen = true;` - App logic step.
+- Line 2212: `} else {` - App logic step.
+- Line 2213: `this.isFullscreen = false;` - App logic step.
+- Line 2214: `}` - Ends a logic block.
+- Line 2215: `` - Blank line for readability.
+- Line 2216: `return !!fullscreenElement;` - Returns a value.
+- Line 2217: `}` - Ends a logic block.
+- Line 2218: `` - Blank line for readability.
+- Line 2219: `/**` - Developer comment or documentation.
+- Line 2220: `* Zoom the map in one step (custom control).` - Developer comment or documentation.
+- Line 2221: `* Directly manipulates the SVG viewBox to zoom in.` - Developer comment or documentation.
+- Line 2222: `*/` - Developer comment or documentation.
+- Line 2223: `zoomIn(): void {` - Starts a logic block.
+- Line 2224: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2225: `if (!container) return;` - Checks a condition.
+- Line 2226: `` - Blank line for readability.
+- Line 2227: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2228: `if (!svg) return;` - Checks a condition.
+- Line 2229: `` - Blank line for readability.
+- Line 2230: `// Mark that user is manually zooming` - Developer comment or documentation.
+- Line 2231: `this.userHasZoomed = true;` - App logic step.
+- Line 2232: `` - Blank line for readability.
+- Line 2233: `// Try jsVectorMap API first` - Developer comment or documentation.
+- Line 2234: `if (this.mapInstance && typeof (this.mapInstance as any).zoomIn === 'function') {` - Starts a logic block.
+- Line 2235: `try {` - Starts a logic block.
+- Line 2236: `(this.mapInstance as any).zoomIn();` - App logic step.
+- Line 2237: `setTimeout(() => {` - Starts a logic block.
+- Line 2238: `this.updateLabelPositions();` - App logic step.
+- Line 2239: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 2240: `this.refreshTooltipPosition();` - App logic step.
+- Line 2241: `}, 300);` - Ends a logic block.
+- Line 2242: `return;` - App logic step.
+- Line 2243: `} catch (e) {` - App logic step.
+- Line 2244: `console.warn('jsVectorMap zoomIn failed, using manual zoom:', e);` - App logic step.
+- Line 2245: `}` - Ends a logic block.
+- Line 2246: `}` - Ends a logic block.
+- Line 2247: `` - Blank line for readability.
+- Line 2248: `// Manual zoom by manipulating viewBox` - Developer comment or documentation.
+- Line 2249: `this.zoomViewBox(svg, 1.5); // Zoom in by 1.5x` - App logic step.
+- Line 2250: `}` - Ends a logic block.
+- Line 2251: `` - Blank line for readability.
+- Line 2252: `/**` - Developer comment or documentation.
+- Line 2253: `* Zoom the map out one step (custom control).` - Developer comment or documentation.
+- Line 2254: `* Directly manipulates the SVG viewBox to zoom out.` - Developer comment or documentation.
+- Line 2255: `*/` - Developer comment or documentation.
+- Line 2256: `zoomOut(): void {` - Starts a logic block.
+- Line 2257: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2258: `if (!container) return;` - Checks a condition.
+- Line 2259: `` - Blank line for readability.
+- Line 2260: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2261: `if (!svg) return;` - Checks a condition.
+- Line 2262: `` - Blank line for readability.
+- Line 2263: `// Mark that user is manually zooming` - Developer comment or documentation.
+- Line 2264: `this.userHasZoomed = true;` - App logic step.
+- Line 2265: `` - Blank line for readability.
+- Line 2266: `// Try jsVectorMap API first` - Developer comment or documentation.
+- Line 2267: `if (this.mapInstance && typeof (this.mapInstance as any).zoomOut === 'function') {` - Starts a logic block.
+- Line 2268: `try {` - Starts a logic block.
+- Line 2269: `(this.mapInstance as any).zoomOut();` - App logic step.
+- Line 2270: `setTimeout(() => {` - Starts a logic block.
+- Line 2271: `this.updateLabelPositions();` - App logic step.
+- Line 2272: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 2273: `this.refreshTooltipPosition();` - App logic step.
+- Line 2274: `}, 300);` - Ends a logic block.
+- Line 2275: `return;` - App logic step.
+- Line 2276: `} catch (e) {` - App logic step.
+- Line 2277: `console.warn('jsVectorMap zoomOut failed, using manual zoom:', e);` - App logic step.
+- Line 2278: `}` - Ends a logic block.
+- Line 2279: `}` - Ends a logic block.
+- Line 2280: `` - Blank line for readability.
+- Line 2281: `// Manual zoom by manipulating viewBox` - Developer comment or documentation.
+- Line 2282: `this.zoomViewBox(svg, 1 / 1.5); // Zoom out by 1/1.5x` - App logic step.
+- Line 2283: `}` - Ends a logic block.
+- Line 2284: `` - Blank line for readability.
+- Line 2285: `/**` - Developer comment or documentation.
+- Line 2286: `* Manually zoom the SVG by adjusting the viewBox.` - Developer comment or documentation.
+- Line 2287: `* @param svg - The SVG element to zoom` - Developer comment or documentation.
+- Line 2288: `* @param factor - Zoom factor (>1 = zoom in, <1 = zoom out)` - Developer comment or documentation.
+- Line 2289: `*/` - Developer comment or documentation.
+- Line 2290: `private zoomViewBox(svg: SVGElement, factor: number): void {` - Starts a logic block.
+- Line 2291: `const currentViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 2292: `if (!currentViewBox) {` - Starts a logic block.
+- Line 2293: `// No viewBox, set default` - Developer comment or documentation.
+- Line 2294: `svg.setAttribute('viewBox', '0 0 950 550');` - App logic step.
+- Line 2295: `return;` - App logic step.
+- Line 2296: `}` - Ends a logic block.
+- Line 2297: `` - Blank line for readability.
+- Line 2298: `const [x, y, width, height] = currentViewBox.split(' ').map(Number);` - App logic step.
+- Line 2299: `const fullWorldWidth = 950;` - App logic step.
+- Line 2300: `const fullWorldHeight = 550;` - App logic step.
+- Line 2301: `` - Blank line for readability.
+- Line 2302: `// Calculate new viewBox dimensions` - Developer comment or documentation.
+- Line 2303: `const newWidth = width / factor;` - App logic step.
+- Line 2304: `const newHeight = height / factor;` - App logic step.
+- Line 2305: `` - Blank line for readability.
+- Line 2306: `// Prevent zooming out beyond full world view` - Developer comment or documentation.
+- Line 2307: `if (newWidth >= fullWorldWidth || newHeight >= fullWorldHeight) {` - Starts a logic block.
+- Line 2308: `// Reset to full world view` - Developer comment or documentation.
+- Line 2309: `this.userHasZoomed = false;` - App logic step.
+- Line 2310: `this.resetMapToFullWorldView();` - App logic step.
+- Line 2311: `} else {` - App logic step.
+- Line 2312: `// Calculate center point to zoom around` - Developer comment or documentation.
+- Line 2313: `const centerX = x + width / 2;` - App logic step.
+- Line 2314: `const centerY = y + height / 2;` - App logic step.
+- Line 2315: `` - Blank line for readability.
+- Line 2316: `// Calculate new x, y to keep center point` - Developer comment or documentation.
+- Line 2317: `const newX = centerX - newWidth / 2;` - App logic step.
+- Line 2318: `const newY = centerY - newHeight / 2;` - App logic step.
+- Line 2319: `` - Blank line for readability.
+- Line 2320: `// Clamp to map bounds` - Developer comment or documentation.
+- Line 2321: `const clampedX = Math.max(0, Math.min(fullWorldWidth - newWidth, newX));` - App logic step.
+- Line 2322: `const clampedY = Math.max(0, Math.min(fullWorldHeight - newHeight, newY));` - App logic step.
+- Line 2323: `` - Blank line for readability.
+- Line 2324: `// Set new viewBox` - Developer comment or documentation.
+- Line 2325: `svg.setAttribute('viewBox', '${clampedX} ${clampedY} ${newWidth} ${newHeight}');` - App logic step.
+- Line 2326: `}` - Ends a logic block.
+- Line 2327: `` - Blank line for readability.
+- Line 2328: `// Mark labels as dirty to trigger RAF update` - Developer comment or documentation.
+- Line 2329: `this.markLabelsDirty();` - App logic step.
+- Line 2330: `this.refreshTooltipPosition();` - App logic step.
+- Line 2331: `}` - Ends a logic block.
+- Line 2332: `` - Blank line for readability.
+- Line 2333: `/**` - Developer comment or documentation.
+- Line 2334: `* Fallback: trigger wheel zoom on the map container when zoomIn/zoomOut API is not available.` - Developer comment or documentation.
+- Line 2335: `*/` - Developer comment or documentation.
+- Line 2336: `private zoomByWheel(direction: -1 | 1): void {` - Starts a logic block.
+- Line 2337: `const el = document.getElementById('war-room-map');` - App logic step.
+- Line 2338: `if (!el) return;` - Checks a condition.
+- Line 2339: `` - Blank line for readability.
+- Line 2340: `// Mark that user is manually zooming` - Developer comment or documentation.
+- Line 2341: `this.userHasZoomed = true;` - App logic step.
+- Line 2342: `` - Blank line for readability.
+- Line 2343: `const delta = 120 * direction; // negative = zoom in, positive = zoom out` - App logic step.
+- Line 2344: `el.dispatchEvent(new WheelEvent('wheel', { deltaY: delta, bubbles: true }));` - App logic step.
+- Line 2345: `setTimeout(() => this.updateLabelPositions(), 300);` - App logic step.
+- Line 2346: `}` - Ends a logic block.
+- Line 2347: `` - Blank line for readability.
+- Line 2348: `/**` - Developer comment or documentation.
+- Line 2349: `* Reposition zoom buttons to avoid overlap with SHOW METRICS button` - Developer comment or documentation.
+- Line 2350: `* This method directly sets inline styles to override library defaults` - Developer comment or documentation.
+- Line 2351: `*/` - Developer comment or documentation.
+- Line 2352: `private repositionZoomButtons(): void {` - Starts a logic block.
+- Line 2353: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2354: `if (!container) return;` - Checks a condition.
+- Line 2355: `` - Blank line for readability.
+- Line 2356: `// Find the zoom container element` - Developer comment or documentation.
+- Line 2357: `const zoomContainer = container.querySelector('.jvm-zoom-container') as HTMLElement;` - App logic step.
+- Line 2358: `if (zoomContainer) {` - Starts a logic block.
+- Line 2359: `// Set position directly via inline styles to override library defaults` - Developer comment or documentation.
+- Line 2360: `// Top-right, grouped with fullscreen (top: 6px, right: 0.5rem)` - Developer comment or documentation.
+- Line 2361: `zoomContainer.style.position = 'absolute';` - App logic step.
+- Line 2362: `zoomContainer.style.top = '6px';` - App logic step.
+- Line 2363: `zoomContainer.style.bottom = 'auto';` - App logic step.
+- Line 2364: `zoomContainer.style.right = '0.5rem';` - App logic step.
+- Line 2365: `zoomContainer.style.left = 'auto';` - App logic step.
+- Line 2366: `zoomContainer.style.display = 'flex';` - App logic step.
+- Line 2367: `zoomContainer.style.flexDirection = 'column';` - App logic step.
+- Line 2368: `zoomContainer.style.gap = '0.25rem';` - App logic step.
+- Line 2369: `zoomContainer.style.zIndex = '40';` - App logic step.
+- Line 2370: `console.log('Zoom buttons repositioned to top-right');` - App logic step.
+- Line 2371: `} else {` - App logic step.
+- Line 2372: `// Retry if element not found yet` - Developer comment or documentation.
+- Line 2373: `setTimeout(() => this.repositionZoomButtons(), 500);` - App logic step.
+- Line 2374: `}` - Ends a logic block.
+- Line 2375: `}` - Ends a logic block.
+- Line 2376: `` - Blank line for readability.
+- Line 2377: `/**` - Developer comment or documentation.
+- Line 2378: `* Update positions of company logos and labels when viewport changes` - Developer comment or documentation.
+- Line 2379: `* Makes everything responsive to zoom` - Developer comment or documentation.
+- Line 2380: `*/` - Developer comment or documentation.
+- Line 2381: `/**` - Developer comment or documentation.
+- Line 2382: `* Update positions of company logos and labels when viewport changes` - Developer comment or documentation.
+- Line 2383: `* Makes everything responsive to zoom` - Developer comment or documentation.
+- Line 2384: `*/` - Developer comment or documentation.
+- Line 2385: `private updateCompanyLogosAndLabelsPositions(): void {` - Starts a logic block.
+- Line 2386: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2387: `if (!container) return;` - Checks a condition.
+- Line 2388: `` - Blank line for readability.
+- Line 2389: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2390: `if (!svg) return;` - Checks a condition.
+- Line 2391: `` - Blank line for readability.
+- Line 2392: `const nodes = this.nodes();` - App logic step.
+- Line 2393: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index], circle[class*="jvm-marker"]');` - App logic step.
+- Line 2394: `` - Blank line for readability.
+- Line 2395: `if (markers.length === 0) return;` - Checks a condition.
+- Line 2396: `` - Blank line for readability.
+- Line 2397: `// Get current viewBox for zoom calculation` - Developer comment or documentation.
+- Line 2398: `const viewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 2399: `` - Blank line for readability.
+- Line 2400: `// Calculate zoom factor` - Developer comment or documentation.
+- Line 2401: `let zoomFactor = 1;` - App logic step.
+- Line 2402: `if (viewBox) {` - Starts a logic block.
+- Line 2403: `const parts = viewBox.split(' ').map(parseFloat);` - App logic step.
+- Line 2404: `if (parts.length === 4) {` - Starts a logic block.
+- Line 2405: `const viewBoxWidth = parts[2];` - App logic step.
+- Line 2406: `const viewBoxHeight = parts[3];` - App logic step.
+- Line 2407: `const baseWidth = 950;` - App logic step.
+- Line 2408: `const baseHeight = 550;` - App logic step.
+- Line 2409: `` - Blank line for readability.
+- Line 2410: `const widthRatio = baseWidth / viewBoxWidth;` - App logic step.
+- Line 2411: `const heightRatio = baseHeight / viewBoxHeight;` - App logic step.
+- Line 2412: `zoomFactor = (widthRatio + heightRatio) / 2;` - App logic step.
+- Line 2413: `zoomFactor = Math.max(0.1, Math.min(10, zoomFactor));` - App logic step.
+- Line 2414: `}` - Ends a logic block.
+- Line 2415: `}` - Ends a logic block.
+- Line 2416: `` - Blank line for readability.
+- Line 2417: `const markersGroup = svg.querySelector('#jvm-markers-group') || svg;` - App logic step.
+- Line 2418: `const logosGroup = markersGroup.querySelector('#jvm-logos-group') || markersGroup;` - App logic step.
+- Line 2419: `const labelsGroup = markersGroup.querySelector('#jvm-labels-group') || markersGroup;` - App logic step.
+- Line 2420: `` - Blank line for readability.
+- Line 2421: `nodes.forEach((node, index) => {` - Starts a logic block.
+- Line 2422: `// Find the marker for this node` - Developer comment or documentation.
+- Line 2423: `let marker: Element | null = svg.querySelector('circle[data-index="${index}"]');` - App logic step.
+- Line 2424: `if (!marker && index < markers.length) {` - Starts a logic block.
+- Line 2425: `marker = markers[index];` - App logic step.
+- Line 2426: `}` - Ends a logic block.
+- Line 2427: `` - Blank line for readability.
+- Line 2428: `if (!marker) return;` - Checks a condition.
+- Line 2429: `` - Blank line for readability.
+- Line 2430: `// Get marker attributes` - Developer comment or documentation.
+- Line 2431: `const markerEl = marker as Element;` - App logic step.
+- Line 2432: `const cx = parseFloat(markerEl.getAttribute('cx') || '0');` - App logic step.
+- Line 2433: `const cy = parseFloat(markerEl.getAttribute('cy') || '0');` - App logic step.
+- Line 2434: `const r = parseFloat(markerEl.getAttribute('r') || '8');` - App logic step.
+- Line 2435: `` - Blank line for readability.
+- Line 2436: `// Update logo image position` - Developer comment or documentation.
+- Line 2437: `const logoImageId = 'company-logo-image-${index}';` - App logic step.
+- Line 2438: `const logoImage = logosGroup.querySelector('image[id="${logoImageId}"]');` - App logic step.
+- Line 2439: `` - Blank line for readability.
+- Line 2440: `if (logoImage) {` - Starts a logic block.
+- Line 2441: `const imageSize = this.getLogoImageSize(r, zoomFactor, this.getLogoSizeMultiplier(node));` - App logic step.
+- Line 2442: `` - Blank line for readability.
+- Line 2443: `logoImage.setAttribute('x', (cx - imageSize / 2).toString());` - App logic step.
+- Line 2444: `logoImage.setAttribute('y', (cy - imageSize / 2).toString());` - App logic step.
+- Line 2445: `logoImage.setAttribute('width', imageSize.toString());` - App logic step.
+- Line 2446: `logoImage.setAttribute('height', imageSize.toString());` - App logic step.
+- Line 2447: `}` - Ends a logic block.
+- Line 2448: `` - Blank line for readability.
+- Line 2449: `// Update label position if it exists` - Developer comment or documentation.
+- Line 2450: `const label = labelsGroup.querySelector('text[data-marker-index="${index}"]');` - App logic step.
+- Line 2451: `if (label) {` - Starts a logic block.
+- Line 2452: `label.setAttribute('x', cx.toString());` - App logic step.
+- Line 2453: `label.setAttribute('y', (cy + r + 15).toString());` - App logic step.
+- Line 2454: `}` - Ends a logic block.
+- Line 2455: `});` - Ends a logic block.
+- Line 2456: `}` - Ends a logic block.
+- Line 2457: `` - Blank line for readability.
+- Line 2458: `/**` - Developer comment or documentation.
+- Line 2459: `* Add company logos and labels to markers for specific companies` - Developer comment or documentation.
+- Line 2460: `* Uses SVG pattern to integrate logo with circle marker` - Developer comment or documentation.
+- Line 2461: `*/` - Developer comment or documentation.
+- Line 2462: `private addCompanyLogosAndLabels(): void {` - Starts a logic block.
+- Line 2463: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2464: `if (!container) return;` - Checks a condition.
+- Line 2465: `` - Blank line for readability.
+- Line 2466: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2467: `if (!svg) return;` - Checks a condition.
+- Line 2468: `` - Blank line for readability.
+- Line 2469: `const nodes = this.nodes();` - App logic step.
+- Line 2470: `const markersGroup = svg.querySelector('#jvm-markers-group') as SVGGElement;` - App logic step.
+- Line 2471: `if (!markersGroup) return;` - Checks a condition.
+- Line 2472: `` - Blank line for readability.
+- Line 2473: `// Keep labels below logos to prevent text covering images` - Developer comment or documentation.
+- Line 2474: `let labelsGroup = markersGroup.querySelector('#jvm-labels-group') as SVGGElement | null;` - App logic step.
+- Line 2475: `if (!labelsGroup) {` - Starts a logic block.
+- Line 2476: `labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');` - App logic step.
+- Line 2477: `labelsGroup.setAttribute('id', 'jvm-labels-group');` - App logic step.
+- Line 2478: `markersGroup.appendChild(labelsGroup);` - App logic step.
+- Line 2479: `}` - Ends a logic block.
+- Line 2480: `` - Blank line for readability.
+- Line 2481: `let logosGroup = markersGroup.querySelector('#jvm-logos-group') as SVGGElement | null;` - App logic step.
+- Line 2482: `if (!logosGroup) {` - Starts a logic block.
+- Line 2483: `logosGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');` - App logic step.
+- Line 2484: `logosGroup.setAttribute('id', 'jvm-logos-group');` - App logic step.
+- Line 2485: `markersGroup.appendChild(logosGroup);` - App logic step.
+- Line 2486: `} else {` - App logic step.
+- Line 2487: `// Ensure logos render above labels` - Developer comment or documentation.
+- Line 2488: `markersGroup.appendChild(logosGroup);` - App logic step.
+- Line 2489: `}` - Ends a logic block.
+- Line 2490: `` - Blank line for readability.
+- Line 2491: `// Get or create defs section for patterns` - Developer comment or documentation.
+- Line 2492: `let defs = svg.querySelector('defs') as SVGDefsElement;` - App logic step.
+- Line 2493: `if (!defs) {` - Starts a logic block.
+- Line 2494: `defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');` - App logic step.
+- Line 2495: `svg.insertBefore(defs, svg.firstChild);` - App logic step.
+- Line 2496: `}` - Ends a logic block.
+- Line 2497: `` - Blank line for readability.
+- Line 2498: `// Find nodes with logos` - Developer comment or documentation.
+- Line 2499: `nodes.forEach((node, index) => {` - Starts a logic block.
+- Line 2500: `const logoSource = this.getCompanyLogoSource(node);` - App logic step.
+- Line 2501: `` - Blank line for readability.
+- Line 2502: `if (logoSource) {` - Starts a logic block.
+- Line 2503: `// Find the corresponding marker circle` - Developer comment or documentation.
+- Line 2504: `const markers = svg.querySelectorAll('circle.jvm-marker, circle[data-index]');` - App logic step.
+- Line 2505: `let marker = svg.querySelector('circle[data-index="${index}"]') as SVGCircleElement | null;` - App logic step.
+- Line 2506: `if (!marker && index < markers.length) {` - Starts a logic block.
+- Line 2507: `marker = markers[index] as SVGCircleElement;` - App logic step.
+- Line 2508: `}` - Ends a logic block.
+- Line 2509: `` - Blank line for readability.
+- Line 2510: `if (marker) {` - Starts a logic block.
+- Line 2511: `const cx = parseFloat(marker.getAttribute('cx') || '0');` - App logic step.
+- Line 2512: `const cy = parseFloat(marker.getAttribute('cy') || '0');` - App logic step.
+- Line 2513: `const r = parseFloat(marker.getAttribute('r') || '8');` - App logic step.
+- Line 2514: `` - Blank line for readability.
+- Line 2515: `// Use image overlay instead of pattern - more reliable` - Developer comment or documentation.
+- Line 2516: `const logoImageId = 'company-logo-image-${index}';` - App logic step.
+- Line 2517: `let logoImage = logosGroup.querySelector('image[id="${logoImageId}"]') as SVGImageElement;` - App logic step.
+- Line 2518: `if (!logoImage) {` - Starts a logic block.
+- Line 2519: `logoImage = markersGroup.querySelector('image[id="${logoImageId}"]') as SVGImageElement;` - App logic step.
+- Line 2520: `}` - Ends a logic block.
+- Line 2521: `` - Blank line for readability.
+- Line 2522: `if (!logoImage) {` - Starts a logic block.
+- Line 2523: `// Create image element directly in markers group (overlay on circle)` - Developer comment or documentation.
+- Line 2524: `logoImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');` - App logic step.
+- Line 2525: `logoImage.setAttribute('id', logoImageId);` - App logic step.
+- Line 2526: `logoImage.setAttribute('data-marker-index', index.toString());` - App logic step.
+- Line 2527: `logoImage.setAttribute('class', 'company-logo-image');` - App logic step.
+- Line 2528: `` - Blank line for readability.
+- Line 2529: `// Calculate responsive image size based on current zoom` - Developer comment or documentation.
+- Line 2530: `// Get zoom factor from viewBox if available - use same simplified calculation` - Developer comment or documentation.
+- Line 2531: `const viewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 2532: `let zoomFactor = 1;` - App logic step.
+- Line 2533: `if (viewBox) {` - Starts a logic block.
+- Line 2534: `const [vbX, vbY, vbWidth, vbHeight] = viewBox.split(' ').map(Number);` - App logic step.
+- Line 2535: `const baseWidth = 950; // Base map width` - App logic step.
+- Line 2536: `const baseHeight = 550; // Base map height` - App logic step.
+- Line 2537: `` - Blank line for readability.
+- Line 2538: `// Simplified zoom factor calculation (same as updateCompanyLogosAndLabelsPositions)` - Developer comment or documentation.
+- Line 2539: `const widthRatio = baseWidth / vbWidth;` - App logic step.
+- Line 2540: `const heightRatio = baseHeight / vbHeight;` - App logic step.
+- Line 2541: `zoomFactor = (widthRatio + heightRatio) / 2;` - App logic step.
+- Line 2542: `zoomFactor = Math.max(0.1, Math.min(10, zoomFactor));` - App logic step.
+- Line 2543: `}` - Ends a logic block.
+- Line 2544: `` - Blank line for readability.
+- Line 2545: `const imageSize = this.getLogoImageSize(r, zoomFactor, this.getLogoSizeMultiplier(node));` - App logic step.
+- Line 2546: `` - Blank line for readability.
+- Line 2547: `logoImage.setAttribute('x', (cx - imageSize / 2).toString());` - App logic step.
+- Line 2548: `logoImage.setAttribute('y', (cy - imageSize / 2).toString());` - App logic step.
+- Line 2549: `logoImage.setAttribute('width', imageSize.toString());` - App logic step.
+- Line 2550: `logoImage.setAttribute('height', imageSize.toString());` - App logic step.
+- Line 2551: `logoImage.setAttribute('preserveAspectRatio', 'xMidYMid meet');` - App logic step.
+- Line 2552: `` - Blank line for readability.
+- Line 2553: `// Try different path formats` - Developer comment or documentation.
+- Line 2554: `const imagePaths = this.getLogoImagePaths(logoSource);` - App logic step.
+- Line 2555: `` - Blank line for readability.
+- Line 2556: `// Set initial path - prefer relative path for better compatibility` - Developer comment or documentation.
+- Line 2557: `const primaryPath = imagePaths[0]; // Use resolved primary path` - App logic step.
+- Line 2558: `logoImage.setAttribute('href', primaryPath);` - App logic step.
+- Line 2559: `// Also try xlink:href for older SVG compatibility` - Developer comment or documentation.
+- Line 2560: `logoImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', primaryPath);` - App logic step.
+- Line 2561: `console.log('[${node.company}] Setting logo image with path:', primaryPath);` - App logic step.
+- Line 2562: `console.log('[${node.company}] All fallback paths:', imagePaths);` - App logic step.
+- Line 2563: `` - Blank line for readability.
+- Line 2564: `// Add error handler to try fallback paths` - Developer comment or documentation.
+- Line 2565: `let currentPathIndex = 0; // Start with the primary path index` - App logic step.
+- Line 2566: `let triedDefaultFallback = false;` - App logic step.
+- Line 2567: `const errorHandler = () => {` - Starts a logic block.
+- Line 2568: `const currentHref = logoImage.getAttribute('href') || '';` - App logic step.
+- Line 2569: `console.warn('[${node.company}] Logo failed to load from: ${currentHref}');` - App logic step.
+- Line 2570: `` - Blank line for readability.
+- Line 2571: `if (imagePaths.length <= 1) {` - Starts a logic block.
+- Line 2572: `if (!triedDefaultFallback) {` - Starts a logic block.
+- Line 2573: `triedDefaultFallback = true;` - App logic step.
+- Line 2574: `const fallbackPath = '/assets/images/default-logo.png';` - App logic step.
+- Line 2575: `console.warn('[${node.company}] Falling back to default logo: ${fallbackPath}');` - App logic step.
+- Line 2576: `logoImage.setAttribute('href', fallbackPath);` - App logic step.
+- Line 2577: `logoImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', fallbackPath);` - App logic step.
+- Line 2578: `return;` - App logic step.
+- Line 2579: `}` - Ends a logic block.
+- Line 2580: `console.error('[${node.company}] Default logo fallback also failed.');` - App logic step.
+- Line 2581: `return;` - App logic step.
+- Line 2582: `}` - Ends a logic block.
+- Line 2583: `` - Blank line for readability.
+- Line 2584: `if (currentPathIndex < imagePaths.length - 1) {` - Starts a logic block.
+- Line 2585: `currentPathIndex++;` - App logic step.
+- Line 2586: `const nextPath = imagePaths[currentPathIndex];` - App logic step.
+- Line 2587: `console.log('[${node.company}] Trying fallback path ${currentPathIndex + 1}/${imagePaths.length}: ${nextPath}');` - App logic step.
+- Line 2588: `logoImage.setAttribute('href', nextPath);` - App logic step.
+- Line 2589: `logoImage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', nextPath);` - App logic step.
+- Line 2590: `} else {` - App logic step.
+- Line 2591: `console.error('[${node.company}] Logo failed to load from all ${imagePaths.length} paths:', imagePaths);` - App logic step.
+- Line 2592: `console.error('[${node.company}] Please verify the logo source is valid:', logoSource);` - App logic step.
+- Line 2593: `console.error('[${node.company}] Check browser Network tab for 404 errors');` - App logic step.
+- Line 2594: `console.error('[${node.company}] Current window location:', window.location.href);` - App logic step.
+- Line 2595: `}` - Ends a logic block.
+- Line 2596: `};` - Ends a logic block.
+- Line 2597: `` - Blank line for readability.
+- Line 2598: `logoImage.addEventListener('error', errorHandler);` - App logic step.
+- Line 2599: `` - Blank line for readability.
+- Line 2600: `// Add load handler to confirm success` - Developer comment or documentation.
+- Line 2601: `logoImage.addEventListener('load', () => {` - Starts a logic block.
+- Line 2602: `console.log('✓ [${node.company}] Logo loaded successfully from:', logoImage.getAttribute('href'));` - App logic step.
+- Line 2603: `}, { once: true });` - App logic step.
+- Line 2604: `` - Blank line for readability.
+- Line 2605: `// Insert image into the logos group so it appears above labels` - Developer comment or documentation.
+- Line 2606: `logosGroup.appendChild(logoImage);` - App logic step.
+- Line 2607: `} else {` - App logic step.
+- Line 2608: `// Update existing image position - make it responsive to zoom` - Developer comment or documentation.
+- Line 2609: `const viewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 2610: `let zoomFactor = 1;` - App logic step.
+- Line 2611: `if (viewBox) {` - Starts a logic block.
+- Line 2612: `const [vbX, vbY, vbWidth, vbHeight] = viewBox.split(' ').map(Number);` - App logic step.
+- Line 2613: `const svgRect = svg.getBoundingClientRect();` - App logic step.
+- Line 2614: `const baseWidth = 950;` - App logic step.
+- Line 2615: `const baseHeight = 550;` - App logic step.
+- Line 2616: `zoomFactor = Math.max(baseWidth / vbWidth, baseHeight / vbHeight);` - App logic step.
+- Line 2617: `}` - Ends a logic block.
+- Line 2618: `` - Blank line for readability.
+- Line 2619: `const imageSize = this.getLogoImageSize(r, zoomFactor, this.getLogoSizeMultiplier(node));` - App logic step.
+- Line 2620: `` - Blank line for readability.
+- Line 2621: `logoImage.setAttribute('x', (cx - imageSize / 2).toString());` - App logic step.
+- Line 2622: `logoImage.setAttribute('y', (cy - imageSize / 2).toString());` - App logic step.
+- Line 2623: `logoImage.setAttribute('width', imageSize.toString());` - App logic step.
+- Line 2624: `logoImage.setAttribute('height', imageSize.toString());` - App logic step.
+- Line 2625: `` - Blank line for readability.
+- Line 2626: `if (logoImage.parentNode !== logosGroup) {` - Starts a logic block.
+- Line 2627: `logosGroup.appendChild(logoImage);` - App logic step.
+- Line 2628: `}` - Ends a logic block.
+- Line 2629: `}` - Ends a logic block.
+- Line 2630: `` - Blank line for readability.
+- Line 2631: `// Ensure hover handlers are attached (for both new and existing logos)` - Developer comment or documentation.
+- Line 2632: `if (logoImage && !logoImage.hasAttribute('data-hover-attached')) {` - Starts a logic block.
+- Line 2633: `this.attachLogoHoverHandlers(logoImage, node, logoSource, index);` - App logic step.
+- Line 2634: `logoImage.setAttribute('data-hover-attached', 'true');` - App logic step.
+- Line 2635: `}` - Ends a logic block.
+- Line 2636: `` - Blank line for readability.
+- Line 2637: `// Keep circle visible with stroke (logo will overlay it)` - Developer comment or documentation.
+- Line 2638: `marker.setAttribute('fill', '#00FF41'); // Keep original fill as fallback` - App logic step.
+- Line 2639: `marker.setAttribute('fill-opacity', '0.3'); // Semi-transparent so logo shows through` - App logic step.
+- Line 2640: `marker.setAttribute('stroke', '#ffffff');` - App logic step.
+- Line 2641: `marker.setAttribute('stroke-width', '2');` - App logic step.
+- Line 2642: `marker.setAttribute('stroke-opacity', '0.8');` - App logic step.
+- Line 2643: `` - Blank line for readability.
+- Line 2644: `// Check if text label already exists` - Developer comment or documentation.
+- Line 2645: `const existingText = markersGroup.querySelector('text[data-marker-index="${index}"]');` - App logic step.
+- Line 2646: `` - Blank line for readability.
+- Line 2647: `// Always update or create text element to ensure it's visible and positioned correctly` - Developer comment or documentation.
+- Line 2648: `let text = labelsGroup.querySelector('text[data-marker-index="${index}"]') as SVGTextElement;` - App logic step.
+- Line 2649: `` - Blank line for readability.
+- Line 2650: `if (!text) {` - Starts a logic block.
+- Line 2651: `// Create SVG text element for company name - positioned to stick to circle` - Developer comment or documentation.
+- Line 2652: `text = document.createElementNS('http://www.w3.org/2000/svg', 'text');` - App logic step.
+- Line 2653: `text.setAttribute('data-marker-index', index.toString());` - App logic step.
+- Line 2654: `text.setAttribute('class', 'company-label');` - App logic step.
+- Line 2655: `labelsGroup.appendChild(text);` - App logic step.
+- Line 2656: `} else if (text.parentNode !== labelsGroup) {` - Checks a condition.
+- Line 2657: `labelsGroup.appendChild(text);` - App logic step.
+- Line 2658: `}` - Ends a logic block.
+- Line 2659: `` - Blank line for readability.
+- Line 2660: `// Always update text properties to ensure it sticks to circle` - Developer comment or documentation.
+- Line 2661: `text.setAttribute('x', cx.toString());` - App logic step.
+- Line 2662: `text.setAttribute('y', (cy + r + 15).toString()); // Position below the circle` - App logic step.
+- Line 2663: `text.setAttribute('text-anchor', 'middle');` - App logic step.
+- Line 2664: `text.setAttribute('font-size', '12');` - App logic step.
+- Line 2665: `text.setAttribute('dominant-baseline', 'hanging'); // Align text from top` - App logic step.
+- Line 2666: `text.style.fill = '#00FF41'; // Tactical green` - App logic step.
+- Line 2667: `text.style.fontWeight = 'bold';` - App logic step.
+- Line 2668: `text.style.fontFamily = 'Arial, sans-serif';` - App logic step.
+- Line 2669: `text.style.pointerEvents = 'none';` - App logic step.
+- Line 2670: `text.style.userSelect = 'none';` - App logic step.
+- Line 2671: `text.style.textShadow = '0 0 4px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.6)';` - App logic step.
+- Line 2672: `text.style.transform = 'none'; // Ensure no transforms that cause floating` - App logic step.
+- Line 2673: `text.style.visibility = 'visible';` - App logic step.
+- Line 2674: `text.style.opacity = '1';` - App logic step.
+- Line 2675: `// Custom display names for specific companies` - Developer comment or documentation.
+- Line 2676: `let displayName = node.company.toUpperCase();` - App logic step.
+- Line 2677: `if (node.company?.toLowerCase().includes('nova')) {` - Starts a logic block.
+- Line 2678: `displayName = 'NOVA BUS';` - App logic step.
+- Line 2679: `}` - Ends a logic block.
+- Line 2680: `if (node.company?.toLowerCase().includes('karzan') || node.company?.toLowerCase().includes('karsan')) {` - Starts a logic block.
+- Line 2681: `displayName = 'KARSAN';` - App logic step.
+- Line 2682: `}` - Ends a logic block.
+- Line 2683: `if (node.company?.toLowerCase().includes('arboc') || node.company?.toLowerCase().includes('arbroc')) {` - Starts a logic block.
+- Line 2684: `displayName = 'ARBOC';` - App logic step.
+- Line 2685: `}` - Ends a logic block.
+- Line 2686: `text.textContent = displayName;` - App logic step.
+- Line 2687: `}` - Ends a logic block.
+- Line 2688: `}` - Ends a logic block.
+- Line 2689: `});` - Ends a logic block.
+- Line 2690: `` - Blank line for readability.
+- Line 2691: `this.updateSelectedMarkerStyles();` - App logic step.
+- Line 2692: `}` - Ends a logic block.
+- Line 2693: `` - Blank line for readability.
+- Line 2694: `/**` - Developer comment or documentation.
+- Line 2695: `* Attach hover event handlers to company logo images for tooltip display` - Developer comment or documentation.
+- Line 2696: `*/` - Developer comment or documentation.
+- Line 2697: `private attachLogoHoverHandlers(` - App logic step.
+- Line 2698: `logoImage: SVGImageElement,` - App logic step.
+- Line 2699: `node: WarRoomNode,` - App logic step.
+- Line 2700: `logoSource: string,` - App logic step.
+- Line 2701: `markerIndex: number` - App logic step.
+- Line 2702: `): void {` - Starts a logic block.
+- Line 2703: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2704: `if (!container) return;` - Checks a condition.
+- Line 2705: `` - Blank line for readability.
+- Line 2706: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2707: `if (!svg) return;` - Checks a condition.
+- Line 2708: `` - Blank line for readability.
+- Line 2709: `// Mouse enter handler` - Developer comment or documentation.
+- Line 2710: `const handleMouseEnter: EventListener = (event) => {` - Starts a logic block.
+- Line 2711: `if (this.destroyed) return;` - Checks a condition.
+- Line 2712: `` - Blank line for readability.
+- Line 2713: `if (this.tooltipTimeoutId) {` - Starts a logic block.
+- Line 2714: `clearTimeout(this.tooltipTimeoutId);` - App logic step.
+- Line 2715: `this.tooltipTimeoutId = null;` - App logic step.
+- Line 2716: `}` - Ends a logic block.
+- Line 2717: `` - Blank line for readability.
+- Line 2718: `const mouseEvent = event as MouseEvent;` - App logic step.
+- Line 2719: `this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);` - App logic step.
+- Line 2720: `};` - Ends a logic block.
+- Line 2721: `` - Blank line for readability.
+- Line 2722: `// Mouse leave handler` - Developer comment or documentation.
+- Line 2723: `const handleMouseLeave: EventListener = () => {` - Starts a logic block.
+- Line 2724: `if (this.destroyed) return;` - Checks a condition.
+- Line 2725: `` - Blank line for readability.
+- Line 2726: `// Clear timeout if tooltip hasn't shown yet` - Developer comment or documentation.
+- Line 2727: `if (this.tooltipTimeoutId) {` - Starts a logic block.
+- Line 2728: `clearTimeout(this.tooltipTimeoutId);` - App logic step.
+- Line 2729: `this.tooltipTimeoutId = null;` - App logic step.
+- Line 2730: `}` - Ends a logic block.
+- Line 2731: `` - Blank line for readability.
+- Line 2732: `// Hide tooltip immediately` - Developer comment or documentation.
+- Line 2733: `this.clearCompanyTooltip();` - App logic step.
+- Line 2734: `};` - Ends a logic block.
+- Line 2735: `` - Blank line for readability.
+- Line 2736: `// Mouse move handler to update position` - Developer comment or documentation.
+- Line 2737: `const handleMouseMove: EventListener = (event) => {` - Starts a logic block.
+- Line 2738: `if (this.destroyed || !this.hoveredCompanyTooltip()) return;` - Checks a condition.
+- Line 2739: `const mouseEvent = event as MouseEvent;` - App logic step.
+- Line 2740: `this.showCompanyTooltipAtElement(node, mouseEvent.currentTarget as Element, logoSource);` - App logic step.
+- Line 2741: `};` - Ends a logic block.
+- Line 2742: `` - Blank line for readability.
+- Line 2743: `// Attach event listeners` - Developer comment or documentation.
+- Line 2744: `logoImage.addEventListener('mouseenter', handleMouseEnter);` - App logic step.
+- Line 2745: `logoImage.addEventListener('mouseleave', handleMouseLeave);` - App logic step.
+- Line 2746: `logoImage.addEventListener('mousemove', handleMouseMove);` - App logic step.
+- Line 2747: `` - Blank line for readability.
+- Line 2748: `if (!logoImage.hasAttribute('data-logo-click-handler')) {` - Starts a logic block.
+- Line 2749: `logoImage.addEventListener('click', (event: MouseEvent) => {` - Starts a logic block.
+- Line 2750: `event.stopPropagation();` - App logic step.
+- Line 2751: `event.preventDefault();` - App logic step.
+- Line 2752: `this.clearCompanyTooltip();` - App logic step.
+- Line 2753: `this.nodeSelected.emit(node);` - App logic step.
+- Line 2754: `this.hideMarkerPopup();` - App logic step.
+- Line 2755: `}, true);` - Ends a logic block.
+- Line 2756: `logoImage.setAttribute('data-logo-click-handler', 'true');` - App logic step.
+- Line 2757: `}` - Ends a logic block.
+- Line 2758: `}` - Ends a logic block.
+- Line 2759: `` - Blank line for readability.
+- Line 2760: `/**` - Developer comment or documentation.
+- Line 2761: `* Setup fullscreen change listeners` - Developer comment or documentation.
+- Line 2762: `*/` - Developer comment or documentation.
+- Line 2763: `private setupFullscreenListeners(): void {` - Starts a logic block.
+- Line 2764: `const fullscreenChangeEvents = [` - App logic step.
+- Line 2765: `'fullscreenchange',` - App logic step.
+- Line 2766: `'webkitfullscreenchange',` - App logic step.
+- Line 2767: `'msfullscreenchange'` - App logic step.
+- Line 2768: `];` - App logic step.
+- Line 2769: `` - Blank line for readability.
+- Line 2770: `// Create bound handler` - Developer comment or documentation.
+- Line 2771: `this.boundFullscreenHandler = () => {` - Starts a logic block.
+- Line 2772: `if (this.destroyed) return;` - Checks a condition.
+- Line 2773: `` - Blank line for readability.
+- Line 2774: `const wasFullscreen = this.isFullscreen;` - App logic step.
+- Line 2775: `// Update flag based on actual DOM state` - Developer comment or documentation.
+- Line 2776: `const currentState = !!(` - App logic step.
+- Line 2777: `document.fullscreenElement ||` - App logic step.
+- Line 2778: `(document as any).webkitFullscreenElement ||` - App logic step.
+- Line 2779: `(document as any).msFullscreenElement` - App logic step.
+- Line 2780: `);` - App logic step.
+- Line 2781: `this.isFullscreen = currentState;` - App logic step.
+- Line 2782: `const mapContainer = document.querySelector('.war-room-map-container') as HTMLElement;` - App logic step.
+- Line 2783: `const mapDiv = document.getElementById('war-room-map');` - App logic step.
+- Line 2784: `const mapContainerDiv = document.querySelector('.map-container') as HTMLElement;` - App logic step.
+- Line 2785: `` - Blank line for readability.
+- Line 2786: `if (this.isFullscreen && !wasFullscreen) {` - Starts a logic block.
+- Line 2787: `// Get current theme colors` - Developer comment or documentation.
+- Line 2788: `const theme = this.currentTheme();` - App logic step.
+- Line 2789: `const colors = this.colorSchemes[theme as 'light' | 'dark'] || this.colorSchemes.dark;` - App logic step.
+- Line 2790: `` - Blank line for readability.
+- Line 2791: `// Entering fullscreen - ensure container fills screen` - Developer comment or documentation.
+- Line 2792: `if (mapContainer) {` - Starts a logic block.
+- Line 2793: `mapContainer.style.width = '100vw';` - App logic step.
+- Line 2794: `mapContainer.style.height = '100vh';` - App logic step.
+- Line 2795: `mapContainer.style.minHeight = '100vh';` - App logic step.
+- Line 2796: `mapContainer.style.maxHeight = '100vh';` - App logic step.
+- Line 2797: `mapContainer.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2798: `mapContainer.style.position = 'fixed';` - App logic step.
+- Line 2799: `mapContainer.style.top = '0';` - App logic step.
+- Line 2800: `mapContainer.style.left = '0';` - App logic step.
+- Line 2801: `mapContainer.style.right = '0';` - App logic step.
+- Line 2802: `mapContainer.style.bottom = '0';` - App logic step.
+- Line 2803: `}` - Ends a logic block.
+- Line 2804: `` - Blank line for readability.
+- Line 2805: `if (mapContainerDiv) {` - Starts a logic block.
+- Line 2806: `mapContainerDiv.style.width = '100%';` - App logic step.
+- Line 2807: `mapContainerDiv.style.height = '100%';` - App logic step.
+- Line 2808: `mapContainerDiv.style.minHeight = '100vh';` - App logic step.
+- Line 2809: `mapContainerDiv.style.maxHeight = '100vh';` - App logic step.
+- Line 2810: `mapContainerDiv.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2811: `}` - Ends a logic block.
+- Line 2812: `` - Blank line for readability.
+- Line 2813: `if (mapDiv) {` - Starts a logic block.
+- Line 2814: `mapDiv.style.width = '100%';` - App logic step.
+- Line 2815: `mapDiv.style.height = '100%';` - App logic step.
+- Line 2816: `mapDiv.style.minHeight = '100vh';` - App logic step.
+- Line 2817: `mapDiv.style.maxHeight = '100vh';` - App logic step.
+- Line 2818: `mapDiv.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2819: `}` - Ends a logic block.
+- Line 2820: `` - Blank line for readability.
+- Line 2821: `// Ensure body/html use theme-appropriate background in fullscreen` - Developer comment or documentation.
+- Line 2822: `document.body.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2823: `document.documentElement.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2824: `} else if (!this.isFullscreen && wasFullscreen) {` - Checks a condition.
+- Line 2825: `// Exiting fullscreen - reset styles` - Developer comment or documentation.
+- Line 2826: `if (mapContainer) {` - Starts a logic block.
+- Line 2827: `mapContainer.style.width = '';` - App logic step.
+- Line 2828: `mapContainer.style.height = '';` - App logic step.
+- Line 2829: `mapContainer.style.minHeight = '';` - App logic step.
+- Line 2830: `mapContainer.style.maxHeight = '';` - App logic step.
+- Line 2831: `mapContainer.style.position = '';` - App logic step.
+- Line 2832: `mapContainer.style.top = '';` - App logic step.
+- Line 2833: `mapContainer.style.left = '';` - App logic step.
+- Line 2834: `mapContainer.style.right = '';` - App logic step.
+- Line 2835: `mapContainer.style.bottom = '';` - App logic step.
+- Line 2836: `}` - Ends a logic block.
+- Line 2837: `` - Blank line for readability.
+- Line 2838: `if (mapContainerDiv) {` - Starts a logic block.
+- Line 2839: `mapContainerDiv.style.width = '';` - App logic step.
+- Line 2840: `mapContainerDiv.style.height = '';` - App logic step.
+- Line 2841: `mapContainerDiv.style.minHeight = '';` - App logic step.
+- Line 2842: `mapContainerDiv.style.maxHeight = '';` - App logic step.
+- Line 2843: `}` - Ends a logic block.
+- Line 2844: `` - Blank line for readability.
+- Line 2845: `if (mapDiv) {` - Starts a logic block.
+- Line 2846: `mapDiv.style.width = '';` - App logic step.
+- Line 2847: `mapDiv.style.height = '';` - App logic step.
+- Line 2848: `mapDiv.style.minHeight = '';` - App logic step.
+- Line 2849: `mapDiv.style.maxHeight = '';` - App logic step.
+- Line 2850: `}` - Ends a logic block.
+- Line 2851: `` - Blank line for readability.
+- Line 2852: `// Reset body/html background` - Developer comment or documentation.
+- Line 2853: `document.body.style.backgroundColor = '';` - App logic step.
+- Line 2854: `document.documentElement.style.backgroundColor = '';` - App logic step.
+- Line 2855: `}` - Ends a logic block.
+- Line 2856: `` - Blank line for readability.
+- Line 2857: `// Resize map when fullscreen state changes` - Developer comment or documentation.
+- Line 2858: `setTimeout(() => {` - Starts a logic block.
+- Line 2859: `if (!this.destroyed && this.mapInstance && this.mapInstance.updateSize) {` - Starts a logic block.
+- Line 2860: `this.mapInstance.updateSize();` - App logic step.
+- Line 2861: `}` - Ends a logic block.
+- Line 2862: `if (!this.destroyed) {` - Starts a logic block.
+- Line 2863: `this.updateLabelPositions();` - App logic step.
+- Line 2864: `this.refreshTooltipPosition();` - App logic step.
+- Line 2865: `}` - Ends a logic block.
+- Line 2866: `}, 300);` - Ends a logic block.
+- Line 2867: `};` - Ends a logic block.
+- Line 2868: `` - Blank line for readability.
+- Line 2869: `// Add listeners with bound handler` - Developer comment or documentation.
+- Line 2870: `fullscreenChangeEvents.forEach((eventName) => {` - Starts a logic block.
+- Line 2871: `document.addEventListener(eventName, this.boundFullscreenHandler!);` - App logic step.
+- Line 2872: `});` - Ends a logic block.
+- Line 2873: `}` - Ends a logic block.
+- Line 2874: `` - Blank line for readability.
+- Line 2875: `/**` - Developer comment or documentation.
+- Line 2876: `* Update map colors based on current theme` - Developer comment or documentation.
+- Line 2877: `* @param theme - Current theme ('light' or 'dark')` - Developer comment or documentation.
+- Line 2878: `*/` - Developer comment or documentation.
+- Line 2879: `private updateMapColors(theme: 'light' | 'dark'): void {` - Starts a logic block.
+- Line 2880: `if (!this.mapInstance) return;` - Checks a condition.
+- Line 2881: `` - Blank line for readability.
+- Line 2882: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2883: `if (!container) return;` - Checks a condition.
+- Line 2884: `` - Blank line for readability.
+- Line 2885: `const colors = this.colorSchemes[theme] || this.colorSchemes.dark;` - App logic step.
+- Line 2886: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2887: `` - Blank line for readability.
+- Line 2888: `if (svg) {` - Starts a logic block.
+- Line 2889: `// Update map background color` - Developer comment or documentation.
+- Line 2890: `container.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2891: `` - Blank line for readability.
+- Line 2892: `// Update all region paths` - Developer comment or documentation.
+- Line 2893: `const regionPaths = svg.querySelectorAll('#jvm-regions-group path') as NodeListOf<SVGPathElement>;` - App logic step.
+- Line 2894: `regionPaths.forEach((pathElement) => {` - Starts a logic block.
+- Line 2895: `pathElement.setAttribute('fill', colors.regionFill);` - App logic step.
+- Line 2896: `pathElement.setAttribute('fill-opacity', colors.regionFillOpacity.toString());` - App logic step.
+- Line 2897: `pathElement.setAttribute('stroke', colors.regionStroke);` - App logic step.
+- Line 2898: `});` - Ends a logic block.
+- Line 2899: `` - Blank line for readability.
+- Line 2900: `// Update map container background if it exists` - Developer comment or documentation.
+- Line 2901: `const mapContainer = container.closest('.map-container') as HTMLElement;` - App logic step.
+- Line 2902: `if (mapContainer) {` - Starts a logic block.
+- Line 2903: `mapContainer.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2904: `}` - Ends a logic block.
+- Line 2905: `` - Blank line for readability.
+- Line 2906: `// Update jvm-container background if it exists` - Developer comment or documentation.
+- Line 2907: `const jvmContainer = container.querySelector('.jvm-container') as HTMLElement;` - App logic step.
+- Line 2908: `if (jvmContainer) {` - Starts a logic block.
+- Line 2909: `jvmContainer.style.backgroundColor = colors.backgroundColor;` - App logic step.
+- Line 2910: `}` - Ends a logic block.
+- Line 2911: `}` - Ends a logic block.
+- Line 2912: `` - Blank line for readability.
+- Line 2913: `// Update map instance background if the API supports it` - Developer comment or documentation.
+- Line 2914: `if (this.mapInstance && typeof this.mapInstance.setBackgroundColor === 'function') {` - Starts a logic block.
+- Line 2915: `this.mapInstance.setBackgroundColor(colors.backgroundColor);` - App logic step.
+- Line 2916: `}` - Ends a logic block.
+- Line 2917: `}` - Ends a logic block.
+- Line 2918: `` - Blank line for readability.
+- Line 2919: `/**` - Developer comment or documentation.
+- Line 2920: `* Ensure SVG is responsive and shows entire map` - Developer comment or documentation.
+- Line 2921: `* Only resets to full world view on initial load, not when user has zoomed` - Developer comment or documentation.
+- Line 2922: `*/` - Developer comment or documentation.
+- Line 2923: `private ensureSvgResponsive(): void {` - Starts a logic block.
+- Line 2924: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 2925: `if (!container) return;` - Checks a condition.
+- Line 2926: `` - Blank line for readability.
+- Line 2927: `const svg = container.querySelector('svg');` - App logic step.
+- Line 2928: `if (!svg) return;` - Checks a condition.
+- Line 2929: `` - Blank line for readability.
+- Line 2930: `// Remove fixed width/height attributes that prevent responsiveness` - Developer comment or documentation.
+- Line 2931: `svg.removeAttribute('width');` - App logic step.
+- Line 2932: `svg.removeAttribute('height');` - App logic step.
+- Line 2933: `` - Blank line for readability.
+- Line 2934: `// Ensure viewBox is set (required for responsive SVG)` - Developer comment or documentation.
+- Line 2935: `// Full world map viewBox: "0 0 950 550" shows entire world` - Developer comment or documentation.
+- Line 2936: `const fullWorldViewBox = '0 0 950 550';` - App logic step.
+- Line 2937: `const currentViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 2938: `` - Blank line for readability.
+- Line 2939: `// Only reset to full world view if:` - Developer comment or documentation.
+- Line 2940: `// 1. No viewBox is set (initial load)` - Developer comment or documentation.
+- Line 2941: `// 2. User hasn't manually zoomed AND (we're on initial load OR we're initializing)` - Developer comment or documentation.
+- Line 2942: `if (!currentViewBox) {` - Starts a logic block.
+- Line 2943: `// No viewBox set, set it to full world (initial load)` - Developer comment or documentation.
+- Line 2944: `svg.setAttribute('viewBox', fullWorldViewBox);` - App logic step.
+- Line 2945: `} else if (!this.userHasZoomed && !this.pendingZoomCompanyId) {` - Checks a condition.
+- Line 2946: `// Only auto-reset if user hasn't zoomed and no pending zoom` - Developer comment or documentation.
+- Line 2947: `// Force reset if we're still initializing or if viewBox is close to default` - Developer comment or documentation.
+- Line 2948: `const [vbX, vbY, vbWidth, vbHeight] = currentViewBox.split(' ').map(Number);` - App logic step.
+- Line 2949: `` - Blank line for readability.
+- Line 2950: `// If we are initializing, be aggressive about resetting` - Developer comment or documentation.
+- Line 2951: `if (this.isInitializing) {` - Starts a logic block.
+- Line 2952: `if (currentViewBox !== fullWorldViewBox) {` - Starts a logic block.
+- Line 2953: `svg.setAttribute('viewBox', fullWorldViewBox);` - App logic step.
+- Line 2954: `}` - Ends a logic block.
+- Line 2955: `} else if (Math.abs(vbWidth - 950) < 5 && Math.abs(vbHeight - 550) < 5 && currentViewBox !== fullWorldViewBox) {` - Checks a condition.
+- Line 2956: `// Very close to full world but not exact - fix it (likely library artifact)` - Developer comment or documentation.
+- Line 2957: `svg.setAttribute('viewBox', fullWorldViewBox);` - App logic step.
+- Line 2958: `}` - Ends a logic block.
+- Line 2959: `}` - Ends a logic block.
+- Line 2960: `// If user has zoomed, don't interfere with their zoom level` - Developer comment or documentation.
+- Line 2961: `` - Blank line for readability.
+- Line 2962: `// Set preserveAspectRatio to show entire map and maintain aspect ratio` - Developer comment or documentation.
+- Line 2963: `// xMidYMid meet ensures the entire map is visible and centered within container` - Developer comment or documentation.
+- Line 2964: `svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');` - App logic step.
+- Line 2965: `` - Blank line for readability.
+- Line 2966: `// Force responsive sizing via CSS` - Developer comment or documentation.
+- Line 2967: `// Use 100% for both width and height - preserveAspectRatio will handle fitting` - Developer comment or documentation.
+- Line 2968: `svg.style.width = '100%';` - App logic step.
+- Line 2969: `svg.style.height = '100%';` - App logic step.
+- Line 2970: `svg.style.maxWidth = '100%';` - App logic step.
+- Line 2971: `svg.style.maxHeight = '100%';` - App logic step.
+- Line 2972: `svg.style.display = 'block';` - App logic step.
+- Line 2973: `svg.style.position = 'relative';` - App logic step.
+- Line 2974: `svg.style.top = '0';` - App logic step.
+- Line 2975: `svg.style.left = '0';` - App logic step.
+- Line 2976: `svg.style.margin = '0';` - App logic step.
+- Line 2977: `svg.style.padding = '0';` - App logic step.
+- Line 2978: `svg.style.verticalAlign = 'top'; // Align to top to prevent negative positioning` - App logic step.
+- Line 2979: `` - Blank line for readability.
+- Line 2980: `// Ensure jvm-container is also properly sized and positioned` - Developer comment or documentation.
+- Line 2981: `const jvmContainer = container.querySelector('.jvm-container') as HTMLElement;` - App logic step.
+- Line 2982: `if (jvmContainer) {` - Starts a logic block.
+- Line 2983: `jvmContainer.style.width = '100%';` - App logic step.
+- Line 2984: `jvmContainer.style.height = '100%';` - App logic step.
+- Line 2985: `jvmContainer.style.position = 'relative'; // Required for absolute positioned SVG` - App logic step.
+- Line 2986: `jvmContainer.style.overflow = 'hidden';` - App logic step.
+- Line 2987: `jvmContainer.style.top = '0';` - App logic step.
+- Line 2988: `jvmContainer.style.left = '0';` - App logic step.
+- Line 2989: `jvmContainer.style.margin = '0';` - App logic step.
+- Line 2990: `jvmContainer.style.padding = '0';` - App logic step.
+- Line 2991: `}` - Ends a logic block.
+- Line 2992: `` - Blank line for readability.
+- Line 2993: `console.log('SVG made responsive:', {` - Starts a logic block.
+- Line 2994: `viewBox: svg.getAttribute('viewBox'),` - App logic step.
+- Line 2995: `preserveAspectRatio: svg.getAttribute('preserveAspectRatio'),` - App logic step.
+- Line 2996: `containerSize: {` - Starts a logic block.
+- Line 2997: `width: container.getBoundingClientRect().width,` - App logic step.
+- Line 2998: `height: container.getBoundingClientRect().height` - App logic step.
+- Line 2999: `},` - Ends a logic block.
+- Line 3000: `svgSize: {` - Starts a logic block.
+- Line 3001: `width: svg.getBoundingClientRect().width,` - App logic step.
+- Line 3002: `height: svg.getBoundingClientRect().height` - App logic step.
+- Line 3003: `}` - Ends a logic block.
+- Line 3004: `});` - Ends a logic block.
+- Line 3005: `}` - Ends a logic block.
+- Line 3006: `` - Blank line for readability.
+- Line 3007: `/**` - Developer comment or documentation.
+- Line 3008: `* Setup resize handler to keep SVG responsive on window resize` - Developer comment or documentation.
+- Line 3009: `*/` - Developer comment or documentation.
+- Line 3010: `private setupResizeHandler(): void {` - Starts a logic block.
+- Line 3011: `if (this.boundResizeHandler) {` - Starts a logic block.
+- Line 3012: `return; // Already set up` - App logic step.
+- Line 3013: `}` - Ends a logic block.
+- Line 3014: `` - Blank line for readability.
+- Line 3015: `this.boundResizeHandler = () => {` - Starts a logic block.
+- Line 3016: `if (this.destroyed) return;` - Checks a condition.
+- Line 3017: `` - Blank line for readability.
+- Line 3018: `// Debounce resize handler` - Developer comment or documentation.
+- Line 3019: `if (this.updateMarkersTimeoutId) {` - Starts a logic block.
+- Line 3020: `clearTimeout(this.updateMarkersTimeoutId);` - App logic step.
+- Line 3021: `}` - Ends a logic block.
+- Line 3022: `` - Blank line for readability.
+- Line 3023: `this.updateMarkersTimeoutId = setTimeout(() => {` - Starts a logic block.
+- Line 3024: `if (!this.destroyed) {` - Starts a logic block.
+- Line 3025: `this.ensureSvgResponsive();` - App logic step.
+- Line 3026: `// Mark labels as dirty to trigger RAF update after resize` - Developer comment or documentation.
+- Line 3027: `this.markLabelsDirty();` - App logic step.
+- Line 3028: `this.refreshTooltipPosition();` - App logic step.
+- Line 3029: `}` - Ends a logic block.
+- Line 3030: `this.updateMarkersTimeoutId = null;` - App logic step.
+- Line 3031: `}, 150);` - Ends a logic block.
+- Line 3032: `};` - Ends a logic block.
+- Line 3033: `` - Blank line for readability.
+- Line 3034: `window.addEventListener('resize', this.boundResizeHandler);` - App logic step.
+- Line 3035: `}` - Ends a logic block.
+- Line 3036: `` - Blank line for readability.
+- Line 3037: `/**` - Developer comment or documentation.
+- Line 3038: `* Reset map to full world view (zoom out to show entire map)` - Developer comment or documentation.
+- Line 3039: `* Only resets if user hasn't manually zoomed` - Developer comment or documentation.
+- Line 3040: `*/` - Developer comment or documentation.
+- Line 3041: `private resetToFullWorldView(): void {` - Starts a logic block.
+- Line 3042: `// Don't reset if user has manually zoomed` - Developer comment or documentation.
+- Line 3043: `if (this.userHasZoomed) {` - Starts a logic block.
+- Line 3044: `console.log('Skipping resetToFullWorldView - user has manually zoomed');` - App logic step.
+- Line 3045: `return;` - App logic step.
+- Line 3046: `}` - Ends a logic block.
+- Line 3047: `` - Blank line for readability.
+- Line 3048: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 3049: `if (!container) {` - Starts a logic block.
+- Line 3050: `console.warn('resetToFullWorldView: Container not found');` - App logic step.
+- Line 3051: `return;` - App logic step.
+- Line 3052: `}` - Ends a logic block.
+- Line 3053: `` - Blank line for readability.
+- Line 3054: `const svg = container.querySelector('svg');` - App logic step.
+- Line 3055: `if (!svg) {` - Starts a logic block.
+- Line 3056: `console.warn('resetToFullWorldView: SVG not found');` - App logic step.
+- Line 3057: `return;` - App logic step.
+- Line 3058: `}` - Ends a logic block.
+- Line 3059: `` - Blank line for readability.
+- Line 3060: `// Set viewBox to full world map dimensions (0 0 950 550)` - Developer comment or documentation.
+- Line 3061: `// This ensures the entire world map is visible` - Developer comment or documentation.
+- Line 3062: `const fullWorldViewBox = '0 0 950 550';` - App logic step.
+- Line 3063: `const currentViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 3064: `` - Blank line for readability.
+- Line 3065: `console.log('resetToFullWorldView: Current viewBox:', currentViewBox, 'Target:', fullWorldViewBox);` - App logic step.
+- Line 3066: `` - Blank line for readability.
+- Line 3067: `// Force reset to full world view (only on initial load)` - Developer comment or documentation.
+- Line 3068: `console.log('Forcing reset to full world view');` - App logic step.
+- Line 3069: `this.resetMapToFullWorldView();` - App logic step.
+- Line 3070: `` - Blank line for readability.
+- Line 3071: `// Force viewBox multiple times to ensure it sticks (map library might override it)` - Developer comment or documentation.
+- Line 3072: `// Only if user hasn't manually zoomed` - Developer comment or documentation.
+- Line 3073: `const forceViewBox = () => {` - Starts a logic block.
+- Line 3074: `if (this.destroyed || this.userHasZoomed) return;` - Checks a condition.
+- Line 3075: `if (svg && svg.parentNode) {` - Starts a logic block.
+- Line 3076: `const checkViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 3077: `if (checkViewBox !== fullWorldViewBox) {` - Starts a logic block.
+- Line 3078: `console.log('ViewBox was changed to:', checkViewBox, '- forcing back to full world view');` - App logic step.
+- Line 3079: `this.resetMapToFullWorldView();` - App logic step.
+- Line 3080: `}` - Ends a logic block.
+- Line 3081: `}` - Ends a logic block.
+- Line 3082: `};` - Ends a logic block.
+- Line 3083: `` - Blank line for readability.
+- Line 3084: `// Force multiple times to override any library changes (only on initial load)` - Developer comment or documentation.
+- Line 3085: `if (!this.userHasZoomed) {` - Starts a logic block.
+- Line 3086: `setTimeout(forceViewBox, 50);` - App logic step.
+- Line 3087: `setTimeout(forceViewBox, 200);` - App logic step.
+- Line 3088: `setTimeout(forceViewBox, 500);` - App logic step.
+- Line 3089: `setTimeout(forceViewBox, 1000);` - App logic step.
+- Line 3090: `}` - Ends a logic block.
+- Line 3091: `}` - Ends a logic block.
+- Line 3092: `` - Blank line for readability.
+- Line 3093: `/**` - Developer comment or documentation.
+- Line 3094: `* Setup viewBox monitoring (for debugging/logging, not auto-reset)` - Developer comment or documentation.
+- Line 3095: `* This helps track viewBox changes but doesn't auto-reset to allow user zoom control` - Developer comment or documentation.
+- Line 3096: `*/` - Developer comment or documentation.
+- Line 3097: `private setupViewBoxObserver(): void {` - Starts a logic block.
+- Line 3098: `if (this.viewBoxObserver) {` - Starts a logic block.
+- Line 3099: `return; // Already set up` - App logic step.
+- Line 3100: `}` - Ends a logic block.
+- Line 3101: `` - Blank line for readability.
+- Line 3102: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 3103: `if (!container) return;` - Checks a condition.
+- Line 3104: `` - Blank line for readability.
+- Line 3105: `const svg = container.querySelector('svg');` - App logic step.
+- Line 3106: `if (!svg) return;` - Checks a condition.
+- Line 3107: `` - Blank line for readability.
+- Line 3108: `const fullWorldViewBox = '0 0 950 550';` - App logic step.
+- Line 3109: `` - Blank line for readability.
+- Line 3110: `// Just observe and log, don't auto-reset (allows user to zoom in if they want)` - Developer comment or documentation.
+- Line 3111: `this.viewBoxObserver = new MutationObserver((mutations) => {` - Starts a logic block.
+- Line 3112: `if (this.destroyed) return;` - Checks a condition.
+- Line 3113: `` - Blank line for readability.
+- Line 3114: `mutations.forEach((mutation) => {` - Starts a logic block.
+- Line 3115: `if (mutation.type === 'attributes' && mutation.attributeName === 'viewBox') {` - Starts a logic block.
+- Line 3116: `const target = mutation.target as SVGElement;` - App logic step.
+- Line 3117: `if (target.tagName === 'svg') {` - Starts a logic block.
+- Line 3118: `const currentViewBox = target.getAttribute('viewBox');` - App logic step.
+- Line 3119: `if (currentViewBox) {` - Starts a logic block.
+- Line 3120: `const [vbX, vbY, vbWidth, vbHeight] = currentViewBox.split(' ').map(Number);` - App logic step.
+- Line 3121: `// Log viewBox changes for debugging` - Developer comment or documentation.
+- Line 3122: `if (currentViewBox !== fullWorldViewBox) {` - Starts a logic block.
+- Line 3123: `console.log('ViewBox changed:', currentViewBox, 'Zoom level:', (950 / vbWidth).toFixed(2) + 'x');` - App logic step.
+- Line 3124: `}` - Ends a logic block.
+- Line 3125: `}` - Ends a logic block.
+- Line 3126: `}` - Ends a logic block.
+- Line 3127: `}` - Ends a logic block.
+- Line 3128: `});` - Ends a logic block.
+- Line 3129: `});` - Ends a logic block.
+- Line 3130: `` - Blank line for readability.
+- Line 3131: `this.viewBoxObserver.observe(svg, {` - Starts a logic block.
+- Line 3132: `attributes: true,` - App logic step.
+- Line 3133: `attributeFilter: ['viewBox']` - App logic step.
+- Line 3134: `});` - Ends a logic block.
+- Line 3135: `` - Blank line for readability.
+- Line 3136: `console.log('ViewBox observer set up for monitoring');` - App logic step.
+- Line 3137: `}` - Ends a logic block.
+- Line 3138: `` - Blank line for readability.
+- Line 3139: `/**` - Developer comment or documentation.
+- Line 3140: `* Setup wheel/scroll event handler for zoom functionality` - Developer comment or documentation.
+- Line 3141: `*/` - Developer comment or documentation.
+- Line 3142: `private setupWheelZoomHandler(): void {` - Starts a logic block.
+- Line 3143: `if (this.boundWheelHandler) {` - Starts a logic block.
+- Line 3144: `return; // Already set up` - App logic step.
+- Line 3145: `}` - Ends a logic block.
+- Line 3146: `` - Blank line for readability.
+- Line 3147: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 3148: `if (!container) return;` - Checks a condition.
+- Line 3149: `` - Blank line for readability.
+- Line 3150: `this.boundWheelHandler = (e: WheelEvent) => {` - Starts a logic block.
+- Line 3151: `if (this.destroyed) return;` - Checks a condition.
+- Line 3152: `` - Blank line for readability.
+- Line 3153: `// Only handle wheel events on the map container` - Developer comment or documentation.
+- Line 3154: `if (e.target !== container && !container.contains(e.target as Node)) {` - Starts a logic block.
+- Line 3155: `return;` - App logic step.
+- Line 3156: `}` - Ends a logic block.
+- Line 3157: `` - Blank line for readability.
+- Line 3158: `// Mark that user is manually zooming` - Developer comment or documentation.
+- Line 3159: `this.userHasZoomed = true;` - App logic step.
+- Line 3160: `` - Blank line for readability.
+- Line 3161: `// Prevent default scroll behavior` - Developer comment or documentation.
+- Line 3162: `e.preventDefault();` - App logic step.
+- Line 3163: `e.stopPropagation();` - App logic step.
+- Line 3164: `` - Blank line for readability.
+- Line 3165: `const svg = container.querySelector('svg');` - App logic step.
+- Line 3166: `if (!svg) return;` - Checks a condition.
+- Line 3167: `` - Blank line for readability.
+- Line 3168: `// Determine zoom direction` - Developer comment or documentation.
+- Line 3169: `// deltaY > 0 = scroll down = zoom out` - Developer comment or documentation.
+- Line 3170: `// deltaY < 0 = scroll up = zoom in` - Developer comment or documentation.
+- Line 3171: `const zoomFactor = e.deltaY > 0 ? 1 / 1.1 : 1.1; // 10% zoom per scroll step` - App logic step.
+- Line 3172: `` - Blank line for readability.
+- Line 3173: `// Get mouse position relative to SVG for zooming around cursor point` - Developer comment or documentation.
+- Line 3174: `const rect = svg.getBoundingClientRect();` - App logic step.
+- Line 3175: `const mouseX = e.clientX - rect.left;` - App logic step.
+- Line 3176: `const mouseY = e.clientY - rect.top;` - App logic step.
+- Line 3177: `` - Blank line for readability.
+- Line 3178: `// Get current viewBox` - Developer comment or documentation.
+- Line 3179: `let currentViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 3180: `if (!currentViewBox) {` - Starts a logic block.
+- Line 3181: `svg.setAttribute('viewBox', '0 0 950 550');` - App logic step.
+- Line 3182: `currentViewBox = '0 0 950 550';` - App logic step.
+- Line 3183: `}` - Ends a logic block.
+- Line 3184: `` - Blank line for readability.
+- Line 3185: `const [x, y, width, height] = currentViewBox.split(' ').map(Number);` - App logic step.
+- Line 3186: `const fullWorldWidth = 950;` - App logic step.
+- Line 3187: `const fullWorldHeight = 550;` - App logic step.
+- Line 3188: `` - Blank line for readability.
+- Line 3189: `// Calculate new viewBox dimensions` - Developer comment or documentation.
+- Line 3190: `const newWidth = width / zoomFactor;` - App logic step.
+- Line 3191: `const newHeight = height / zoomFactor;` - App logic step.
+- Line 3192: `` - Blank line for readability.
+- Line 3193: `// Prevent zooming out beyond full world view` - Developer comment or documentation.
+- Line 3194: `if (newWidth >= fullWorldWidth || newHeight >= fullWorldHeight) {` - Starts a logic block.
+- Line 3195: `// Reset to full world view` - Developer comment or documentation.
+- Line 3196: `this.userHasZoomed = false;` - App logic step.
+- Line 3197: `this.resetMapToFullWorldView();` - App logic step.
+- Line 3198: `return;` - App logic step.
+- Line 3199: `}` - Ends a logic block.
+- Line 3200: `` - Blank line for readability.
+- Line 3201: `// Calculate mouse position in viewBox coordinates` - Developer comment or documentation.
+- Line 3202: `const mouseXInViewBox = x + (mouseX / rect.width) * width;` - App logic step.
+- Line 3203: `const mouseYInViewBox = y + (mouseY / rect.height) * height;` - App logic step.
+- Line 3204: `` - Blank line for readability.
+- Line 3205: `// Calculate new x, y to keep mouse position fixed` - Developer comment or documentation.
+- Line 3206: `const newX = mouseXInViewBox - (mouseX / rect.width) * newWidth;` - App logic step.
+- Line 3207: `const newY = mouseYInViewBox - (mouseY / rect.height) * newHeight;` - App logic step.
+- Line 3208: `` - Blank line for readability.
+- Line 3209: `// Clamp to map bounds` - Developer comment or documentation.
+- Line 3210: `const clampedX = Math.max(0, Math.min(fullWorldWidth - newWidth, newX));` - App logic step.
+- Line 3211: `const clampedY = Math.max(0, Math.min(fullWorldHeight - newHeight, newY));` - App logic step.
+- Line 3212: `` - Blank line for readability.
+- Line 3213: `// Set new viewBox` - Developer comment or documentation.
+- Line 3214: `svg.setAttribute('viewBox', '${clampedX} ${clampedY} ${newWidth} ${newHeight}');` - App logic step.
+- Line 3215: `` - Blank line for readability.
+- Line 3216: `// Update positions after zoom` - Developer comment or documentation.
+- Line 3217: `setTimeout(() => {` - Starts a logic block.
+- Line 3218: `this.updateLabelPositions();` - App logic step.
+- Line 3219: `this.updateCompanyLogosAndLabelsPositions();` - App logic step.
+- Line 3220: `this.refreshTooltipPosition();` - App logic step.
+- Line 3221: `}, 50);` - Ends a logic block.
+- Line 3222: `};` - Ends a logic block.
+- Line 3223: `` - Blank line for readability.
+- Line 3224: `// Add wheel event listener with passive: false to allow preventDefault` - Developer comment or documentation.
+- Line 3225: `container.addEventListener('wheel', this.boundWheelHandler, { passive: false });` - App logic step.
+- Line 3226: `console.log('Wheel zoom handler set up');` - App logic step.
+- Line 3227: `}` - Ends a logic block.
+- Line 3228: `` - Blank line for readability.
+- Line 3229: `/**` - Developer comment or documentation.
+- Line 3230: `* Keep logo/image overlays synced while jsVectorMap handles drag panning.` - Developer comment or documentation.
+- Line 3231: `* The library updates marker positions on drag without emitting viewport change events,` - Developer comment or documentation.
+- Line 3232: `* so we mark labels dirty during drag to keep overlays stuck to markers.` - Developer comment or documentation.
+- Line 3233: `*/` - Developer comment or documentation.
+- Line 3234: `private setupPanSyncHandlers(): void {` - Starts a logic block.
+- Line 3235: `if (this.boundPanSyncMouseDownHandler || this.boundPanSyncMouseMoveHandler || this.boundPanSyncMouseUpHandler) {` - Starts a logic block.
+- Line 3236: `return; // Already set up` - App logic step.
+- Line 3237: `}` - Ends a logic block.
+- Line 3238: `` - Blank line for readability.
+- Line 3239: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 3240: `if (!container) return;` - Checks a condition.
+- Line 3241: `` - Blank line for readability.
+- Line 3242: `this.boundPanSyncMouseDownHandler = (e: MouseEvent) => {` - Starts a logic block.
+- Line 3243: `if (e.button !== 0) return;` - Checks a condition.
+- Line 3244: `` - Blank line for readability.
+- Line 3245: `const target = e.target as HTMLElement;` - App logic step.
+- Line 3246: `if (` - Checks a condition.
+- Line 3247: `target.closest('circle.jvm-marker') ||` - App logic step.
+- Line 3248: `target.closest('image.company-logo-image') ||` - App logic step.
+- Line 3249: `target.closest('text.company-label') ||` - App logic step.
+- Line 3250: `target.closest('.marker-popup') ||` - App logic step.
+- Line 3251: `target.closest('.map-control-btn')` - App logic step.
+- Line 3252: `) {` - Starts a logic block.
+- Line 3253: `return;` - App logic step.
+- Line 3254: `}` - Ends a logic block.
+- Line 3255: `` - Blank line for readability.
+- Line 3256: `this.isDragging = true;` - App logic step.
+- Line 3257: `this.userHasZoomed = true;` - App logic step.
+- Line 3258: `this.markLabelsDirty();` - App logic step.
+- Line 3259: `};` - Ends a logic block.
+- Line 3260: `` - Blank line for readability.
+- Line 3261: `this.boundPanSyncMouseMoveHandler = () => {` - Starts a logic block.
+- Line 3262: `if (!this.isDragging) return;` - Checks a condition.
+- Line 3263: `this.markLabelsDirty();` - App logic step.
+- Line 3264: `};` - Ends a logic block.
+- Line 3265: `` - Blank line for readability.
+- Line 3266: `this.boundPanSyncMouseUpHandler = () => {` - Starts a logic block.
+- Line 3267: `if (!this.isDragging) return;` - Checks a condition.
+- Line 3268: `this.isDragging = false;` - App logic step.
+- Line 3269: `this.markLabelsDirty();` - App logic step.
+- Line 3270: `};` - Ends a logic block.
+- Line 3271: `` - Blank line for readability.
+- Line 3272: `container.addEventListener('mousedown', this.boundPanSyncMouseDownHandler);` - App logic step.
+- Line 3273: `document.addEventListener('mousemove', this.boundPanSyncMouseMoveHandler);` - App logic step.
+- Line 3274: `document.addEventListener('mouseup', this.boundPanSyncMouseUpHandler);` - App logic step.
+- Line 3275: `console.log('Pan sync handlers set up');` - App logic step.
+- Line 3276: `}` - Ends a logic block.
+- Line 3277: `` - Blank line for readability.
+- Line 3278: `/**` - Developer comment or documentation.
+- Line 3279: `* Setup map drag/pan handler for manual panning` - Developer comment or documentation.
+- Line 3280: `*/` - Developer comment or documentation.
+- Line 3281: `private setupMapDragHandler(): void {` - Starts a logic block.
+- Line 3282: `const container = document.getElementById('war-room-map');` - App logic step.
+- Line 3283: `if (!container) return;` - Checks a condition.
+- Line 3284: `` - Blank line for readability.
+- Line 3285: `const svg = container.querySelector('svg');` - App logic step.
+- Line 3286: `if (!svg) return;` - Checks a condition.
+- Line 3287: `` - Blank line for readability.
+- Line 3288: `// Create bound handlers` - Developer comment or documentation.
+- Line 3289: `this.boundDragMouseMoveHandler = (e: MouseEvent) => {` - Starts a logic block.
+- Line 3290: `if (!this.isDragging) return;` - Checks a condition.
+- Line 3291: `` - Blank line for readability.
+- Line 3292: `e.preventDefault();` - App logic step.
+- Line 3293: `e.stopPropagation();` - App logic step.
+- Line 3294: `` - Blank line for readability.
+- Line 3295: `const currentViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 3296: `if (!currentViewBox) return;` - Checks a condition.
+- Line 3297: `` - Blank line for readability.
+- Line 3298: `const [x, y, width, height] = currentViewBox.split(' ').map(Number);` - App logic step.
+- Line 3299: `const fullWorldWidth = 950;` - App logic step.
+- Line 3300: `const fullWorldHeight = 550;` - App logic step.
+- Line 3301: `` - Blank line for readability.
+- Line 3302: `// Calculate mouse delta` - Developer comment or documentation.
+- Line 3303: `const deltaX = (this.dragStartX - e.clientX) * (width / svg.clientWidth);` - App logic step.
+- Line 3304: `const deltaY = (this.dragStartY - e.clientY) * (height / svg.clientHeight);` - App logic step.
+- Line 3305: `` - Blank line for readability.
+- Line 3306: `// Calculate new viewBox position` - Developer comment or documentation.
+- Line 3307: `let newX = this.dragStartViewBoxX + deltaX;` - App logic step.
+- Line 3308: `let newY = this.dragStartViewBoxY + deltaY;` - App logic step.
+- Line 3309: `` - Blank line for readability.
+- Line 3310: `// Clamp to map bounds` - Developer comment or documentation.
+- Line 3311: `newX = Math.max(0, Math.min(fullWorldWidth - width, newX));` - App logic step.
+- Line 3312: `newY = Math.max(0, Math.min(fullWorldHeight - height, newY));` - App logic step.
+- Line 3313: `` - Blank line for readability.
+- Line 3314: `// Update viewBox` - Developer comment or documentation.
+- Line 3315: `svg.setAttribute('viewBox', '${newX} ${newY} ${width} ${height}');` - App logic step.
+- Line 3316: `` - Blank line for readability.
+- Line 3317: `// Mark labels as dirty to trigger RAF update` - Developer comment or documentation.
+- Line 3318: `this.markLabelsDirty();` - App logic step.
+- Line 3319: `};` - Ends a logic block.
+- Line 3320: `` - Blank line for readability.
+- Line 3321: `this.boundDragMouseUpHandler = (e: MouseEvent) => {` - Starts a logic block.
+- Line 3322: `if (!this.isDragging) return;` - Checks a condition.
+- Line 3323: `` - Blank line for readability.
+- Line 3324: `this.isDragging = false;` - App logic step.
+- Line 3325: `document.body.style.cursor = '';` - App logic step.
+- Line 3326: `document.body.style.userSelect = '';` - App logic step.
+- Line 3327: `` - Blank line for readability.
+- Line 3328: `// Mark labels as dirty for final update` - Developer comment or documentation.
+- Line 3329: `this.markLabelsDirty();` - App logic step.
+- Line 3330: `};` - Ends a logic block.
+- Line 3331: `` - Blank line for readability.
+- Line 3332: `// Add mousedown handler to SVG` - Developer comment or documentation.
+- Line 3333: `svg.addEventListener('mousedown', (e: MouseEvent) => {` - Starts a logic block.
+- Line 3334: `// Don't start drag if clicking on a marker, popup, or control button` - Developer comment or documentation.
+- Line 3335: `const target = e.target as HTMLElement;` - App logic step.
+- Line 3336: `if (` - Checks a condition.
+- Line 3337: `target.closest('circle.jvm-marker') ||` - App logic step.
+- Line 3338: `target.closest('.marker-popup') ||` - App logic step.
+- Line 3339: `target.closest('.map-control-btn') ||` - App logic step.
+- Line 3340: `target.closest('image.company-logo-image') ||` - App logic step.
+- Line 3341: `target.closest('text.company-label')` - App logic step.
+- Line 3342: `) {` - Starts a logic block.
+- Line 3343: `return;` - App logic step.
+- Line 3344: `}` - Ends a logic block.
+- Line 3345: `` - Blank line for readability.
+- Line 3346: `// Don't start drag if right-click` - Developer comment or documentation.
+- Line 3347: `if (e.button !== 0) return;` - Checks a condition.
+- Line 3348: `` - Blank line for readability.
+- Line 3349: `e.preventDefault();` - App logic step.
+- Line 3350: `e.stopPropagation();` - App logic step.
+- Line 3351: `` - Blank line for readability.
+- Line 3352: `const currentViewBox = svg.getAttribute('viewBox');` - App logic step.
+- Line 3353: `if (!currentViewBox) return;` - Checks a condition.
+- Line 3354: `` - Blank line for readability.
+- Line 3355: `const [x, y] = currentViewBox.split(' ').map(Number);` - App logic step.
+- Line 3356: `` - Blank line for readability.
+- Line 3357: `this.isDragging = true;` - App logic step.
+- Line 3358: `this.dragStartX = e.clientX;` - App logic step.
+- Line 3359: `this.dragStartY = e.clientY;` - App logic step.
+- Line 3360: `this.dragStartViewBoxX = x;` - App logic step.
+- Line 3361: `this.dragStartViewBoxY = y;` - App logic step.
+- Line 3362: `this.userHasZoomed = true;` - App logic step.
+- Line 3363: `` - Blank line for readability.
+- Line 3364: `document.body.style.cursor = 'grabbing';` - App logic step.
+- Line 3365: `document.body.style.userSelect = 'none';` - App logic step.
+- Line 3366: `` - Blank line for readability.
+- Line 3367: `// Add global mouse move and up handlers` - Developer comment or documentation.
+- Line 3368: `document.addEventListener('mousemove', this.boundDragMouseMoveHandler!);` - App logic step.
+- Line 3369: `document.addEventListener('mouseup', this.boundDragMouseUpHandler!);` - App logic step.
+- Line 3370: `});` - Ends a logic block.
+- Line 3371: `` - Blank line for readability.
+- Line 3372: `console.log('Map drag handler set up');` - App logic step.
+- Line 3373: `}` - Ends a logic block.
+- Line 3374: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-map/war-room-map.component.html
+- Line 1: `<div class="war-room-map-container">` - Structural container.
+- Line 2: `<!-- Grid Overlay -->` - UI element definition.
+- Line 3: `<div class="grid-overlay"></div>` - Structural container.
+- Line 4: `` - Blank line for readability.
+- Line 5: `<!-- Map Container -->` - UI element definition.
+- Line 6: `<div class="map-container">` - Structural container.
+- Line 7: `<div id="war-room-map"></div>` - Structural container.
+- Line 8: `` - Blank line for readability.
+- Line 9: `<!-- Map controls: zoom in, zoom out, fullscreen (grouped top-right) -->` - UI element definition.
+- Line 10: `<div class="map-controls">` - Structural container.
+- Line 11: `<button type="button" class="map-control-btn zoom-in-btn" (click)="zoomIn()" aria-label="Zoom in"` - Clickable button.
+- Line 12: `title="Zoom in">+</button>` - UI element definition.
+- Line 13: `<button type="button" class="map-control-btn zoom-out-btn" (click)="zoomOut()" aria-label="Zoom out"` - Clickable button.
+- Line 14: `title="Zoom out">−</button>` - UI element definition.
+- Line 15: `<button type="button" class="map-control-btn fullscreen-btn" (click)="toggleFullscreen()"` - Clickable button.
+- Line 16: `[attr.aria-label]="getFullscreenState() ? 'Exit fullscreen' : 'Enter fullscreen'"` - UI element definition.
+- Line 17: `[title]="getFullscreenState() ? 'Exit Fullscreen (ESC)' : 'Enter Fullscreen'">` - UI element definition.
+- Line 18: `<span class="fullscreen-icon">{{ getFullscreenState() ? '⤓' : '⤢' }}</span>` - UI element definition.
+- Line 19: `</button>` - UI element definition.
+- Line 20: `</div>` - UI element definition.
+- Line 21: `</div>` - UI element definition.
+- Line 22: `<!-- Node Markers Overlay -->` - UI element definition.
+- Line 23: `<div class="node-markers-overlay">` - Structural container.
+- Line 24: `@for (node of nodes(); track node.id) {` - Starts a logic block.
+- Line 25: `<!-- Hide overlay label for companies with logos - they're shown in SVG instead -->` - UI element definition.
+- Line 26: `@if (!((node.company && (node.company.toLowerCase().includes('creative carriage') ||` - Checks a condition.
+- Line 27: `node.company.toLowerCase().includes('alexander dennis') || node.company.toLowerCase().includes('karsan') ||` - UI element definition.
+- Line 28: `node.company.toLowerCase().includes('karzan') || node.company.toLowerCase().includes('arboc') ||` - UI element definition.
+- Line 29: `node.company.toLowerCase().includes('arbroc') || node.company.toLowerCase().includes('tam') ||` - UI element definition.
+- Line 30: `node.company.toLowerCase().includes('nfl') || node.company.toLowerCase().includes('new flyer') ||` - UI element definition.
+- Line 31: `node.company.toLowerCase().includes('nova'))) || node.logo)) {` - Starts a logic block.
+- Line 32: `<div class="node-marker-wrapper" [style.top.px]="getNodePosition(node).top"` - Structural container.
+- Line 33: `[style.left.px]="getNodePosition(node).left" [class.selected]="isNodeSelected(node)" [class.hub]="isHub(node)">` - UI element definition.
+- Line 34: `<div class="node-marker" [class.hub-marker]="isHub(node)"></div>` - Structural container.
+- Line 35: `<div class="glass-tag">{{ getNodeDisplayName(node) }}</div>` - Structural container.
+- Line 36: `</div>` - UI element definition.
+- Line 37: `}` - Ends a logic block.
+- Line 38: `}` - Ends a logic block.
+- Line 39: `</div>` - UI element definition.
+- Line 40: `` - Blank line for readability.
+- Line 41: `<!-- Company Logo Hover Tooltip -->` - UI element definition.
+- Line 42: `@if (hoveredCompanyTooltip()) {` - Starts a logic block.
+- Line 43: `<div class="company-logo-tooltip"` - Structural container.
+- Line 44: `[style.top.px]="hoveredCompanyTooltip()!.position.top"` - UI element definition.
+- Line 45: `[style.left.px]="hoveredCompanyTooltip()!.position.left">` - UI element definition.
+- Line 46: `<div class="tooltip-content">` - Structural container.
+- Line 47: `<div class="tooltip-header">` - Structural container.
+- Line 48: `<img [src]="hoveredCompanyTooltip()!.logoPath"` - UI element definition.
+- Line 49: `[alt]="hoveredCompanyTooltip()!.displayName + ' logo'"` - UI element definition.
+- Line 50: `class="tooltip-logo"` - UI element definition.
+- Line 51: `(error)="onLogoError($event)">` - UI element definition.
+- Line 52: `<div class="tooltip-title">{{ hoveredCompanyTooltip()!.displayName }}</div>` - Structural container.
+- Line 53: `</div>` - UI element definition.
+- Line 54: `<div class="tooltip-body">` - Structural container.
+- Line 55: `<div class="tooltip-description">{{ hoveredCompanyTooltip()!.description }}</div>` - Structural container.
+- Line 56: `<div class="tooltip-location">` - Structural container.
+- Line 57: `<span class="tooltip-label">LOCATION:</span>` - UI element definition.
+- Line 58: `<span class="tooltip-value">{{ hoveredCompanyTooltip()!.node.city }}{{ hoveredCompanyTooltip()!.node.country ? ', ' + hoveredCompanyTooltip()!.node.country : '' }}</span>` - UI element definition.
+- Line 59: `</div>` - UI element definition.
+- Line 60: `<div class="tooltip-status">` - Structural container.
+- Line 61: `<span class="tooltip-label">STATUS:</span>` - UI element definition.
+- Line 62: `<span class="tooltip-value status-online">{{ hoveredCompanyTooltip()!.node.status }}</span>` - UI element definition.
+- Line 63: `</div>` - UI element definition.
+- Line 64: `</div>` - UI element definition.
+- Line 65: `</div>` - UI element definition.
+- Line 66: `<div class="tooltip-arrow"></div>` - Structural container.
+- Line 67: `</div>` - UI element definition.
+- Line 68: `}` - Ends a logic block.
+- Line 69: `</div>` - UI element definition.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-map/war-room-map.component.scss
+- Line 1: `@use '../../war-room.component.scss' as *;` - Styling rule.
+- Line 2: `` - Blank line for readability.
+- Line 3: `.war-room-map-container {` - Starts a logic block.
+- Line 4: `position: relative;` - Defines a visual property.
+- Line 5: `width: 100%;` - Defines a visual property.
+- Line 6: `height: 100%;` - Defines a visual property.
+- Line 7: `min-height: 280px;` - Defines a visual property.
+- Line 8: `max-height: 100%; // Ensure it doesn't exceed parent` - Defines a visual property.
+- Line 9: `overflow: hidden;` - Defines a visual property.
+- Line 10: `background-color: #ffffff;` - Defines a visual property.
+- Line 11: `display: flex;` - Defines a visual property.
+- Line 12: `flex-direction: column;` - Defines a visual property.
+- Line 13: `` - Blank line for readability.
+- Line 14: `// Set CSS variables for theme-aware fullscreen` - Developer comment or documentation.
+- Line 15: `&[data-theme-mode="light"] {` - Starts a logic block.
+- Line 16: `--war-map-bg: #f5f5f5;` - Defines a visual property.
+- Line 17: `}` - Ends a logic block.
+- Line 18: `` - Blank line for readability.
+- Line 19: `&[data-theme-mode="dark"] {` - Starts a logic block.
+- Line 20: `--war-map-bg: #1a1a1a;` - Defines a visual property.
+- Line 21: `}` - Ends a logic block.
+- Line 22: `` - Blank line for readability.
+- Line 23: `// Default fallback` - Developer comment or documentation.
+- Line 24: `--war-map-bg: #1a1a1a;` - Defines a visual property.
+- Line 25: `` - Blank line for readability.
+- Line 26: `// Fullscreen styles` - Developer comment or documentation.
+- Line 27: `&:fullscreen,` - Defines a visual property.
+- Line 28: `&:-webkit-full-screen,` - Defines a visual property.
+- Line 29: `&:-moz-full-screen,` - Defines a visual property.
+- Line 30: `&:-ms-fullscreen {` - Starts a logic block.
+- Line 31: `width: 100vw !important;` - Loads external tools or data types.
+- Line 32: `height: 100vh !important;` - Loads external tools or data types.
+- Line 33: `min-height: 100vh !important;` - Loads external tools or data types.
+- Line 34: `max-height: 100vh !important;` - Loads external tools or data types.
+- Line 35: `background-color: #ffffff !important;` - Loads external tools or data types.
+- Line 36: `z-index: 9999;` - Defines a visual property.
+- Line 37: `padding: 0 !important;` - Loads external tools or data types.
+- Line 38: `margin: 0 !important;` - Loads external tools or data types.
+- Line 39: `border: none !important;` - Loads external tools or data types.
+- Line 40: `border-radius: 0 !important;` - Loads external tools or data types.
+- Line 41: `position: fixed !important;` - Loads external tools or data types.
+- Line 42: `top: 0 !important;` - Loads external tools or data types.
+- Line 43: `left: 0 !important;` - Loads external tools or data types.
+- Line 44: `right: 0 !important;` - Loads external tools or data types.
+- Line 45: `bottom: 0 !important;` - Loads external tools or data types.
+- Line 46: `` - Blank line for readability.
+- Line 47: `.map-container {` - Starts a logic block.
+- Line 48: `width: 100% !important;` - Loads external tools or data types.
+- Line 49: `height: 100% !important;` - Loads external tools or data types.
+- Line 50: `min-height: 100vh !important;` - Loads external tools or data types.
+- Line 51: `max-height: 100vh !important;` - Loads external tools or data types.
+- Line 52: `background-color: var(--war-map-bg, #1a1a1a) !important;` - Loads external tools or data types.
+- Line 53: `position: absolute !important;` - Loads external tools or data types.
+- Line 54: `top: 0 !important;` - Loads external tools or data types.
+- Line 55: `left: 0 !important;` - Loads external tools or data types.
+- Line 56: `right: 0 !important;` - Loads external tools or data types.
+- Line 57: `bottom: 0 !important;` - Loads external tools or data types.
+- Line 58: `}` - Ends a logic block.
+- Line 59: `` - Blank line for readability.
+- Line 60: `#war-room-map {` - Starts a logic block.
+- Line 61: `width: 100% !important;` - Loads external tools or data types.
+- Line 62: `height: 100% !important;` - Loads external tools or data types.
+- Line 63: `min-height: 100vh !important;` - Loads external tools or data types.
+- Line 64: `max-height: 100vh !important;` - Loads external tools or data types.
+- Line 65: `background-color: #1a1a1a !important;` - Loads external tools or data types.
+- Line 66: `border-radius: 0 !important;` - Loads external tools or data types.
+- Line 67: `border: none !important;` - Loads external tools or data types.
+- Line 68: `box-shadow: none !important;` - Loads external tools or data types.
+- Line 69: `outline: none !important;` - Loads external tools or data types.
+- Line 70: `padding: 0 !important;` - Loads external tools or data types.
+- Line 71: `margin: 0 !important;` - Loads external tools or data types.
+- Line 72: `}` - Ends a logic block.
+- Line 73: `` - Blank line for readability.
+- Line 74: `// Theme-aware fullscreen background` - Developer comment or documentation.
+- Line 75: `[data-theme-mode="light"] & #war-room-map {` - Starts a logic block.
+- Line 76: `background-color: #f5f5f5 !important;` - Loads external tools or data types.
+- Line 77: `}` - Ends a logic block.
+- Line 78: `` - Blank line for readability.
+- Line 79: `[data-theme-mode="dark"] & #war-room-map {` - Starts a logic block.
+- Line 80: `background-color: #1a1a1a !important;` - Loads external tools or data types.
+- Line 81: `}` - Ends a logic block.
+- Line 82: `` - Blank line for readability.
+- Line 83: `.grid-overlay {` - Starts a logic block.
+- Line 84: `width: 100% !important;` - Loads external tools or data types.
+- Line 85: `height: 100% !important;` - Loads external tools or data types.
+- Line 86: `top: 0 !important;` - Loads external tools or data types.
+- Line 87: `left: 0 !important;` - Loads external tools or data types.
+- Line 88: `right: 0 !important;` - Loads external tools or data types.
+- Line 89: `bottom: 0 !important;` - Loads external tools or data types.
+- Line 90: `}` - Ends a logic block.
+- Line 91: `` - Blank line for readability.
+- Line 92: `.node-markers-overlay {` - Starts a logic block.
+- Line 93: `width: 100% !important;` - Loads external tools or data types.
+- Line 94: `height: 100% !important;` - Loads external tools or data types.
+- Line 95: `top: 0 !important;` - Loads external tools or data types.
+- Line 96: `left: 0 !important;` - Loads external tools or data types.
+- Line 97: `right: 0 !important;` - Loads external tools or data types.
+- Line 98: `bottom: 0 !important;` - Loads external tools or data types.
+- Line 99: `}` - Ends a logic block.
+- Line 100: `` - Blank line for readability.
+- Line 101: `::ng-deep {` - Starts a logic block.
+- Line 102: `.jvm-container {` - Starts a logic block.
+- Line 103: `width: 100% !important;` - Loads external tools or data types.
+- Line 104: `height: 100% !important;` - Loads external tools or data types.
+- Line 105: `min-height: 100vh !important;` - Loads external tools or data types.
+- Line 106: `max-height: 100vh !important;` - Loads external tools or data types.
+- Line 107: `background-color: #1a1a1a !important;` - Loads external tools or data types.
+- Line 108: `border: none !important;` - Loads external tools or data types.
+- Line 109: `border-radius: 0 !important;` - Loads external tools or data types.
+- Line 110: `box-shadow: none !important;` - Loads external tools or data types.
+- Line 111: `padding: 0 !important;` - Loads external tools or data types.
+- Line 112: `margin: 0 !important;` - Loads external tools or data types.
+- Line 113: `outline: none !important;` - Loads external tools or data types.
+- Line 114: `}` - Ends a logic block.
+- Line 115: `` - Blank line for readability.
+- Line 116: `// Theme-aware fullscreen jvm-container background` - Developer comment or documentation.
+- Line 117: `[data-theme-mode="light"] & .jvm-container {` - Starts a logic block.
+- Line 118: `background-color: #f5f5f5 !important;` - Loads external tools or data types.
+- Line 119: `}` - Ends a logic block.
+- Line 120: `` - Blank line for readability.
+- Line 121: `[data-theme-mode="dark"] & .jvm-container {` - Starts a logic block.
+- Line 122: `background-color: #1a1a1a !important;` - Loads external tools or data types.
+- Line 123: `}` - Ends a logic block.
+- Line 124: `` - Blank line for readability.
+- Line 125: `svg {` - Starts a logic block.
+- Line 126: `width: 100% !important;` - Loads external tools or data types.
+- Line 127: `height: 100% !important;` - Loads external tools or data types.
+- Line 128: `min-height: 100vh !important;` - Loads external tools or data types.
+- Line 129: `max-height: 100vh !important;` - Loads external tools or data types.
+- Line 130: `border: none !important;` - Loads external tools or data types.
+- Line 131: `border-radius: 0 !important;` - Loads external tools or data types.
+- Line 132: `box-shadow: none !important;` - Loads external tools or data types.
+- Line 133: `}` - Ends a logic block.
+- Line 134: `}` - Ends a logic block.
+- Line 135: `}` - Ends a logic block.
+- Line 136: `}` - Ends a logic block.
+- Line 137: `` - Blank line for readability.
+- Line 138: `.grid-overlay {` - Starts a logic block.
+- Line 139: `position: absolute;` - Defines a visual property.
+- Line 140: `inset: 0;` - Defines a visual property.
+- Line 141: `background-image:` - Defines a visual property.
+- Line 142: `linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),` - Styling rule.
+- Line 143: `linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);` - Styling rule.
+- Line 144: `background-size: 40px 40px;` - Defines a visual property.
+- Line 145: `opacity: 0.8;` - Defines a visual property.
+- Line 146: `pointer-events: none;` - Defines a visual property.
+- Line 147: `z-index: 5;` - Defines a visual property.
+- Line 148: `}` - Ends a logic block.
+- Line 149: `` - Blank line for readability.
+- Line 150: `.map-container {` - Starts a logic block.
+- Line 151: `position: absolute;` - Defines a visual property.
+- Line 152: `inset: 0;` - Defines a visual property.
+- Line 153: `z-index: 10;` - Defines a visual property.
+- Line 154: `min-height: 280px;` - Defines a visual property.
+- Line 155: `height: 100%;` - Defines a visual property.
+- Line 156: `max-height: 100%; // Ensure it doesn't exceed parent` - Defines a visual property.
+- Line 157: `overflow: hidden; // Changed from visible to hidden to prevent map from being cut off` - Defines a visual property.
+- Line 158: `background-color: #1a1a1a;` - Defines a visual property.
+- Line 159: `display: flex;` - Defines a visual property.
+- Line 160: `flex-direction: column;` - Defines a visual property.
+- Line 161: `align-items: center; // Center content horizontally` - Defines a visual property.
+- Line 162: `justify-content: center; // Center content vertically` - Defines a visual property.
+- Line 163: `` - Blank line for readability.
+- Line 164: `// Theme-aware background` - Developer comment or documentation.
+- Line 165: `[data-theme-mode="light"] & {` - Starts a logic block.
+- Line 166: `background-color: #f5f5f5;` - Defines a visual property.
+- Line 167: `}` - Ends a logic block.
+- Line 168: `` - Blank line for readability.
+- Line 169: `[data-theme-mode="dark"] & {` - Starts a logic block.
+- Line 170: `background-color: #1a1a1a;` - Defines a visual property.
+- Line 171: `}` - Ends a logic block.
+- Line 172: `}` - Ends a logic block.
+- Line 173: `` - Blank line for readability.
+- Line 174: `#war-room-map {` - Starts a logic block.
+- Line 175: `width: 100%;` - Defines a visual property.
+- Line 176: `height: 100%;` - Defines a visual property.
+- Line 177: `min-height: 280px;` - Defines a visual property.
+- Line 178: `max-height: 100%; // Ensure it doesn't exceed parent` - Defines a visual property.
+- Line 179: `position: relative;` - Defines a visual property.
+- Line 180: `background-color: #1a1a1a;` - Defines a visual property.
+- Line 181: `border-radius: 0.35rem;` - Defines a visual property.
+- Line 182: `display: flex;` - Defines a visual property.
+- Line 183: `flex-direction: column;` - Defines a visual property.
+- Line 184: `align-items: center; // Center content horizontally` - Defines a visual property.
+- Line 185: `justify-content: center; // Center content vertically` - Defines a visual property.
+- Line 186: `visibility: visible !important;` - Loads external tools or data types.
+- Line 187: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 188: `box-sizing: border-box;` - Defines a visual property.
+- Line 189: `overflow: hidden; // Ensure map doesn't overflow container` - Defines a visual property.
+- Line 190: `// Maintain map aspect ratio (950:550 = 1.727:1)` - Developer comment or documentation.
+- Line 191: `aspect-ratio: 950 / 550; // This helps maintain proper proportions` - Defines a visual property.
+- Line 192: `` - Blank line for readability.
+- Line 193: `// Theme-aware background` - Developer comment or documentation.
+- Line 194: `[data-theme-mode="light"] & {` - Starts a logic block.
+- Line 195: `background-color: #f5f5f5;` - Defines a visual property.
+- Line 196: `}` - Ends a logic block.
+- Line 197: `` - Blank line for readability.
+- Line 198: `[data-theme-mode="dark"] & {` - Starts a logic block.
+- Line 199: `background-color: #1a1a1a;` - Defines a visual property.
+- Line 200: `}` - Ends a logic block.
+- Line 201: `` - Blank line for readability.
+- Line 202: `// Direct style for zoom container to override library inline styles` - Developer comment or documentation.
+- Line 203: `// Positioned top-right, grouped with fullscreen button` - Developer comment or documentation.
+- Line 204: `::ng-deep .jvm-zoom-container {` - Starts a logic block.
+- Line 205: `position: absolute !important;` - Loads external tools or data types.
+- Line 206: `top: 6px !important;` - Loads external tools or data types.
+- Line 207: `bottom: auto !important;` - Loads external tools or data types.
+- Line 208: `right: 0.5rem !important;` - Loads external tools or data types.
+- Line 209: `left: auto !important;` - Loads external tools or data types.
+- Line 210: `display: flex !important;` - Loads external tools or data types.
+- Line 211: `flex-direction: column !important;` - Loads external tools or data types.
+- Line 212: `gap: 0.25rem !important;` - Loads external tools or data types.
+- Line 213: `z-index: 40 !important;` - Loads external tools or data types.
+- Line 214: `}` - Ends a logic block.
+- Line 215: `` - Blank line for readability.
+- Line 216: `::ng-deep {` - Starts a logic block.
+- Line 217: `.jvm-container {` - Starts a logic block.
+- Line 218: `background-color: #ffffff !important;` - Loads external tools or data types.
+- Line 219: `width: 100% !important;` - Loads external tools or data types.
+- Line 220: `height: 100% !important;` - Loads external tools or data types.
+- Line 221: `position: relative !important; // Required for absolute positioned SVG` - Loads external tools or data types.
+- Line 222: `visibility: visible !important;` - Loads external tools or data types.
+- Line 223: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 224: `display: block !important; // Ensure container is displayed` - Loads external tools or data types.
+- Line 225: `overflow: hidden !important; // Prevent overflow` - Loads external tools or data types.
+- Line 226: `top: 0 !important;` - Loads external tools or data types.
+- Line 227: `left: 0 !important;` - Loads external tools or data types.
+- Line 228: `margin: 0 !important;` - Loads external tools or data types.
+- Line 229: `padding: 0 !important;` - Loads external tools or data types.
+- Line 230: `}` - Ends a logic block.
+- Line 231: `` - Blank line for readability.
+- Line 232: `// Theme-aware jvm-container background` - Developer comment or documentation.
+- Line 233: `[data-theme-mode="light"] & .jvm-container {` - Starts a logic block.
+- Line 234: `background-color: #f5f5f5 !important;` - Loads external tools or data types.
+- Line 235: `}` - Ends a logic block.
+- Line 236: `` - Blank line for readability.
+- Line 237: `[data-theme-mode="dark"] & .jvm-container {` - Starts a logic block.
+- Line 238: `background-color: #1a1a1a !important;` - Loads external tools or data types.
+- Line 239: `}` - Ends a logic block.
+- Line 240: `` - Blank line for readability.
+- Line 241: `// Ensure SVG is visible and responsive` - Developer comment or documentation.
+- Line 242: `svg {` - Starts a logic block.
+- Line 243: `width: 100% !important;` - Loads external tools or data types.
+- Line 244: `height: 100% !important;` - Loads external tools or data types.
+- Line 245: `display: block !important;` - Loads external tools or data types.
+- Line 246: `visibility: visible !important;` - Loads external tools or data types.
+- Line 247: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 248: `max-width: 100% !important; // Prevent overflow` - Loads external tools or data types.
+- Line 249: `max-height: 100% !important; // Prevent overflow` - Loads external tools or data types.
+- Line 250: `// Remove fixed width/height attributes via CSS override` - Developer comment or documentation.
+- Line 251: `box-sizing: border-box !important;` - Loads external tools or data types.
+- Line 252: `position: relative !important;` - Loads external tools or data types.
+- Line 253: `top: 0 !important;` - Loads external tools or data types.
+- Line 254: `left: 0 !important;` - Loads external tools or data types.
+- Line 255: `margin: 0 auto !important; // Center horizontally` - Loads external tools or data types.
+- Line 256: `padding: 0 !important;` - Loads external tools or data types.
+- Line 257: `}` - Ends a logic block.
+- Line 258: `` - Blank line for readability.
+- Line 259: `// Override any fixed width/height attributes on SVG` - Developer comment or documentation.
+- Line 260: `svg[width],` - Styling rule.
+- Line 261: `svg[height] {` - Starts a logic block.
+- Line 262: `width: 100% !important;` - Loads external tools or data types.
+- Line 263: `height: 100% !important;` - Loads external tools or data types.
+- Line 264: `}` - Ends a logic block.
+- Line 265: `` - Blank line for readability.
+- Line 266: `#jvm-regions-group path {` - Starts a logic block.
+- Line 267: `fill: #2d2d2d !important;` - Loads external tools or data types.
+- Line 268: `stroke: #3d3d3d !important;` - Loads external tools or data types.
+- Line 269: `stroke-width: 0.5 !important;` - Loads external tools or data types.
+- Line 270: `visibility: visible !important;` - Loads external tools or data types.
+- Line 271: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 272: `fill-opacity: 0.7 !important;` - Loads external tools or data types.
+- Line 273: `}` - Ends a logic block.
+- Line 274: `` - Blank line for readability.
+- Line 275: `#jvm-regions-group path:hover {` - Starts a logic block.
+- Line 276: `fill: #404040 !important;` - Loads external tools or data types.
+- Line 277: `}` - Ends a logic block.
+- Line 278: `` - Blank line for readability.
+- Line 279: `// Light theme colors` - Developer comment or documentation.
+- Line 280: `[data-theme-mode="light"] & {` - Starts a logic block.
+- Line 281: `#jvm-regions-group path {` - Starts a logic block.
+- Line 282: `fill: #e0e0e0 !important;` - Loads external tools or data types.
+- Line 283: `stroke: #d0d0d0 !important;` - Loads external tools or data types.
+- Line 284: `fill-opacity: 0.8 !important;` - Loads external tools or data types.
+- Line 285: `}` - Ends a logic block.
+- Line 286: `` - Blank line for readability.
+- Line 287: `#jvm-regions-group path:hover {` - Starts a logic block.
+- Line 288: `fill: #d5d5d5 !important;` - Loads external tools or data types.
+- Line 289: `}` - Ends a logic block.
+- Line 290: `}` - Ends a logic block.
+- Line 291: `` - Blank line for readability.
+- Line 292: `// Dark theme colors` - Developer comment or documentation.
+- Line 293: `[data-theme-mode="dark"] & {` - Starts a logic block.
+- Line 294: `#jvm-regions-group path {` - Starts a logic block.
+- Line 295: `fill: #2d2d2d !important;` - Loads external tools or data types.
+- Line 296: `stroke: #3d3d3d !important;` - Loads external tools or data types.
+- Line 297: `fill-opacity: 0.7 !important;` - Loads external tools or data types.
+- Line 298: `}` - Ends a logic block.
+- Line 299: `` - Blank line for readability.
+- Line 300: `#jvm-regions-group path:hover {` - Starts a logic block.
+- Line 301: `fill: #404040 !important;` - Loads external tools or data types.
+- Line 302: `}` - Ends a logic block.
+- Line 303: `}` - Ends a logic block.
+- Line 304: `` - Blank line for readability.
+- Line 305: `.jvm-series-lines path,` - Styling rule.
+- Line 306: `.jvm-series-lines line {` - Starts a logic block.
+- Line 307: `stroke: #00FF41 !important; // Tactical green` - Loads external tools or data types.
+- Line 308: `stroke-width: 3 !important;` - Loads external tools or data types.
+- Line 309: `stroke-opacity: 0.8 !important;` - Loads external tools or data types.
+- Line 310: `visibility: visible !important;` - Loads external tools or data types.
+- Line 311: `}` - Ends a logic block.
+- Line 312: `` - Blank line for readability.
+- Line 313: `.jvm-marker {` - Starts a logic block.
+- Line 314: `fill: #00FF41 !important; // Tactical green for markers` - Loads external tools or data types.
+- Line 315: `visibility: visible !important;` - Loads external tools or data types.
+- Line 316: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 317: `cursor: pointer !important;` - Loads external tools or data types.
+- Line 318: `pointer-events: auto !important; // Ensure markers are clickable` - Loads external tools or data types.
+- Line 319: `z-index: 30 !important; // Higher than overlay` - Loads external tools or data types.
+- Line 320: `}` - Ends a logic block.
+- Line 321: `` - Blank line for readability.
+- Line 322: `// Ensure all marker circles are clickable` - Developer comment or documentation.
+- Line 323: `circle.jvm-marker,` - Styling rule.
+- Line 324: `circle[data-index],` - Styling rule.
+- Line 325: `circle[class*="jvm-marker"] {` - Starts a logic block.
+- Line 326: `cursor: pointer !important;` - Loads external tools or data types.
+- Line 327: `pointer-events: auto !important;` - Loads external tools or data types.
+- Line 328: `z-index: 30 !important;` - Loads external tools or data types.
+- Line 329: `}` - Ends a logic block.
+- Line 330: `` - Blank line for readability.
+- Line 331: `// Ensure all map elements are visible` - Developer comment or documentation.
+- Line 332: `.jvm-series-container,` - Styling rule.
+- Line 333: `.jvm-zoom-container,` - Styling rule.
+- Line 334: `.jvm-tooltip {` - Starts a logic block.
+- Line 335: `visibility: visible !important;` - Loads external tools or data types.
+- Line 336: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 337: `}` - Ends a logic block.
+- Line 338: `` - Blank line for readability.
+- Line 339: `// Enhanced tooltip styling for company descriptions` - Developer comment or documentation.
+- Line 340: `.jvm-tooltip {` - Starts a logic block.
+- Line 341: `max-width: 350px !important;` - Loads external tools or data types.
+- Line 342: `background-color: rgba(26, 26, 26, 0.95) !important;` - Loads external tools or data types.
+- Line 343: `border: 1px solid #00FF41 !important;` - Loads external tools or data types.
+- Line 344: `border-radius: 4px !important;` - Loads external tools or data types.
+- Line 345: `padding: 12px !important;` - Loads external tools or data types.
+- Line 346: `box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;` - Loads external tools or data types.
+- Line 347: `z-index: 1000 !important;` - Loads external tools or data types.
+- Line 348: `` - Blank line for readability.
+- Line 349: `// Ensure text is readable` - Developer comment or documentation.
+- Line 350: `color: #ffffff !important;` - Loads external tools or data types.
+- Line 351: `font-family: Arial, sans-serif !important;` - Loads external tools or data types.
+- Line 352: `line-height: 1.5 !important;` - Loads external tools or data types.
+- Line 353: `}` - Ends a logic block.
+- Line 354: `}` - Ends a logic block.
+- Line 355: `` - Blank line for readability.
+- Line 356: `// Marker popup (shown on click)` - Developer comment or documentation.
+- Line 357: `.marker-popup {` - Starts a logic block.
+- Line 358: `position: absolute;` - Defines a visual property.
+- Line 359: `z-index: 2000;` - Defines a visual property.
+- Line 360: `background-color: rgba(26, 26, 26, 0.98);` - Defines a visual property.
+- Line 361: `border: 2px solid #00FF41;` - Defines a visual property.
+- Line 362: `border-radius: 8px;` - Defines a visual property.
+- Line 363: `padding: 0;` - Defines a visual property.
+- Line 364: `min-width: 300px;` - Defines a visual property.
+- Line 365: `max-width: 400px;` - Defines a visual property.
+- Line 366: `box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 367: `pointer-events: auto;` - Defines a visual property.
+- Line 368: `animation: popupFadeIn 0.2s ease-out;` - Defines a visual property.
+- Line 369: `` - Blank line for readability.
+- Line 370: `.marker-popup-header {` - Starts a logic block.
+- Line 371: `display: flex;` - Defines a visual property.
+- Line 372: `justify-content: space-between;` - Defines a visual property.
+- Line 373: `align-items: center;` - Defines a visual property.
+- Line 374: `padding: 12px 16px;` - Defines a visual property.
+- Line 375: `border-bottom: 1px solid rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 376: `background-color: rgba(0, 255, 65, 0.1);` - Defines a visual property.
+- Line 377: `` - Blank line for readability.
+- Line 378: `.marker-popup-title {` - Starts a logic block.
+- Line 379: `margin: 0;` - Defines a visual property.
+- Line 380: `font-size: 16px;` - Defines a visual property.
+- Line 381: `font-weight: 600;` - Defines a visual property.
+- Line 382: `color: #00FF41;` - Defines a visual property.
+- Line 383: `flex: 1;` - Defines a visual property.
+- Line 384: `}` - Ends a logic block.
+- Line 385: `` - Blank line for readability.
+- Line 386: `.marker-popup-close {` - Starts a logic block.
+- Line 387: `background: none;` - Defines a visual property.
+- Line 388: `border: none;` - Defines a visual property.
+- Line 389: `color: #00FF41;` - Defines a visual property.
+- Line 390: `font-size: 24px;` - Defines a visual property.
+- Line 391: `line-height: 1;` - Defines a visual property.
+- Line 392: `cursor: pointer;` - Defines a visual property.
+- Line 393: `padding: 0;` - Defines a visual property.
+- Line 394: `width: 24px;` - Defines a visual property.
+- Line 395: `height: 24px;` - Defines a visual property.
+- Line 396: `display: flex;` - Defines a visual property.
+- Line 397: `align-items: center;` - Defines a visual property.
+- Line 398: `justify-content: center;` - Defines a visual property.
+- Line 399: `transition: color 0.2s;` - Defines a visual property.
+- Line 400: `` - Blank line for readability.
+- Line 401: `&:hover {` - Starts a logic block.
+- Line 402: `color: #ffffff;` - Defines a visual property.
+- Line 403: `}` - Ends a logic block.
+- Line 404: `}` - Ends a logic block.
+- Line 405: `}` - Ends a logic block.
+- Line 406: `` - Blank line for readability.
+- Line 407: `.marker-popup-body {` - Starts a logic block.
+- Line 408: `padding: 16px;` - Defines a visual property.
+- Line 409: `` - Blank line for readability.
+- Line 410: `.marker-popup-location {` - Starts a logic block.
+- Line 411: `margin-bottom: 12px;` - Defines a visual property.
+- Line 412: `font-size: 14px;` - Defines a visual property.
+- Line 413: `color: #ffffff;` - Defines a visual property.
+- Line 414: `` - Blank line for readability.
+- Line 415: `strong {` - Starts a logic block.
+- Line 416: `color: #00FF41;` - Defines a visual property.
+- Line 417: `}` - Ends a logic block.
+- Line 418: `}` - Ends a logic block.
+- Line 419: `` - Blank line for readability.
+- Line 420: `.marker-popup-description {` - Starts a logic block.
+- Line 421: `font-size: 13px;` - Defines a visual property.
+- Line 422: `line-height: 1.6;` - Defines a visual property.
+- Line 423: `color: #e0e0e0;` - Defines a visual property.
+- Line 424: `margin-top: 12px;` - Defines a visual property.
+- Line 425: `}` - Ends a logic block.
+- Line 426: `}` - Ends a logic block.
+- Line 427: `}` - Ends a logic block.
+- Line 428: `` - Blank line for readability.
+- Line 429: `@keyframes popupFadeIn {` - Starts a logic block.
+- Line 430: `from {` - Starts a logic block.
+- Line 431: `opacity: 0;` - Defines a visual property.
+- Line 432: `transform: translate(-50%, -90%) scale(0.95);` - Defines a visual property.
+- Line 433: `}` - Ends a logic block.
+- Line 434: `` - Blank line for readability.
+- Line 435: `to {` - Starts a logic block.
+- Line 436: `opacity: 1;` - Defines a visual property.
+- Line 437: `transform: translate(-50%, -100%) scale(1);` - Defines a visual property.
+- Line 438: `}` - Ends a logic block.
+- Line 439: `}` - Ends a logic block.
+- Line 440: `` - Blank line for readability.
+- Line 441: `// Theme-aware popup styles` - Developer comment or documentation.
+- Line 442: `[data-theme-mode="light"] & .marker-popup {` - Starts a logic block.
+- Line 443: `background-color: rgba(255, 255, 255, 0.98);` - Defines a visual property.
+- Line 444: `border-color: #00FF41;` - Defines a visual property.
+- Line 445: `` - Blank line for readability.
+- Line 446: `.marker-popup-header {` - Starts a logic block.
+- Line 447: `background-color: rgba(0, 255, 65, 0.1);` - Defines a visual property.
+- Line 448: `border-bottom-color: rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 449: `}` - Ends a logic block.
+- Line 450: `` - Blank line for readability.
+- Line 451: `.marker-popup-body {` - Starts a logic block.
+- Line 452: `.marker-popup-location {` - Starts a logic block.
+- Line 453: `color: #333333;` - Defines a visual property.
+- Line 454: `}` - Ends a logic block.
+- Line 455: `` - Blank line for readability.
+- Line 456: `.marker-popup-description {` - Starts a logic block.
+- Line 457: `color: #555555;` - Defines a visual property.
+- Line 458: `}` - Ends a logic block.
+- Line 459: `}` - Ends a logic block.
+- Line 460: `}` - Ends a logic block.
+- Line 461: `` - Blank line for readability.
+- Line 462: `// Custom tooltip for markers (fallback if jsVectorMap tooltip doesn't work)` - Developer comment or documentation.
+- Line 463: `.custom-marker-tooltip {` - Starts a logic block.
+- Line 464: `position: absolute;` - Defines a visual property.
+- Line 465: `z-index: 10000 !important;` - Loads external tools or data types.
+- Line 466: `pointer-events: none;` - Defines a visual property.
+- Line 467: `display: none;` - Defines a visual property.
+- Line 468: `visibility: hidden;` - Defines a visual property.
+- Line 469: `opacity: 0;` - Defines a visual property.
+- Line 470: `transition: opacity 0.1s ease-in-out;` - Defines a visual property.
+- Line 471: `` - Blank line for readability.
+- Line 472: `&.visible {` - Starts a logic block.
+- Line 473: `display: block !important;` - Loads external tools or data types.
+- Line 474: `visibility: visible !important;` - Loads external tools or data types.
+- Line 475: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 476: `}` - Ends a logic block.
+- Line 477: `` - Blank line for readability.
+- Line 478: `div {` - Starts a logic block.
+- Line 479: `background-color: rgba(26, 26, 26, 0.98) !important;` - Loads external tools or data types.
+- Line 480: `border: 1px solid #00FF41 !important;` - Loads external tools or data types.
+- Line 481: `border-radius: 4px;` - Defines a visual property.
+- Line 482: `padding: 12px;` - Defines a visual property.
+- Line 483: `max-width: 350px;` - Defines a visual property.
+- Line 484: `box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);` - Defines a visual property.
+- Line 485: `color: #ffffff;` - Defines a visual property.
+- Line 486: `font-family: Arial, sans-serif;` - Defines a visual property.
+- Line 487: `line-height: 1.5;` - Defines a visual property.
+- Line 488: `}` - Ends a logic block.
+- Line 489: `}` - Ends a logic block.
+- Line 490: `` - Blank line for readability.
+- Line 491: `// Ensure markers group is clickable (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 492: `::ng-deep #jvm-markers-group,` - Defines a visual property.
+- Line 493: `::ng-deep g[class*="markers"] {` - Starts a logic block.
+- Line 494: `pointer-events: auto !important;` - Loads external tools or data types.
+- Line 495: `}` - Ends a logic block.
+- Line 496: `` - Blank line for readability.
+- Line 497: `// Ensure marker circles have proper pointer events (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 498: `::ng-deep #jvm-markers-group circle,` - Defines a visual property.
+- Line 499: `::ng-deep g[class*="markers"] circle {` - Starts a logic block.
+- Line 500: `pointer-events: auto !important;` - Loads external tools or data types.
+- Line 501: `cursor: pointer !important;` - Loads external tools or data types.
+- Line 502: `}` - Ends a logic block.
+- Line 503: `` - Blank line for readability.
+- Line 504: `// Company logo images (overlay on circles) (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 505: `::ng-deep .company-logo-image {` - Starts a logic block.
+- Line 506: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 507: `visibility: visible !important;` - Loads external tools or data types.
+- Line 508: `pointer-events: auto !important; // Changed to auto to enable hover events` - Loads external tools or data types.
+- Line 509: `z-index: 25 !important;` - Loads external tools or data types.
+- Line 510: `transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;` - Loads external tools or data types.
+- Line 511: `cursor: pointer !important; // Show pointer cursor on hover` - Loads external tools or data types.
+- Line 512: `filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) !important;` - Loads external tools or data types.
+- Line 513: `transform-box: fill-box;` - Defines a visual property.
+- Line 514: `transform-origin: center;` - Defines a visual property.
+- Line 515: `` - Blank line for readability.
+- Line 516: `&:hover {` - Starts a logic block.
+- Line 517: `transform: scale(1.15) !important;` - Loads external tools or data types.
+- Line 518: `filter: drop-shadow(0 4px 12px rgba(0, 255, 65, 0.6)) drop-shadow(0 0 8px rgba(0, 255, 65, 0.4)) !important;` - Loads external tools or data types.
+- Line 519: `z-index: 30 !important;` - Loads external tools or data types.
+- Line 520: `}` - Ends a logic block.
+- Line 521: `}` - Ends a logic block.
+- Line 522: `` - Blank line for readability.
+- Line 523: `::ng-deep .company-logo-image[data-selected="true"] {` - Starts a logic block.
+- Line 524: `filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.85)) drop-shadow(0 0 20px rgba(0, 255, 65, 0.6)) !important;` - Loads external tools or data types.
+- Line 525: `z-index: 28 !important;` - Loads external tools or data types.
+- Line 526: `}` - Ends a logic block.
+- Line 527: `` - Blank line for readability.
+- Line 528: `::ng-deep .company-logo-image[data-selected="true"]:hover {` - Starts a logic block.
+- Line 529: `transform: scale(1.15) !important;` - Loads external tools or data types.
+- Line 530: `filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.9)) drop-shadow(0 0 24px rgba(0, 255, 65, 0.7)) !important;` - Loads external tools or data types.
+- Line 531: `}` - Ends a logic block.
+- Line 532: `` - Blank line for readability.
+- Line 533: `// Ensure logo images are visible (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 534: `::ng-deep image.company-logo-image {` - Starts a logic block.
+- Line 535: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 536: `visibility: visible !important;` - Loads external tools or data types.
+- Line 537: `}` - Ends a logic block.
+- Line 538: `` - Blank line for readability.
+- Line 539: `::ng-deep .company-label[data-selected="true"] {` - Starts a logic block.
+- Line 540: `fill: #eafff1 !important;` - Loads external tools or data types.
+- Line 541: `text-shadow: 0 0 6px rgba(0, 255, 65, 0.8), 0 0 12px rgba(0, 255, 65, 0.6) !important;` - Loads external tools or data types.
+- Line 542: `}` - Ends a logic block.
+- Line 543: `` - Blank line for readability.
+- Line 544: `::ng-deep circle.jvm-marker.selected-marker,` - Defines a visual property.
+- Line 545: `::ng-deep circle[data-index].selected-marker,` - Defines a visual property.
+- Line 546: `::ng-deep circle[class*="jvm-marker"].selected-marker {` - Starts a logic block.
+- Line 547: `stroke: #00FF41 !important;` - Loads external tools or data types.
+- Line 548: `stroke-width: 4 !important;` - Loads external tools or data types.
+- Line 549: `stroke-opacity: 1 !important;` - Loads external tools or data types.
+- Line 550: `fill-opacity: 0.5 !important;` - Loads external tools or data types.
+- Line 551: `filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.7)) !important;` - Loads external tools or data types.
+- Line 552: `}` - Ends a logic block.
+- Line 553: `` - Blank line for readability.
+- Line 554: `// Company name labels - responsive and visible (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 555: `::ng-deep .company-label {` - Starts a logic block.
+- Line 556: `pointer-events: none !important;` - Loads external tools or data types.
+- Line 557: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 558: `visibility: visible !important;` - Loads external tools or data types.
+- Line 559: `z-index: 25 !important;` - Loads external tools or data types.
+- Line 560: `text-shadow:` - Defines a visual property.
+- Line 561: `0 0 4px rgba(0, 0, 0, 0.9),` - Styling rule.
+- Line 562: `0 0 2px rgba(0, 0, 0, 0.7),` - Styling rule.
+- Line 563: `0 1px 2px rgba(0, 0, 0, 0.5) !important;` - Loads external tools or data types.
+- Line 564: `font-weight: bold !important;` - Loads external tools or data types.
+- Line 565: `fill: #00FF41 !important;` - Loads external tools or data types.
+- Line 566: `transition: all 0.3s ease !important;` - Loads external tools or data types.
+- Line 567: `}` - Ends a logic block.
+- Line 568: `` - Blank line for readability.
+- Line 569: `// Ensure pattern images are visible (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 570: `::ng-deep defs pattern image {` - Starts a logic block.
+- Line 571: `opacity: 1 !important;` - Loads external tools or data types.
+- Line 572: `visibility: visible !important;` - Loads external tools or data types.
+- Line 573: `}` - Ends a logic block.
+- Line 574: `` - Blank line for readability.
+- Line 575: `// Reposition zoom buttons top-right, grouped with fullscreen (moved out of .custom-marker-tooltip)` - Developer comment or documentation.
+- Line 576: `::ng-deep .jvm-zoom-container,` - Defines a visual property.
+- Line 577: `::ng-deep div.jvm-zoom-container,` - Defines a visual property.
+- Line 578: `::ng-deep #war-room-map .jvm-zoom-container,` - Defines a visual property.
+- Line 579: `::ng-deep #war-room-map div.jvm-zoom-container {` - Starts a logic block.
+- Line 580: `position: absolute !important;` - Loads external tools or data types.
+- Line 581: `top: 6px !important;` - Loads external tools or data types.
+- Line 582: `bottom: auto !important;` - Loads external tools or data types.
+- Line 583: `right: 0.5rem !important;` - Loads external tools or data types.
+- Line 584: `left: auto !important;` - Loads external tools or data types.
+- Line 585: `display: flex !important;` - Loads external tools or data types.
+- Line 586: `flex-direction: column !important;` - Loads external tools or data types.
+- Line 587: `gap: 0.25rem !important;` - Loads external tools or data types.
+- Line 588: `z-index: 40 !important;` - Loads external tools or data types.
+- Line 589: `}` - Ends a logic block.
+- Line 590: `` - Blank line for readability.
+- Line 591: `::ng-deep .jvm-zoom-btn {` - Starts a logic block.
+- Line 592: `left: auto !important;` - Loads external tools or data types.
+- Line 593: `top: auto !important;` - Loads external tools or data types.
+- Line 594: `position: relative !important;` - Loads external tools or data types.
+- Line 595: `background-color: rgba(255, 255, 255, 0.9) !important;` - Loads external tools or data types.
+- Line 596: `border: 1px solid #e5e5e5 !important;` - Loads external tools or data types.
+- Line 597: `color: #000000 !important;` - Loads external tools or data types.
+- Line 598: `width: 28px !important;` - Loads external tools or data types.
+- Line 599: `height: 28px !important;` - Loads external tools or data types.
+- Line 600: `display: flex !important;` - Loads external tools or data types.
+- Line 601: `align-items: center !important;` - Loads external tools or data types.
+- Line 602: `justify-content: center !important;` - Loads external tools or data types.
+- Line 603: `font-size: 0.875rem !important;` - Loads external tools or data types.
+- Line 604: `font-weight: 700 !important;` - Loads external tools or data types.
+- Line 605: `cursor: pointer !important;` - Loads external tools or data types.
+- Line 606: `transition: all 0.2s ease !important;` - Loads external tools or data types.
+- Line 607: `box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;` - Loads external tools or data types.
+- Line 608: `border-radius: 2px !important;` - Loads external tools or data types.
+- Line 609: `margin: 0 !important;` - Loads external tools or data types.
+- Line 610: `padding: 0 !important;` - Loads external tools or data types.
+- Line 611: `}` - Ends a logic block.
+- Line 612: `` - Blank line for readability.
+- Line 613: `::ng-deep .jvm-zoom-btn:hover {` - Starts a logic block.
+- Line 614: `background-color: #00FF41 !important;` - Loads external tools or data types.
+- Line 615: `color: #000000 !important;` - Loads external tools or data types.
+- Line 616: `border-color: #00FF41 !important;` - Loads external tools or data types.
+- Line 617: `box-shadow: 0 2px 6px rgba(0, 255, 65, 0.4) !important;` - Loads external tools or data types.
+- Line 618: `transform: scale(1.05) !important;` - Loads external tools or data types.
+- Line 619: `}` - Ends a logic block.
+- Line 620: `` - Blank line for readability.
+- Line 621: `::ng-deep .jvm-zoom-btn:active {` - Starts a logic block.
+- Line 622: `transform: scale(0.95) !important;` - Loads external tools or data types.
+- Line 623: `}` - Ends a logic block.
+- Line 624: `}` - Ends a logic block.
+- Line 625: `` - Blank line for readability.
+- Line 626: `.map-controls {` - Starts a logic block.
+- Line 627: `position: absolute;` - Defines a visual property.
+- Line 628: `top: 6px;` - Defines a visual property.
+- Line 629: `right: 0.5rem;` - Defines a visual property.
+- Line 630: `z-index: 50;` - Defines a visual property.
+- Line 631: `display: flex;` - Defines a visual property.
+- Line 632: `flex-direction: column;` - Defines a visual property.
+- Line 633: `gap: 0.25rem;` - Defines a visual property.
+- Line 634: `}` - Ends a logic block.
+- Line 635: `` - Blank line for readability.
+- Line 636: `.map-control-btn {` - Starts a logic block.
+- Line 637: `width: 28px;` - Defines a visual property.
+- Line 638: `height: 28px;` - Defines a visual property.
+- Line 639: `background-color: rgba(255, 255, 255, 0.9);` - Defines a visual property.
+- Line 640: `border: 1px solid #e5e5e5;` - Defines a visual property.
+- Line 641: `color: #000000;` - Defines a visual property.
+- Line 642: `cursor: pointer;` - Defines a visual property.
+- Line 643: `display: flex;` - Defines a visual property.
+- Line 644: `align-items: center;` - Defines a visual property.
+- Line 645: `justify-content: center;` - Defines a visual property.
+- Line 646: `border-radius: 2px;` - Defines a visual property.
+- Line 647: `transition: all 0.2s ease;` - Defines a visual property.
+- Line 648: `box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 649: `font-size: 0.875rem;` - Defines a visual property.
+- Line 650: `line-height: 1;` - Defines a visual property.
+- Line 651: `font-weight: 700;` - Defines a visual property.
+- Line 652: `padding: 0;` - Defines a visual property.
+- Line 653: `` - Blank line for readability.
+- Line 654: `&:hover {` - Starts a logic block.
+- Line 655: `background-color: #00FF41 !important;` - Loads external tools or data types.
+- Line 656: `color: #000000 !important;` - Loads external tools or data types.
+- Line 657: `border-color: #00FF41;` - Defines a visual property.
+- Line 658: `box-shadow: 0 2px 6px rgba(0, 255, 65, 0.4);` - Defines a visual property.
+- Line 659: `transform: scale(1.05);` - Defines a visual property.
+- Line 660: `}` - Ends a logic block.
+- Line 661: `` - Blank line for readability.
+- Line 662: `&:active {` - Starts a logic block.
+- Line 663: `transform: scale(0.95);` - Defines a visual property.
+- Line 664: `}` - Ends a logic block.
+- Line 665: `` - Blank line for readability.
+- Line 666: `&:focus {` - Starts a logic block.
+- Line 667: `outline: 2px solid #00FF41;` - Defines a visual property.
+- Line 668: `outline-offset: 2px;` - Defines a visual property.
+- Line 669: `}` - Ends a logic block.
+- Line 670: `}` - Ends a logic block.
+- Line 671: `` - Blank line for readability.
+- Line 672: `.zoom-in-btn,` - Styling rule.
+- Line 673: `.zoom-out-btn {` - Starts a logic block.
+- Line 674: `font-size: 1rem;` - Defines a visual property.
+- Line 675: `}` - Ends a logic block.
+- Line 676: `` - Blank line for readability.
+- Line 677: `.fullscreen-btn .fullscreen-icon {` - Starts a logic block.
+- Line 678: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 679: `font-weight: 700;` - Defines a visual property.
+- Line 680: `display: inline-block;` - Defines a visual property.
+- Line 681: `line-height: 1;` - Defines a visual property.
+- Line 682: `}` - Ends a logic block.
+- Line 683: `` - Blank line for readability.
+- Line 684: `.node-markers-overlay {` - Starts a logic block.
+- Line 685: `position: absolute;` - Defines a visual property.
+- Line 686: `inset: 0;` - Defines a visual property.
+- Line 687: `z-index: 20;` - Defines a visual property.
+- Line 688: `pointer-events: none; // Allow clicks to pass through to SVG markers below` - Defines a visual property.
+- Line 689: `}` - Ends a logic block.
+- Line 690: `` - Blank line for readability.
+- Line 691: `.node-marker-wrapper {` - Starts a logic block.
+- Line 692: `position: absolute;` - Defines a visual property.
+- Line 693: `transform: translate(-50%, -50%);` - Defines a visual property.
+- Line 694: `pointer-events: none; // Allow clicks to pass through to SVG markers` - Defines a visual property.
+- Line 695: `` - Blank line for readability.
+- Line 696: `// Only the label should be clickable, not the marker area` - Developer comment or documentation.
+- Line 697: `.glass-tag {` - Starts a logic block.
+- Line 698: `pointer-events: auto; // Label can be clicked` - Defines a visual property.
+- Line 699: `}` - Ends a logic block.
+- Line 700: `` - Blank line for readability.
+- Line 701: `&.selected {` - Starts a logic block.
+- Line 702: `.node-marker {` - Starts a logic block.
+- Line 703: `transform: scale(1.5);` - Defines a visual property.
+- Line 704: `box-shadow: 0 0 15px $tactical-green;` - Defines a visual property.
+- Line 705: `}` - Ends a logic block.
+- Line 706: `` - Blank line for readability.
+- Line 707: `.glass-tag {` - Starts a logic block.
+- Line 708: `border-color: $tactical-green;` - Defines a visual property.
+- Line 709: `}` - Ends a logic block.
+- Line 710: `}` - Ends a logic block.
+- Line 711: `` - Blank line for readability.
+- Line 712: `&.hub {` - Starts a logic block.
+- Line 713: `.node-marker {` - Starts a logic block.
+- Line 714: `background-color: $war-gray;` - Defines a visual property.
+- Line 715: `border-color: $tactical-green;` - Defines a visual property.
+- Line 716: `}` - Ends a logic block.
+- Line 717: `}` - Ends a logic block.
+- Line 718: `}` - Ends a logic block.
+- Line 719: `` - Blank line for readability.
+- Line 720: `.node-marker {` - Starts a logic block.
+- Line 721: `width: 0.75rem;` - Defines a visual property.
+- Line 722: `height: 0.75rem;` - Defines a visual property.
+- Line 723: `background-color: $tactical-green;` - Defines a visual property.
+- Line 724: `border: 2px solid $war-gray;` - Defines a visual property.
+- Line 725: `position: absolute;` - Defines a visual property.
+- Line 726: `transform: translate(-50%, -50%);` - Defines a visual property.
+- Line 727: `clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);` - Defines a visual property.
+- Line 728: `transition: all 0.2s ease;` - Defines a visual property.
+- Line 729: `pointer-events: none; // Don't block clicks to SVG markers below` - Defines a visual property.
+- Line 730: `` - Blank line for readability.
+- Line 731: `&.hub-marker {` - Starts a logic block.
+- Line 732: `background-color: $war-gray;` - Defines a visual property.
+- Line 733: `border-color: $tactical-green;` - Defines a visual property.
+- Line 734: `}` - Ends a logic block.
+- Line 735: `}` - Ends a logic block.
+- Line 736: `` - Blank line for readability.
+- Line 737: `.glass-tag {` - Starts a logic block.
+- Line 738: `background: rgba(255, 255, 255, 0.85);` - Defines a visual property.
+- Line 739: `backdrop-filter: blur(4px);` - Defines a visual property.
+- Line 740: `border-left: 2px solid $tactical-green;` - Defines a visual property.
+- Line 741: `padding: 0.125rem 0.375rem;` - Defines a visual property.
+- Line 742: `font-size: 0.5625rem;` - Defines a visual property.
+- Line 743: `font-weight: 700;` - Defines a visual property.
+- Line 744: `color: $black;` - Defines a visual property.
+- Line 745: `text-transform: uppercase;` - Defines a visual property.
+- Line 746: `letter-spacing: -0.02em;` - Defines a visual property.
+- Line 747: `white-space: nowrap;` - Defines a visual property.
+- Line 748: `box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 749: `margin-top: 0.75rem;` - Defines a visual property.
+- Line 750: `margin-left: -50%;` - Defines a visual property.
+- Line 751: `transform: translateX(50%);` - Defines a visual property.
+- Line 752: `pointer-events: auto; // Label can be clicked` - Defines a visual property.
+- Line 753: `cursor: pointer;` - Defines a visual property.
+- Line 754: `user-select: none;` - Defines a visual property.
+- Line 755: `max-width: 120px;` - Defines a visual property.
+- Line 756: `overflow: hidden;` - Defines a visual property.
+- Line 757: `text-overflow: ellipsis;` - Defines a visual property.
+- Line 758: `}` - Ends a logic block.
+- Line 759: `` - Blank line for readability.
+- Line 760: `// Transit line animations (handled by SVG in map)` - Developer comment or documentation.
+- Line 761: `.transit-line {` - Starts a logic block.
+- Line 762: `stroke: $tactical-green;` - Defines a visual property.
+- Line 763: `stroke-width: 3;` - Defines a visual property.
+- Line 764: `stroke-dasharray: 0;` - Defines a visual property.
+- Line 765: `filter: drop-shadow(0 0 2px rgba(228, 224, 224, 0.5));` - Defines a visual property.
+- Line 766: `}` - Ends a logic block.
+- Line 767: `` - Blank line for readability.
+- Line 768: `.chevron-path {` - Starts a logic block.
+- Line 769: `stroke: $tactical-green;` - Defines a visual property.
+- Line 770: `stroke-width: 5;` - Defines a visual property.
+- Line 771: `stroke-dasharray: 12 24;` - Defines a visual property.
+- Line 772: `animation: move-chevrons 1.5s linear infinite;` - Defines a visual property.
+- Line 773: `}` - Ends a logic block.
+- Line 774: `` - Blank line for readability.
+- Line 775: `@keyframes move-chevrons {` - Starts a logic block.
+- Line 776: `from {` - Starts a logic block.
+- Line 777: `stroke-dashoffset: 72;` - Defines a visual property.
+- Line 778: `}` - Ends a logic block.
+- Line 779: `` - Blank line for readability.
+- Line 780: `to {` - Starts a logic block.
+- Line 781: `stroke-dashoffset: 0;` - Defines a visual property.
+- Line 782: `}` - Ends a logic block.
+- Line 783: `}` - Ends a logic block.
+- Line 784: `` - Blank line for readability.
+- Line 785: `// -------- Responsive: map container & SVG --------` - Developer comment or documentation.
+- Line 786: `@media (max-width: 575.98px) {` - Starts a logic block.
+- Line 787: `.war-room-map-container {` - Starts a logic block.
+- Line 788: `min-height: 240px;` - Defines a visual property.
+- Line 789: `}` - Ends a logic block.
+- Line 790: `` - Blank line for readability.
+- Line 791: `.map-container {` - Starts a logic block.
+- Line 792: `min-height: 240px;` - Defines a visual property.
+- Line 793: `}` - Ends a logic block.
+- Line 794: `` - Blank line for readability.
+- Line 795: `#war-room-map {` - Starts a logic block.
+- Line 796: `min-height: 240px;` - Defines a visual property.
+- Line 797: `border-radius: 0.2rem;` - Defines a visual property.
+- Line 798: `}` - Ends a logic block.
+- Line 799: `` - Blank line for readability.
+- Line 800: `.map-controls {` - Starts a logic block.
+- Line 801: `top: 6px;` - Defines a visual property.
+- Line 802: `right: 0.375rem;` - Defines a visual property.
+- Line 803: `}` - Ends a logic block.
+- Line 804: `` - Blank line for readability.
+- Line 805: `.map-control-btn {` - Starts a logic block.
+- Line 806: `width: 26px;` - Defines a visual property.
+- Line 807: `height: 26px;` - Defines a visual property.
+- Line 808: `font-size: 0.75rem;` - Defines a visual property.
+- Line 809: `}` - Ends a logic block.
+- Line 810: `` - Blank line for readability.
+- Line 811: `.zoom-in-btn,` - Styling rule.
+- Line 812: `.zoom-out-btn {` - Starts a logic block.
+- Line 813: `font-size: 0.875rem;` - Defines a visual property.
+- Line 814: `}` - Ends a logic block.
+- Line 815: `` - Blank line for readability.
+- Line 816: `.fullscreen-btn .fullscreen-icon {` - Starts a logic block.
+- Line 817: `font-size: 0.75rem;` - Defines a visual property.
+- Line 818: `}` - Ends a logic block.
+- Line 819: `` - Blank line for readability.
+- Line 820: `.node-marker {` - Starts a logic block.
+- Line 821: `width: 0.625rem;` - Defines a visual property.
+- Line 822: `height: 0.625rem;` - Defines a visual property.
+- Line 823: `}` - Ends a logic block.
+- Line 824: `` - Blank line for readability.
+- Line 825: `.glass-tag {` - Starts a logic block.
+- Line 826: `font-size: 0.5rem;` - Defines a visual property.
+- Line 827: `padding: 0.1rem 0.25rem;` - Defines a visual property.
+- Line 828: `margin-top: 0.5rem;` - Defines a visual property.
+- Line 829: `max-width: 90px;` - Defines a visual property.
+- Line 830: `}` - Ends a logic block.
+- Line 831: `}` - Ends a logic block.
+- Line 832: `` - Blank line for readability.
+- Line 833: `@media (min-width: 576px) and (max-width: 991.98px) {` - Starts a logic block.
+- Line 834: `.war-room-map-container {` - Starts a logic block.
+- Line 835: `min-height: 400px;` - Defines a visual property.
+- Line 836: `}` - Ends a logic block.
+- Line 837: `` - Blank line for readability.
+- Line 838: `.map-container {` - Starts a logic block.
+- Line 839: `min-height: 400px;` - Defines a visual property.
+- Line 840: `}` - Ends a logic block.
+- Line 841: `` - Blank line for readability.
+- Line 842: `#war-room-map {` - Starts a logic block.
+- Line 843: `min-height: 400px;` - Defines a visual property.
+- Line 844: `}` - Ends a logic block.
+- Line 845: `}` - Ends a logic block.
+- Line 846: `` - Blank line for readability.
+- Line 847: `@media (min-width: 992px) {` - Starts a logic block.
+- Line 848: `.war-room-map-container {` - Starts a logic block.
+- Line 849: `min-height: 500px;` - Defines a visual property.
+- Line 850: `}` - Ends a logic block.
+- Line 851: `` - Blank line for readability.
+- Line 852: `.map-container {` - Starts a logic block.
+- Line 853: `min-height: 500px;` - Defines a visual property.
+- Line 854: `}` - Ends a logic block.
+- Line 855: `` - Blank line for readability.
+- Line 856: `#war-room-map {` - Starts a logic block.
+- Line 857: `min-height: 500px;` - Defines a visual property.
+- Line 858: `}` - Ends a logic block.
+- Line 859: `}` - Ends a logic block.
+- Line 860: `` - Blank line for readability.
+- Line 861: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 862: `.war-room-map-container {` - Starts a logic block.
+- Line 863: `min-height: 600px;` - Defines a visual property.
+- Line 864: `}` - Ends a logic block.
+- Line 865: `` - Blank line for readability.
+- Line 866: `.map-container {` - Starts a logic block.
+- Line 867: `min-height: 600px;` - Defines a visual property.
+- Line 868: `}` - Ends a logic block.
+- Line 869: `` - Blank line for readability.
+- Line 870: `#war-room-map {` - Starts a logic block.
+- Line 871: `min-height: 600px;` - Defines a visual property.
+- Line 872: `}` - Ends a logic block.
+- Line 873: `}` - Ends a logic block.
+- Line 874: `` - Blank line for readability.
+- Line 875: `// Popup Overlay` - Developer comment or documentation.
+- Line 876: `.map-popup-overlay {` - Starts a logic block.
+- Line 877: `position: absolute;` - Defines a visual property.
+- Line 878: `z-index: 1000;` - Defines a visual property.
+- Line 879: `transform: translate(-50%, -100%);` - Defines a visual property.
+- Line 880: `filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));` - Defines a visual property.
+- Line 881: `pointer-events: auto;` - Defines a visual property.
+- Line 882: `` - Blank line for readability.
+- Line 883: `.popup-content {` - Starts a logic block.
+- Line 884: `background: rgba(10, 20, 15, 0.95);` - Defines a visual property.
+- Line 885: `backdrop-filter: blur(8px);` - Defines a visual property.
+- Line 886: `border: 1px solid #00FF41;` - Defines a visual property.
+- Line 887: `border-radius: 4px;` - Defines a visual property.
+- Line 888: `padding: 0;` - Defines a visual property.
+- Line 889: `min-width: 220px;` - Defines a visual property.
+- Line 890: `overflow: hidden;` - Defines a visual property.
+- Line 891: `}` - Ends a logic block.
+- Line 892: `` - Blank line for readability.
+- Line 893: `.popup-header {` - Starts a logic block.
+- Line 894: `background: rgba(0, 255, 65, 0.1);` - Defines a visual property.
+- Line 895: `border-bottom: 1px solid rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 896: `padding: 8px 12px;` - Defines a visual property.
+- Line 897: `display: flex;` - Defines a visual property.
+- Line 898: `justify-content: space-between;` - Defines a visual property.
+- Line 899: `align-items: center;` - Defines a visual property.
+- Line 900: `` - Blank line for readability.
+- Line 901: `.popup-title {` - Starts a logic block.
+- Line 902: `font-weight: 700;` - Defines a visual property.
+- Line 903: `color: #00FF41;` - Defines a visual property.
+- Line 904: `font-size: 0.85rem;` - Defines a visual property.
+- Line 905: `letter-spacing: 0.5px;` - Defines a visual property.
+- Line 906: `}` - Ends a logic block.
+- Line 907: `` - Blank line for readability.
+- Line 908: `.popup-close {` - Starts a logic block.
+- Line 909: `background: none;` - Defines a visual property.
+- Line 910: `border: none;` - Defines a visual property.
+- Line 911: `color: #00FF41;` - Defines a visual property.
+- Line 912: `font-size: 1.2rem;` - Defines a visual property.
+- Line 913: `line-height: 1;` - Defines a visual property.
+- Line 914: `cursor: pointer;` - Defines a visual property.
+- Line 915: `opacity: 0.7;` - Defines a visual property.
+- Line 916: `` - Blank line for readability.
+- Line 917: `&:hover {` - Starts a logic block.
+- Line 918: `opacity: 1;` - Defines a visual property.
+- Line 919: `}` - Ends a logic block.
+- Line 920: `}` - Ends a logic block.
+- Line 921: `}` - Ends a logic block.
+- Line 922: `` - Blank line for readability.
+- Line 923: `.popup-body {` - Starts a logic block.
+- Line 924: `padding: 12px;` - Defines a visual property.
+- Line 925: `}` - Ends a logic block.
+- Line 926: `` - Blank line for readability.
+- Line 927: `.popup-row {` - Starts a logic block.
+- Line 928: `display: flex;` - Defines a visual property.
+- Line 929: `justify-content: space-between;` - Defines a visual property.
+- Line 930: `margin-bottom: 8px;` - Defines a visual property.
+- Line 931: `font-size: 0.8rem;` - Defines a visual property.
+- Line 932: `` - Blank line for readability.
+- Line 933: `&:last-child {` - Starts a logic block.
+- Line 934: `margin-bottom: 0;` - Defines a visual property.
+- Line 935: `}` - Ends a logic block.
+- Line 936: `` - Blank line for readability.
+- Line 937: `.popup-label {` - Starts a logic block.
+- Line 938: `color: #b0b0b0;` - Defines a visual property.
+- Line 939: `font-size: 0.7rem;` - Defines a visual property.
+- Line 940: `}` - Ends a logic block.
+- Line 941: `` - Blank line for readability.
+- Line 942: `.popup-value {` - Starts a logic block.
+- Line 943: `color: #fff;` - Defines a visual property.
+- Line 944: `font-weight: 600;` - Defines a visual property.
+- Line 945: `` - Blank line for readability.
+- Line 946: `&.status-online {` - Starts a logic block.
+- Line 947: `color: #00FF41;` - Defines a visual property.
+- Line 948: `}` - Ends a logic block.
+- Line 949: `}` - Ends a logic block.
+- Line 950: `}` - Ends a logic block.
+- Line 951: `` - Blank line for readability.
+- Line 952: `.popup-actions {` - Starts a logic block.
+- Line 953: `margin-top: 12px;` - Defines a visual property.
+- Line 954: `text-align: center;` - Defines a visual property.
+- Line 955: `` - Blank line for readability.
+- Line 956: `.popup-action-btn {` - Starts a logic block.
+- Line 957: `background: rgba(0, 255, 65, 0.1);` - Defines a visual property.
+- Line 958: `border: 1px solid #00FF41;` - Defines a visual property.
+- Line 959: `color: #00FF41;` - Defines a visual property.
+- Line 960: `font-size: 0.7rem;` - Defines a visual property.
+- Line 961: `padding: 4px 12px;` - Defines a visual property.
+- Line 962: `border-radius: 2px;` - Defines a visual property.
+- Line 963: `cursor: pointer;` - Defines a visual property.
+- Line 964: `transition: all 0.2s ease;` - Defines a visual property.
+- Line 965: `width: 100%;` - Defines a visual property.
+- Line 966: `text-transform: uppercase;` - Defines a visual property.
+- Line 967: `letter-spacing: 1px;` - Defines a visual property.
+- Line 968: `` - Blank line for readability.
+- Line 969: `&:hover {` - Starts a logic block.
+- Line 970: `background: #00FF41;` - Defines a visual property.
+- Line 971: `color: #000;` - Defines a visual property.
+- Line 972: `}` - Ends a logic block.
+- Line 973: `}` - Ends a logic block.
+- Line 974: `}` - Ends a logic block.
+- Line 975: `` - Blank line for readability.
+- Line 976: `.popup-arrow {` - Starts a logic block.
+- Line 977: `width: 0;` - Defines a visual property.
+- Line 978: `height: 0;` - Defines a visual property.
+- Line 979: `border-left: 8px solid transparent;` - Defines a visual property.
+- Line 980: `border-right: 8px solid transparent;` - Defines a visual property.
+- Line 981: `border-top: 8px solid #00FF41;` - Defines a visual property.
+- Line 982: `margin: 0 auto;` - Defines a visual property.
+- Line 983: `}` - Ends a logic block.
+- Line 984: `}` - Ends a logic block.
+- Line 985: `` - Blank line for readability.
+- Line 986: `// Company Logo Hover Tooltip` - Developer comment or documentation.
+- Line 987: `.company-logo-tooltip {` - Starts a logic block.
+- Line 988: `position: fixed;` - Defines a visual property.
+- Line 989: `z-index: 10000;` - Defines a visual property.
+- Line 990: `pointer-events: none;` - Defines a visual property.
+- Line 991: `transform: translate(-50%, -100%);` - Defines a visual property.
+- Line 992: `margin-top: -12px;` - Defines a visual property.
+- Line 993: `animation: tooltipFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);` - Defines a visual property.
+- Line 994: `filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));` - Defines a visual property.
+- Line 995: `` - Blank line for readability.
+- Line 996: `.tooltip-content {` - Starts a logic block.
+- Line 997: `background: rgba(10, 20, 15, 0.98);` - Defines a visual property.
+- Line 998: `backdrop-filter: blur(12px);` - Defines a visual property.
+- Line 999: `border: 1.5px solid #00FF41;` - Defines a visual property.
+- Line 1000: `border-radius: 8px;` - Defines a visual property.
+- Line 1001: `padding: 0;` - Defines a visual property.
+- Line 1002: `width: clamp(280px, 90vw, 420px);` - Defines a visual property.
+- Line 1003: `max-width: 92vw;` - Defines a visual property.
+- Line 1004: `max-height: 70vh;` - Defines a visual property.
+- Line 1005: `box-shadow:` - Defines a visual property.
+- Line 1006: `0 8px 24px rgba(0, 0, 0, 0.6),` - Styling rule.
+- Line 1007: `0 0 20px rgba(0, 255, 65, 0.2),` - Styling rule.
+- Line 1008: `inset 0 1px 0 rgba(255, 255, 255, 0.1);` - Styling rule.
+- Line 1009: `overflow: hidden;` - Defines a visual property.
+- Line 1010: `}` - Ends a logic block.
+- Line 1011: `` - Blank line for readability.
+- Line 1012: `.tooltip-header {` - Starts a logic block.
+- Line 1013: `display: flex;` - Defines a visual property.
+- Line 1014: `align-items: center;` - Defines a visual property.
+- Line 1015: `gap: 12px;` - Defines a visual property.
+- Line 1016: `padding: 14px 16px;` - Defines a visual property.
+- Line 1017: `background: rgba(0, 255, 65, 0.08);` - Defines a visual property.
+- Line 1018: `border-bottom: 1px solid rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 1019: `backdrop-filter: blur(4px);` - Defines a visual property.
+- Line 1020: `` - Blank line for readability.
+- Line 1021: `.tooltip-logo {` - Starts a logic block.
+- Line 1022: `width: 48px;` - Defines a visual property.
+- Line 1023: `height: 48px;` - Defines a visual property.
+- Line 1024: `object-fit: contain;` - Defines a visual property.
+- Line 1025: `border-radius: 4px;` - Defines a visual property.
+- Line 1026: `background: rgba(255, 255, 255, 0.05);` - Defines a visual property.
+- Line 1027: `padding: 4px;` - Defines a visual property.
+- Line 1028: `border: 1px solid rgba(0, 255, 65, 0.2);` - Defines a visual property.
+- Line 1029: `flex-shrink: 0;` - Defines a visual property.
+- Line 1030: `animation: logoPulse 2s ease-in-out infinite;` - Defines a visual property.
+- Line 1031: `}` - Ends a logic block.
+- Line 1032: `` - Blank line for readability.
+- Line 1033: `.tooltip-title {` - Starts a logic block.
+- Line 1034: `font-weight: 700;` - Defines a visual property.
+- Line 1035: `font-size: 1rem;` - Defines a visual property.
+- Line 1036: `color: #00FF41;` - Defines a visual property.
+- Line 1037: `letter-spacing: 0.5px;` - Defines a visual property.
+- Line 1038: `text-transform: uppercase;` - Defines a visual property.
+- Line 1039: `flex: 1;` - Defines a visual property.
+- Line 1040: `line-height: 1.3;` - Defines a visual property.
+- Line 1041: `}` - Ends a logic block.
+- Line 1042: `}` - Ends a logic block.
+- Line 1043: `` - Blank line for readability.
+- Line 1044: `.tooltip-body {` - Starts a logic block.
+- Line 1045: `padding: 16px;` - Defines a visual property.
+- Line 1046: `max-height: 44vh;` - Defines a visual property.
+- Line 1047: `overflow-y: auto;` - Defines a visual property.
+- Line 1048: `` - Blank line for readability.
+- Line 1049: `.tooltip-description {` - Starts a logic block.
+- Line 1050: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 1051: `line-height: 1.6;` - Defines a visual property.
+- Line 1052: `color: #e0e0e0;` - Defines a visual property.
+- Line 1053: `margin-bottom: 14px;` - Defines a visual property.
+- Line 1054: `text-align: justify;` - Defines a visual property.
+- Line 1055: `}` - Ends a logic block.
+- Line 1056: `` - Blank line for readability.
+- Line 1057: `.tooltip-location,` - Styling rule.
+- Line 1058: `.tooltip-status {` - Starts a logic block.
+- Line 1059: `display: flex;` - Defines a visual property.
+- Line 1060: `justify-content: space-between;` - Defines a visual property.
+- Line 1061: `align-items: center;` - Defines a visual property.
+- Line 1062: `padding: 8px 0;` - Defines a visual property.
+- Line 1063: `font-size: 0.75rem;` - Defines a visual property.
+- Line 1064: `border-top: 1px solid rgba(0, 255, 65, 0.1);` - Defines a visual property.
+- Line 1065: `` - Blank line for readability.
+- Line 1066: `&:first-of-type {` - Starts a logic block.
+- Line 1067: `border-top: none;` - Defines a visual property.
+- Line 1068: `padding-top: 0;` - Defines a visual property.
+- Line 1069: `}` - Ends a logic block.
+- Line 1070: `` - Blank line for readability.
+- Line 1071: `.tooltip-label {` - Starts a logic block.
+- Line 1072: `color: #b0b0b0;` - Defines a visual property.
+- Line 1073: `font-size: 0.7rem;` - Defines a visual property.
+- Line 1074: `text-transform: uppercase;` - Defines a visual property.
+- Line 1075: `letter-spacing: 0.5px;` - Defines a visual property.
+- Line 1076: `font-weight: 600;` - Defines a visual property.
+- Line 1077: `}` - Ends a logic block.
+- Line 1078: `` - Blank line for readability.
+- Line 1079: `.tooltip-value {` - Starts a logic block.
+- Line 1080: `color: #ffffff;` - Defines a visual property.
+- Line 1081: `font-weight: 600;` - Defines a visual property.
+- Line 1082: `text-align: right;` - Defines a visual property.
+- Line 1083: `` - Blank line for readability.
+- Line 1084: `&.status-online {` - Starts a logic block.
+- Line 1085: `color: #00FF41;` - Defines a visual property.
+- Line 1086: `text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);` - Defines a visual property.
+- Line 1087: `}` - Ends a logic block.
+- Line 1088: `}` - Ends a logic block.
+- Line 1089: `}` - Ends a logic block.
+- Line 1090: `}` - Ends a logic block.
+- Line 1091: `` - Blank line for readability.
+- Line 1092: `.tooltip-arrow {` - Starts a logic block.
+- Line 1093: `width: 0;` - Defines a visual property.
+- Line 1094: `height: 0;` - Defines a visual property.
+- Line 1095: `border-left: 10px solid transparent;` - Defines a visual property.
+- Line 1096: `border-right: 10px solid transparent;` - Defines a visual property.
+- Line 1097: `border-top: 10px solid #00FF41;` - Defines a visual property.
+- Line 1098: `margin: 0 auto;` - Defines a visual property.
+- Line 1099: `filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));` - Defines a visual property.
+- Line 1100: `animation: arrowPulse 2s ease-in-out infinite;` - Defines a visual property.
+- Line 1101: `}` - Ends a logic block.
+- Line 1102: `` - Blank line for readability.
+- Line 1103: `// Light theme styles` - Developer comment or documentation.
+- Line 1104: `[data-theme-mode="light"] & {` - Starts a logic block.
+- Line 1105: `.tooltip-content {` - Starts a logic block.
+- Line 1106: `background: rgba(255, 255, 255, 0.98);` - Defines a visual property.
+- Line 1107: `border-color: #00FF41;` - Defines a visual property.
+- Line 1108: `box-shadow:` - Defines a visual property.
+- Line 1109: `0 8px 24px rgba(0, 0, 0, 0.3),` - Styling rule.
+- Line 1110: `0 0 20px rgba(0, 255, 65, 0.15);` - Styling rule.
+- Line 1111: `}` - Ends a logic block.
+- Line 1112: `` - Blank line for readability.
+- Line 1113: `.tooltip-header {` - Starts a logic block.
+- Line 1114: `background: rgba(0, 255, 65, 0.1);` - Defines a visual property.
+- Line 1115: `border-bottom-color: rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 1116: `` - Blank line for readability.
+- Line 1117: `.tooltip-logo {` - Starts a logic block.
+- Line 1118: `background: rgba(0, 0, 0, 0.02);` - Defines a visual property.
+- Line 1119: `border-color: rgba(0, 255, 65, 0.3);` - Defines a visual property.
+- Line 1120: `}` - Ends a logic block.
+- Line 1121: `}` - Ends a logic block.
+- Line 1122: `` - Blank line for readability.
+- Line 1123: `.tooltip-body {` - Starts a logic block.
+- Line 1124: `.tooltip-description {` - Starts a logic block.
+- Line 1125: `color: #555555;` - Defines a visual property.
+- Line 1126: `}` - Ends a logic block.
+- Line 1127: `` - Blank line for readability.
+- Line 1128: `.tooltip-location,` - Styling rule.
+- Line 1129: `.tooltip-status {` - Starts a logic block.
+- Line 1130: `border-top-color: rgba(0, 255, 65, 0.15);` - Defines a visual property.
+- Line 1131: `` - Blank line for readability.
+- Line 1132: `.tooltip-label {` - Starts a logic block.
+- Line 1133: `color: #777777;` - Defines a visual property.
+- Line 1134: `}` - Ends a logic block.
+- Line 1135: `` - Blank line for readability.
+- Line 1136: `.tooltip-value {` - Starts a logic block.
+- Line 1137: `color: #333333;` - Defines a visual property.
+- Line 1138: `` - Blank line for readability.
+- Line 1139: `&.status-online {` - Starts a logic block.
+- Line 1140: `color: #00FF41;` - Defines a visual property.
+- Line 1141: `}` - Ends a logic block.
+- Line 1142: `}` - Ends a logic block.
+- Line 1143: `}` - Ends a logic block.
+- Line 1144: `}` - Ends a logic block.
+- Line 1145: `}` - Ends a logic block.
+- Line 1146: `}` - Ends a logic block.
+- Line 1147: `` - Blank line for readability.
+- Line 1148: `// Animations` - Developer comment or documentation.
+- Line 1149: `@keyframes tooltipFadeIn {` - Starts a logic block.
+- Line 1150: `from {` - Starts a logic block.
+- Line 1151: `opacity: 0;` - Defines a visual property.
+- Line 1152: `transform: translate(-50%, -90%) scale(0.9);` - Defines a visual property.
+- Line 1153: `}` - Ends a logic block.
+- Line 1154: `to {` - Starts a logic block.
+- Line 1155: `opacity: 1;` - Defines a visual property.
+- Line 1156: `transform: translate(-50%, -100%) scale(1);` - Defines a visual property.
+- Line 1157: `}` - Ends a logic block.
+- Line 1158: `}` - Ends a logic block.
+- Line 1159: `` - Blank line for readability.
+- Line 1160: `@keyframes logoPulse {` - Starts a logic block.
+- Line 1161: `0%, 100% {` - Starts a logic block.
+- Line 1162: `box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4);` - Defines a visual property.
+- Line 1163: `}` - Ends a logic block.
+- Line 1164: `50% {` - Starts a logic block.
+- Line 1165: `box-shadow: 0 0 0 4px rgba(0, 255, 65, 0);` - Defines a visual property.
+- Line 1166: `}` - Ends a logic block.
+- Line 1167: `}` - Ends a logic block.
+- Line 1168: `` - Blank line for readability.
+- Line 1169: `@keyframes arrowPulse {` - Starts a logic block.
+- Line 1170: `0%, 100% {` - Starts a logic block.
+- Line 1171: `opacity: 1;` - Defines a visual property.
+- Line 1172: `transform: translateY(0);` - Defines a visual property.
+- Line 1173: `}` - Ends a logic block.
+- Line 1174: `50% {` - Starts a logic block.
+- Line 1175: `opacity: 0.8;` - Defines a visual property.
+- Line 1176: `transform: translateY(-2px);` - Defines a visual property.
+- Line 1177: `}` - Ends a logic block.
+- Line 1178: `}` - Ends a logic block.
+- Line 1179: `` - Blank line for readability.
+- Line 1180: `// Responsive tooltip` - Developer comment or documentation.
+- Line 1181: `@media (max-width: 575.98px) {` - Starts a logic block.
+- Line 1182: `.company-logo-tooltip {` - Starts a logic block.
+- Line 1183: `.tooltip-content {` - Starts a logic block.
+- Line 1184: `min-width: 280px;` - Defines a visual property.
+- Line 1185: `max-width: 320px;` - Defines a visual property.
+- Line 1186: `}` - Ends a logic block.
+- Line 1187: `` - Blank line for readability.
+- Line 1188: `.tooltip-header {` - Starts a logic block.
+- Line 1189: `padding: 12px 14px;` - Defines a visual property.
+- Line 1190: `gap: 10px;` - Defines a visual property.
+- Line 1191: `` - Blank line for readability.
+- Line 1192: `.tooltip-logo {` - Starts a logic block.
+- Line 1193: `width: 40px;` - Defines a visual property.
+- Line 1194: `height: 40px;` - Defines a visual property.
+- Line 1195: `}` - Ends a logic block.
+- Line 1196: `` - Blank line for readability.
+- Line 1197: `.tooltip-title {` - Starts a logic block.
+- Line 1198: `font-size: 0.875rem;` - Defines a visual property.
+- Line 1199: `}` - Ends a logic block.
+- Line 1200: `}` - Ends a logic block.
+- Line 1201: `` - Blank line for readability.
+- Line 1202: `.tooltip-body {` - Starts a logic block.
+- Line 1203: `padding: 12px;` - Defines a visual property.
+- Line 1204: `` - Blank line for readability.
+- Line 1205: `.tooltip-description {` - Starts a logic block.
+- Line 1206: `font-size: 0.75rem;` - Defines a visual property.
+- Line 1207: `margin-bottom: 12px;` - Defines a visual property.
+- Line 1208: `}` - Ends a logic block.
+- Line 1209: `}` - Ends a logic block.
+- Line 1210: `}` - Ends a logic block.
+- Line 1211: `}` - Ends a logic block.
+- Line 1212: `` - Blank line for readability.
+- Line 1213: `// Fullscreen styles` - Developer comment or documentation.
+- Line 1214: `:host-context(:fullscreen) .war-room-map-container,` - Defines a visual property.
+- Line 1215: `:host-context(:-webkit-full-screen) .war-room-map-container,` - Defines a visual property.
+- Line 1216: `:host-context(:-ms-fullscreen) .war-room-map-container {` - Starts a logic block.
+- Line 1217: `width: 100vw !important;` - Loads external tools or data types.
+- Line 1218: `height: 100vh !important;` - Loads external tools or data types.
+- Line 1219: `position: fixed !important;` - Loads external tools or data types.
+- Line 1220: `top: 0 !important;` - Loads external tools or data types.
+- Line 1221: `left: 0 !important;` - Loads external tools or data types.
+- Line 1222: `z-index: 9999 !important;` - Loads external tools or data types.
+- Line 1223: `background-color: #1a1a1a;` - Defines a visual property.
+- Line 1224: `` - Blank line for readability.
+- Line 1225: `.map-container,` - Styling rule.
+- Line 1226: `#war-room-map {` - Starts a logic block.
+- Line 1227: `width: 100% !important;` - Loads external tools or data types.
+- Line 1228: `height: 100% !important;` - Loads external tools or data types.
+- Line 1229: `}` - Ends a logic block.
+- Line 1230: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-activity-log/war-room-activity-log.component.ts
+- Line 1: `import { Component, input, output } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { CommonModule } from '@angular/common';` - Loads external tools or data types.
+- Line 3: `import { ActivityLog } from '../../../../../shared/models/war-room.interface';` - Loads external tools or data types.
+- Line 4: `` - Blank line for readability.
+- Line 5: `@Component({` - Marks this class as a UI component.
+- Line 6: `selector: 'app-war-room-activity-log',` - Defines the HTML tag name for this component.
+- Line 7: `imports: [CommonModule],` - Loads external tools or data types.
+- Line 8: `templateUrl: './war-room-activity-log.component.html',` - Links to the layout file.
+- Line 9: `styleUrl: './war-room-activity-log.component.scss',` - Links to the styling file.
+- Line 10: `})` - Ends a logic block.
+- Line 11: `export class WarRoomActivityLogComponent {` - Starts the logic class for this component.
+- Line 12: `activityLogs = input.required<ActivityLog[]>();` - App logic step.
+- Line 13: `selectedCompanyId = input<string | null>(null);` - App logic step.
+- Line 14: `` - Blank line for readability.
+- Line 15: `companySelected = output<string>();` - App logic step.
+- Line 16: `` - Blank line for readability.
+- Line 17: `/**` - Developer comment or documentation.
+- Line 18: `* Format timestamp for display` - Developer comment or documentation.
+- Line 19: `*/` - Developer comment or documentation.
+- Line 20: `formatTimestamp(timestamp: Date | string): string {` - Starts a logic block.
+- Line 21: `const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;` - App logic step.
+- Line 22: `const hours = date.getHours().toString().padStart(2, '0');` - App logic step.
+- Line 23: `const minutes = date.getMinutes().toString().padStart(2, '0');` - App logic step.
+- Line 24: `const seconds = date.getSeconds().toString().padStart(2, '0');` - App logic step.
+- Line 25: `return '${hours}:${minutes}:${seconds}';` - Returns a value.
+- Line 26: `}` - Ends a logic block.
+- Line 27: `` - Blank line for readability.
+- Line 28: `/**` - Developer comment or documentation.
+- Line 29: `* Handle log entry click` - Developer comment or documentation.
+- Line 30: `*/` - Developer comment or documentation.
+- Line 31: `onLogClick(log: ActivityLog): void {` - Starts a logic block.
+- Line 32: `console.log('Activity log entry clicked:', log);` - App logic step.
+- Line 33: `console.log('Emitting companyId:', log.companyId);` - App logic step.
+- Line 34: `this.companySelected.emit(log.companyId);` - App logic step.
+- Line 35: `}` - Ends a logic block.
+- Line 36: `` - Blank line for readability.
+- Line 37: `/**` - Developer comment or documentation.
+- Line 38: `* Check if log entry is selected` - Developer comment or documentation.
+- Line 39: `*/` - Developer comment or documentation.
+- Line 40: `isSelected(log: ActivityLog): boolean {` - Starts a logic block.
+- Line 41: `return this.selectedCompanyId() === log.companyId;` - Returns a value.
+- Line 42: `}` - Ends a logic block.
+- Line 43: `` - Blank line for readability.
+- Line 44: `/**` - Developer comment or documentation.
+- Line 45: `* Get status background class` - Developer comment or documentation.
+- Line 46: `*/` - Developer comment or documentation.
+- Line 47: `getStatusClass(status: string): string {` - Starts a logic block.
+- Line 48: `return status === 'ACTIVE' ? 'status-active' : 'status-info';` - Returns a value.
+- Line 49: `}` - Ends a logic block.
+- Line 50: `` - Blank line for readability.
+- Line 51: `/**` - Developer comment or documentation.
+- Line 52: `* Get displayed logs - limit to 7 entries (one per company)` - Developer comment or documentation.
+- Line 53: `*/` - Developer comment or documentation.
+- Line 54: `getDisplayedLogs(): ActivityLog[] {` - Starts a logic block.
+- Line 55: `const logs = this.activityLogs();` - App logic step.
+- Line 56: `// Sort by timestamp (most recent first)` - Developer comment or documentation.
+- Line 57: `const sortedLogs = logs` - App logic step.
+- Line 58: `.slice()` - App logic step.
+- Line 59: `.sort((a, b) => {` - Starts a logic block.
+- Line 60: `const dateA = typeof a.timestamp === 'string' ? new Date(a.timestamp) : a.timestamp;` - App logic step.
+- Line 61: `const dateB = typeof b.timestamp === 'string' ? new Date(b.timestamp) : b.timestamp;` - App logic step.
+- Line 62: `return dateB.getTime() - dateA.getTime();` - Returns a value.
+- Line 63: `});` - Ends a logic block.
+- Line 64: `` - Blank line for readability.
+- Line 65: `// Deduplicate by companyId - keep first entry for each company` - Developer comment or documentation.
+- Line 66: `const companyMap = new Map<string, ActivityLog>();` - App logic step.
+- Line 67: `for (const log of sortedLogs) {` - Starts a logic block.
+- Line 68: `if (!companyMap.has(log.companyId)) {` - Starts a logic block.
+- Line 69: `companyMap.set(log.companyId, log);` - App logic step.
+- Line 70: `}` - Ends a logic block.
+- Line 71: `// Stop once we have 7 entries` - Developer comment or documentation.
+- Line 72: `if (companyMap.size >= 7) {` - Starts a logic block.
+- Line 73: `break;` - App logic step.
+- Line 74: `}` - Ends a logic block.
+- Line 75: `}` - Ends a logic block.
+- Line 76: `` - Blank line for readability.
+- Line 77: `// Return array of unique company logs (up to 7)` - Developer comment or documentation.
+- Line 78: `return Array.from(companyMap.values());` - Returns a value.
+- Line 79: `}` - Ends a logic block.
+- Line 80: `` - Blank line for readability.
+- Line 81: `/**` - Developer comment or documentation.
+- Line 82: `* Extract company name from title (format: "COMPANY | LOCATION")` - Developer comment or documentation.
+- Line 83: `*/` - Developer comment or documentation.
+- Line 84: `getCompanyNameFromTitle(title: string): string {` - Starts a logic block.
+- Line 85: `const parts = title.split('|');` - App logic step.
+- Line 86: `const companyName = parts.length > 0 ? parts[0].trim() : title;` - App logic step.
+- Line 87: `return this.normalizeCompanyName(companyName);` - Returns a value.
+- Line 88: `}` - Ends a logic block.
+- Line 89: `` - Blank line for readability.
+- Line 90: `/**` - Developer comment or documentation.
+- Line 91: `* Extract location from title (format: "COMPANY | LOCATION")` - Developer comment or documentation.
+- Line 92: `*/` - Developer comment or documentation.
+- Line 93: `getLocationFromTitle(title: string): string {` - Starts a logic block.
+- Line 94: `const parts = title.split('|');` - App logic step.
+- Line 95: `return parts.length > 1 ? parts[1].trim() : '';` - Returns a value.
+- Line 96: `}` - Ends a logic block.
+- Line 97: `` - Blank line for readability.
+- Line 98: `/**` - Developer comment or documentation.
+- Line 99: `* Handle company name click specifically` - Developer comment or documentation.
+- Line 100: `*/` - Developer comment or documentation.
+- Line 101: `onCompanyNameClick(log: ActivityLog, event: Event): void {` - Starts a logic block.
+- Line 102: `event.stopPropagation(); // Prevent triggering the parent click handler twice` - App logic step.
+- Line 103: `console.log('Company name clicked:', log.company, 'companyId:', log.companyId);` - App logic step.
+- Line 104: `this.companySelected.emit(log.companyId);` - App logic step.
+- Line 105: `}` - Ends a logic block.
+- Line 106: `` - Blank line for readability.
+- Line 107: `private normalizeCompanyName(companyName: string): string {` - Starts a logic block.
+- Line 108: `const lowerName = companyName.toLowerCase();` - App logic step.
+- Line 109: `if (lowerName.includes('karzan') || lowerName.includes('karsan')) {` - Starts a logic block.
+- Line 110: `return 'KARSAN';` - Returns a value.
+- Line 111: `}` - Ends a logic block.
+- Line 112: `if (lowerName.includes('arbroc') || lowerName.includes('arboc')) {` - Starts a logic block.
+- Line 113: `return 'ARBOC';` - Returns a value.
+- Line 114: `}` - Ends a logic block.
+- Line 115: `if (lowerName.includes('nova bus') || lowerName.includes('nova')) {` - Starts a logic block.
+- Line 116: `return 'Nova Bus';` - Returns a value.
+- Line 117: `}` - Ends a logic block.
+- Line 118: `if (lowerName.includes('nfl') || lowerName.includes('new flyer')) {` - Starts a logic block.
+- Line 119: `return 'New Flyer';` - Returns a value.
+- Line 120: `}` - Ends a logic block.
+- Line 121: `return companyName;` - Returns a value.
+- Line 122: `}` - Ends a logic block.
+- Line 123: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-activity-log/war-room-activity-log.component.html
+- Line 1: `<div class="activity-log-container">` - Structural container.
+- Line 2: `<div class="activity-log-header">` - Structural container.
+- Line 3: `<h2 class="section-title">CRITICAL OPERATION LOG</h2>` - UI element definition.
+- Line 4: `</div>` - UI element definition.
+- Line 5: `` - Blank line for readability.
+- Line 6: `<div class="activity-log-entries">` - Structural container.
+- Line 7: `@for (log of getDisplayedLogs(); track log.id) {` - Starts a logic block.
+- Line 8: `<div` - Structural container.
+- Line 9: `class="log-entry"` - UI element definition.
+- Line 10: `[class.selected]="isSelected(log)"` - UI element definition.
+- Line 11: `[class.status-active]="getStatusClass(log.status) === 'status-active'"` - UI element definition.
+- Line 12: `[class.status-info]="getStatusClass(log.status) === 'status-info'"` - UI element definition.
+- Line 13: `[class.has-logo]="!!log.logo"` - UI element definition.
+- Line 14: `(click)="onLogClick(log)"` - UI element definition.
+- Line 15: `>` - UI element definition.
+- Line 16: `<div class="log-header">` - Structural container.
+- Line 17: `<div class="log-header-left">` - Structural container.
+- Line 18: `@if (log.logo) {` - Starts a logic block.
+- Line 19: `<img [src]="log.logo" alt="Company logo" class="company-logo" />` - UI element definition.
+- Line 20: `}` - Ends a logic block.
+- Line 21: `<div class="log-title-wrapper">` - Structural container.
+- Line 22: `<span class="log-status">{{ log.status }}</span>` - UI element definition.
+- Line 23: `<span class="log-timestamp">{{ formatTimestamp(log.timestamp) }}</span>` - UI element definition.
+- Line 24: `</div>` - UI element definition.
+- Line 25: `</div>` - UI element definition.
+- Line 26: `</div>` - UI element definition.
+- Line 27: `<div class="log-content">` - Structural container.
+- Line 28: `<div class="log-info-row">` - Structural container.
+- Line 29: `<span class="info-label">Company:</span>` - UI element definition.
+- Line 30: `<span class="company-name" (click)="onCompanyNameClick(log, $event)">{{ getCompanyNameFromTitle(log.title) }}</span>` - UI element definition.
+- Line 31: `</div>` - UI element definition.
+- Line 32: `@if (getLocationFromTitle(log.title)) {` - Starts a logic block.
+- Line 33: `<div class="log-info-row">` - Structural container.
+- Line 34: `<span class="info-label">Location:</span>` - UI element definition.
+- Line 35: `<span class="location-name">{{ getLocationFromTitle(log.title) }}</span>` - UI element definition.
+- Line 36: `</div>` - UI element definition.
+- Line 37: `}` - Ends a logic block.
+- Line 38: `@if (log.description) {` - Starts a logic block.
+- Line 39: `<div class="log-info-row description-row">` - Structural container.
+- Line 40: `<span class="info-label">Description:</span>` - UI element definition.
+- Line 41: `<span class="log-description">{{ log.description }}</span>` - UI element definition.
+- Line 42: `</div>` - UI element definition.
+- Line 43: `}` - Ends a logic block.
+- Line 44: `</div>` - UI element definition.
+- Line 45: `</div>` - UI element definition.
+- Line 46: `}` - Ends a logic block.
+- Line 47: `</div>` - UI element definition.
+- Line 48: `</div>` - UI element definition.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-activity-log/war-room-activity-log.component.scss
+- Line 1: `@use '../../war-room.component.scss' as *;` - Styling rule.
+- Line 2: `` - Blank line for readability.
+- Line 3: `.activity-log-container {` - Starts a logic block.
+- Line 4: `padding: 0.5rem 0 0.75rem;` - Defines a visual property.
+- Line 5: `min-width: 0;` - Defines a visual property.
+- Line 6: `max-width: 100%;` - Defines a visual property.
+- Line 7: `background: transparent;` - Defines a visual property.
+- Line 8: `width: 100%;` - Defines a visual property.
+- Line 9: `box-sizing: border-box;` - Defines a visual property.
+- Line 10: `}` - Ends a logic block.
+- Line 11: `` - Blank line for readability.
+- Line 12: `.activity-log-header {` - Starts a logic block.
+- Line 13: `margin-bottom: 0.75rem;` - Defines a visual property.
+- Line 14: `padding: 0 0.25rem;` - Defines a visual property.
+- Line 15: `}` - Ends a logic block.
+- Line 16: `` - Blank line for readability.
+- Line 17: `.section-title {` - Starts a logic block.
+- Line 18: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 19: `font-size: 10px;` - Defines a visual property.
+- Line 20: `font-weight: 700;` - Defines a visual property.
+- Line 21: `letter-spacing: 0.12em;` - Defines a visual property.
+- Line 22: `text-transform: uppercase;` - Defines a visual property.
+- Line 23: `color: $zinc-600;` - Defines a visual property.
+- Line 24: `margin: 0;` - Defines a visual property.
+- Line 25: `opacity: 0.85;` - Defines a visual property.
+- Line 26: `}` - Ends a logic block.
+- Line 27: `` - Blank line for readability.
+- Line 28: `.activity-log-entries {` - Starts a logic block.
+- Line 29: `display: flex;` - Defines a visual property.
+- Line 30: `flex-direction: column;` - Defines a visual property.
+- Line 31: `gap: 0.625rem;` - Defines a visual property.
+- Line 32: `width: 100%;` - Defines a visual property.
+- Line 33: `}` - Ends a logic block.
+- Line 34: `` - Blank line for readability.
+- Line 35: `.log-entry {` - Starts a logic block.
+- Line 36: `// List item structure matching website's .list-group-item` - Developer comment or documentation.
+- Line 37: `position: relative;` - Defines a visual property.
+- Line 38: `--log-logo-size: 1.5rem;` - Defines a visual property.
+- Line 39: `--log-logo-gap: 0.625rem;` - Defines a visual property.
+- Line 40: `padding: 1rem 0.938rem;` - Defines a visual property.
+- Line 41: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 42: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 43: `border: 1px solid var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 44: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 45: `display: flex;` - Defines a visual property.
+- Line 46: `flex-direction: column;` - Defines a visual property.
+- Line 47: `gap: 0.75rem;` - Defines a visual property.
+- Line 48: `cursor: pointer;` - Defines a visual property.
+- Line 49: `transition: all 0.25s ease;` - Defines a visual property.
+- Line 50: `user-select: none;` - Defines a visual property.
+- Line 51: `pointer-events: auto;` - Defines a visual property.
+- Line 52: `min-width: 0;` - Defines a visual property.
+- Line 53: `overflow: visible;` - Defines a visual property.
+- Line 54: `word-wrap: break-word;` - Defines a visual property.
+- Line 55: `hyphens: auto;` - Defines a visual property.
+- Line 56: `` - Blank line for readability.
+- Line 57: `// Hover state matching website's .list-group-item-action` - Developer comment or documentation.
+- Line 58: `&:hover {` - Starts a logic block.
+- Line 59: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 60: `background-color: var(--list-hover-focus-bg, #f1f2f9);` - Defines a visual property.
+- Line 61: `}` - Ends a logic block.
+- Line 62: `` - Blank line for readability.
+- Line 63: `&:focus {` - Starts a logic block.
+- Line 64: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 65: `background-color: var(--list-hover-focus-bg, #f1f2f9);` - Defines a visual property.
+- Line 66: `}` - Ends a logic block.
+- Line 67: `` - Blank line for readability.
+- Line 68: `&.status-active {` - Starts a logic block.
+- Line 69: `border-left: 3px solid transparent;` - Defines a visual property.
+- Line 70: `}` - Ends a logic block.
+- Line 71: `` - Blank line for readability.
+- Line 72: `&.status-info {` - Starts a logic block.
+- Line 73: `border-left: 3px solid transparent;` - Defines a visual property.
+- Line 74: `}` - Ends a logic block.
+- Line 75: `` - Blank line for readability.
+- Line 76: `// Selected state matching website's .list-group-item.active` - Developer comment or documentation.
+- Line 77: `&.selected {` - Starts a logic block.
+- Line 78: `z-index: 2;` - Defines a visual property.
+- Line 79: `color: #fff !important;` - Loads external tools or data types.
+- Line 80: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 81: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 82: `border-left: 3px solid $tactical-green !important;` - Loads external tools or data types.
+- Line 83: `` - Blank line for readability.
+- Line 84: `.log-status {` - Starts a logic block.
+- Line 85: `color: $tactical-green !important;` - Loads external tools or data types.
+- Line 86: `font-weight: 700;` - Defines a visual property.
+- Line 87: `}` - Ends a logic block.
+- Line 88: `` - Blank line for readability.
+- Line 89: `.log-timestamp {` - Starts a logic block.
+- Line 90: `color: rgba(255, 255, 255, 0.9) !important;` - Loads external tools or data types.
+- Line 91: `}` - Ends a logic block.
+- Line 92: `` - Blank line for readability.
+- Line 93: `.info-label {` - Starts a logic block.
+- Line 94: `color: rgba(255, 255, 255, 0.8) !important;` - Loads external tools or data types.
+- Line 95: `}` - Ends a logic block.
+- Line 96: `` - Blank line for readability.
+- Line 97: `.company-name {` - Starts a logic block.
+- Line 98: `color: $tactical-green !important;` - Loads external tools or data types.
+- Line 99: `text-decoration: none !important;` - Loads external tools or data types.
+- Line 100: `font-weight: 600;` - Defines a visual property.
+- Line 101: `` - Blank line for readability.
+- Line 102: `&:hover {` - Starts a logic block.
+- Line 103: `color: #1aff4d !important;` - Loads external tools or data types.
+- Line 104: `}` - Ends a logic block.
+- Line 105: `}` - Ends a logic block.
+- Line 106: `` - Blank line for readability.
+- Line 107: `.location-name {` - Starts a logic block.
+- Line 108: `color: rgba(255, 255, 255, 0.95) !important;` - Loads external tools or data types.
+- Line 109: `font-weight: 500;` - Defines a visual property.
+- Line 110: `}` - Ends a logic block.
+- Line 111: `` - Blank line for readability.
+- Line 112: `.log-description {` - Starts a logic block.
+- Line 113: `color: rgba(255, 255, 255, 0.9) !important;` - Loads external tools or data types.
+- Line 114: `}` - Ends a logic block.
+- Line 115: `` - Blank line for readability.
+- Line 116: `&:hover {` - Starts a logic block.
+- Line 117: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 118: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 119: `}` - Ends a logic block.
+- Line 120: `}` - Ends a logic block.
+- Line 121: `}` - Ends a logic block.
+- Line 122: `` - Blank line for readability.
+- Line 123: `.log-header {` - Starts a logic block.
+- Line 124: `display: flex;` - Defines a visual property.
+- Line 125: `justify-content: space-between;` - Defines a visual property.
+- Line 126: `align-items: center;` - Defines a visual property.
+- Line 127: `margin-bottom: 0.625rem;` - Defines a visual property.
+- Line 128: `padding-bottom: 0.625rem;` - Defines a visual property.
+- Line 129: `border-bottom: 1px solid var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 130: `min-width: 0;` - Defines a visual property.
+- Line 131: `transition: border-color 0.25s ease;` - Defines a visual property.
+- Line 132: `` - Blank line for readability.
+- Line 133: `.log-entry:hover & {` - Starts a logic block.
+- Line 134: `border-bottom-color: var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 135: `}` - Ends a logic block.
+- Line 136: `` - Blank line for readability.
+- Line 137: `.log-entry.selected & {` - Starts a logic block.
+- Line 138: `border-bottom-color: rgba(255, 255, 255, 0.2);` - Defines a visual property.
+- Line 139: `}` - Ends a logic block.
+- Line 140: `}` - Ends a logic block.
+- Line 141: `` - Blank line for readability.
+- Line 142: `.log-header-left {` - Starts a logic block.
+- Line 143: `display: flex;` - Defines a visual property.
+- Line 144: `align-items: center;` - Defines a visual property.
+- Line 145: `gap: var(--log-logo-gap);` - Defines a visual property.
+- Line 146: `flex: 1;` - Defines a visual property.
+- Line 147: `min-width: 0;` - Defines a visual property.
+- Line 148: `}` - Ends a logic block.
+- Line 149: `` - Blank line for readability.
+- Line 150: `.company-logo {` - Starts a logic block.
+- Line 151: `width: var(--log-logo-size);` - Defines a visual property.
+- Line 152: `height: var(--log-logo-size);` - Defines a visual property.
+- Line 153: `object-fit: contain;` - Defines a visual property.
+- Line 154: `flex-shrink: 0;` - Defines a visual property.
+- Line 155: `border-radius: 4px;` - Defines a visual property.
+- Line 156: `transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;` - Defines a visual property.
+- Line 157: `filter: brightness(1);` - Defines a visual property.
+- Line 158: `` - Blank line for readability.
+- Line 159: `.log-entry:hover & {` - Starts a logic block.
+- Line 160: `transform: scale(1.08);` - Defines a visual property.
+- Line 161: `filter: brightness(1.1);` - Defines a visual property.
+- Line 162: `}` - Ends a logic block.
+- Line 163: `` - Blank line for readability.
+- Line 164: `.log-entry.selected & {` - Starts a logic block.
+- Line 165: `filter: brightness(1.2);` - Defines a visual property.
+- Line 166: `}` - Ends a logic block.
+- Line 167: `}` - Ends a logic block.
+- Line 168: `` - Blank line for readability.
+- Line 169: `.log-title-wrapper {` - Starts a logic block.
+- Line 170: `display: flex;` - Defines a visual property.
+- Line 171: `flex-direction: row;` - Defines a visual property.
+- Line 172: `align-items: center;` - Defines a visual property.
+- Line 173: `gap: 0.625rem;` - Defines a visual property.
+- Line 174: `min-width: 0;` - Defines a visual property.
+- Line 175: `flex-wrap: wrap;` - Defines a visual property.
+- Line 176: `}` - Ends a logic block.
+- Line 177: `` - Blank line for readability.
+- Line 178: `.log-status {` - Starts a logic block.
+- Line 179: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 180: `font-size: 0.75rem;` - Defines a visual property.
+- Line 181: `font-weight: 700;` - Defines a visual property.
+- Line 182: `letter-spacing: 0.1em;` - Defines a visual property.
+- Line 183: `color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 184: `transition: color 0.25s ease;` - Defines a visual property.
+- Line 185: `line-height: 1.3;` - Defines a visual property.
+- Line 186: `white-space: nowrap;` - Defines a visual property.
+- Line 187: `flex-shrink: 0;` - Defines a visual property.
+- Line 188: `}` - Ends a logic block.
+- Line 189: `` - Blank line for readability.
+- Line 190: `.log-timestamp {` - Starts a logic block.
+- Line 191: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 192: `font-size: 0.6875rem;` - Defines a visual property.
+- Line 193: `font-weight: 500;` - Defines a visual property.
+- Line 194: `letter-spacing: 0.04em;` - Defines a visual property.
+- Line 195: `color: var(--text-muted, #8f8fb1);` - Defines a visual property.
+- Line 196: `transition: color 0.25s ease;` - Defines a visual property.
+- Line 197: `line-height: 1.3;` - Defines a visual property.
+- Line 198: `white-space: nowrap;` - Defines a visual property.
+- Line 199: `flex-shrink: 0;` - Defines a visual property.
+- Line 200: `}` - Ends a logic block.
+- Line 201: `` - Blank line for readability.
+- Line 202: `.log-content {` - Starts a logic block.
+- Line 203: `display: flex;` - Defines a visual property.
+- Line 204: `flex-direction: column;` - Defines a visual property.
+- Line 205: `gap: 0.625rem;` - Defines a visual property.
+- Line 206: `min-width: 0;` - Defines a visual property.
+- Line 207: `}` - Ends a logic block.
+- Line 208: `` - Blank line for readability.
+- Line 209: `.log-entry.has-logo {` - Starts a logic block.
+- Line 210: `.log-content {` - Starts a logic block.
+- Line 211: `padding-left: calc(var(--log-logo-size) + var(--log-logo-gap));` - Defines a visual property.
+- Line 212: `}` - Ends a logic block.
+- Line 213: `}` - Ends a logic block.
+- Line 214: `` - Blank line for readability.
+- Line 215: `.log-info-row {` - Starts a logic block.
+- Line 216: `display: flex;` - Defines a visual property.
+- Line 217: `align-items: flex-start;` - Defines a visual property.
+- Line 218: `gap: 0.625rem;` - Defines a visual property.
+- Line 219: `min-width: 0;` - Defines a visual property.
+- Line 220: `line-height: 1.6;` - Defines a visual property.
+- Line 221: `transition: opacity 0.2s ease;` - Defines a visual property.
+- Line 222: `` - Blank line for readability.
+- Line 223: `.log-entry:hover & {` - Starts a logic block.
+- Line 224: `opacity: 1;` - Defines a visual property.
+- Line 225: `}` - Ends a logic block.
+- Line 226: `}` - Ends a logic block.
+- Line 227: `` - Blank line for readability.
+- Line 228: `.info-label {` - Starts a logic block.
+- Line 229: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 230: `font-size: 0.6875rem;` - Defines a visual property.
+- Line 231: `font-weight: 600;` - Defines a visual property.
+- Line 232: `letter-spacing: 0.05em;` - Defines a visual property.
+- Line 233: `text-transform: uppercase;` - Defines a visual property.
+- Line 234: `color: var(--text-muted, #8f8fb1);` - Defines a visual property.
+- Line 235: `flex-shrink: 0;` - Defines a visual property.
+- Line 236: `min-width: 60px;` - Defines a visual property.
+- Line 237: `transition: color 0.25s ease;` - Defines a visual property.
+- Line 238: `}` - Ends a logic block.
+- Line 239: `` - Blank line for readability.
+- Line 240: `.company-name {` - Starts a logic block.
+- Line 241: `font-family: 'Plus Jakarta Sans', sans-serif;` - Defines a visual property.
+- Line 242: `font-size: 0.875rem;` - Defines a visual property.
+- Line 243: `font-weight: 600;` - Defines a visual property.
+- Line 244: `color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 245: `cursor: pointer;` - Defines a visual property.
+- Line 246: `text-decoration: underline;` - Defines a visual property.
+- Line 247: `text-decoration-color: var(--primary02, rgba(98, 89, 202, 0.2));` - Defines a visual property.
+- Line 248: `text-underline-offset: 2px;` - Defines a visual property.
+- Line 249: `transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 250: `word-break: break-word;` - Defines a visual property.
+- Line 251: `flex: 1;` - Defines a visual property.
+- Line 252: `min-width: 0;` - Defines a visual property.
+- Line 253: `position: relative;` - Defines a visual property.
+- Line 254: `` - Blank line for readability.
+- Line 255: `&:hover {` - Starts a logic block.
+- Line 256: `color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 257: `text-decoration-color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 258: `transform: translateX(1px);` - Defines a visual property.
+- Line 259: `}` - Ends a logic block.
+- Line 260: `` - Blank line for readability.
+- Line 261: `&:active {` - Starts a logic block.
+- Line 262: `transform: translateX(0);` - Defines a visual property.
+- Line 263: `}` - Ends a logic block.
+- Line 264: `}` - Ends a logic block.
+- Line 265: `` - Blank line for readability.
+- Line 266: `.location-name {` - Starts a logic block.
+- Line 267: `font-family: 'Plus Jakarta Sans', sans-serif;` - Defines a visual property.
+- Line 268: `font-size: 0.875rem;` - Defines a visual property.
+- Line 269: `font-weight: 500;` - Defines a visual property.
+- Line 270: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 271: `word-break: break-word;` - Defines a visual property.
+- Line 272: `flex: 1;` - Defines a visual property.
+- Line 273: `min-width: 0;` - Defines a visual property.
+- Line 274: `transition: color 0.25s ease, opacity 0.25s ease;` - Defines a visual property.
+- Line 275: `` - Blank line for readability.
+- Line 276: `// Ensure selected state overrides base color - prevent theme interference` - Developer comment or documentation.
+- Line 277: `.log-entry.selected & {` - Starts a logic block.
+- Line 278: `color: #ffffff !important;` - Loads external tools or data types.
+- Line 279: `font-weight: 500;` - Defines a visual property.
+- Line 280: `}` - Ends a logic block.
+- Line 281: `}` - Ends a logic block.
+- Line 282: `` - Blank line for readability.
+- Line 283: `.log-description {` - Starts a logic block.
+- Line 284: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 285: `font-size: 0.813rem;` - Defines a visual property.
+- Line 286: `font-weight: 400;` - Defines a visual property.
+- Line 287: `letter-spacing: 0.03em;` - Defines a visual property.
+- Line 288: `text-transform: uppercase;` - Defines a visual property.
+- Line 289: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 290: `word-wrap: break-word;` - Defines a visual property.
+- Line 291: `word-break: break-word;` - Defines a visual property.
+- Line 292: `line-height: 1.5;` - Defines a visual property.
+- Line 293: `flex: 1;` - Defines a visual property.
+- Line 294: `min-width: 0;` - Defines a visual property.
+- Line 295: `transition: color 0.25s ease;` - Defines a visual property.
+- Line 296: `}` - Ends a logic block.
+- Line 297: `` - Blank line for readability.
+- Line 298: `.description-row {` - Starts a logic block.
+- Line 299: `margin-top: 0.25rem;` - Defines a visual property.
+- Line 300: `padding-top: 0.5rem;` - Defines a visual property.
+- Line 301: `border-top: 1px solid var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 302: `` - Blank line for readability.
+- Line 303: `.log-entry.selected & {` - Starts a logic block.
+- Line 304: `border-top-color: rgba(255, 255, 255, 0.15);` - Defines a visual property.
+- Line 305: `}` - Ends a logic block.
+- Line 306: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-hub-status/war-room-hub-status.component.ts
+- Line 1: `import { Component, input, computed, inject, output } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { CommonModule } from '@angular/common';` - Loads external tools or data types.
+- Line 3: `import { CompanyData } from '../../../../../shared/models/war-room.interface';` - Loads external tools or data types.
+- Line 4: `` - Blank line for readability.
+- Line 5: `@Component({` - Marks this class as a UI component.
+- Line 6: `selector: 'app-war-room-hub-status',` - Defines the HTML tag name for this component.
+- Line 7: `imports: [CommonModule],` - Loads external tools or data types.
+- Line 8: `templateUrl: './war-room-hub-status.component.html',` - Links to the layout file.
+- Line 9: `styleUrl: './war-room-hub-status.component.scss',` - Links to the styling file.
+- Line 10: `})` - Ends a logic block.
+- Line 11: `export class WarRoomHubStatusComponent {` - Starts the logic class for this component.
+- Line 12: `selectedCompany = input<CompanyData | null>(null);` - App logic step.
+- Line 13: `` - Blank line for readability.
+- Line 14: `addCompanyRequested = output<void>();` - App logic step.
+- Line 15: `` - Blank line for readability.
+- Line 16: `readonly hubs = computed(() => {` - Starts a logic block.
+- Line 17: `return this.selectedCompany()?.hubs || [];` - Returns a value.
+- Line 18: `});` - Ends a logic block.
+- Line 19: `` - Blank line for readability.
+- Line 20: `readonly quantumChart = computed(() => {` - Starts a logic block.
+- Line 21: `return this.selectedCompany()?.quantumChart || null;` - Returns a value.
+- Line 22: `});` - Ends a logic block.
+- Line 23: `` - Blank line for readability.
+- Line 24: `/**` - Developer comment or documentation.
+- Line 25: `* Get hub border class` - Developer comment or documentation.
+- Line 26: `*/` - Developer comment or documentation.
+- Line 27: `getHubBorderClass(status: string): string {` - Starts a logic block.
+- Line 28: `return status === 'OPTIMAL' ? 'border-tactical-green' : 'border-zinc-700';` - Returns a value.
+- Line 29: `}` - Ends a logic block.
+- Line 30: `` - Blank line for readability.
+- Line 31: `/**` - Developer comment or documentation.
+- Line 32: `* Handle add company click – request modal (handled by war-room, modal over map)` - Developer comment or documentation.
+- Line 33: `*/` - Developer comment or documentation.
+- Line 34: `onAddCompany(): void {` - Starts a logic block.
+- Line 35: `this.addCompanyRequested.emit();` - App logic step.
+- Line 36: `}` - Ends a logic block.
+- Line 37: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-hub-status/war-room-hub-status.component.html
+- Line 1: `<div class="hub-status-container">` - Structural container.
+- Line 2: `<div class="hub-status-header">` - Structural container.
+- Line 3: `<h2 class="section-title">ACTIVE HUB STATUS</h2>` - UI element definition.
+- Line 4: `</div>` - UI element definition.
+- Line 5: `` - Blank line for readability.
+- Line 6: `<div class="hub-status-grid">` - Structural container.
+- Line 7: `@for (hub of hubs(); track hub.id) {` - Starts a logic block.
+- Line 8: `<div class="hub-status-card" [class]="getHubBorderClass(hub.status)">` - Structural container.
+- Line 9: `<p class="hub-code" [style.color]="hub.status === 'OPTIMAL' ? '#00FF41' : '#3f3f46'">` - UI element definition.
+- Line 10: `{{ hub.code }}` - UI element definition.
+- Line 11: `</p>` - UI element definition.
+- Line 12: `<p class="hub-status-value" [style.color]="hub.status === 'OPTIMAL' || hub.status === 'ONLINE' ? '#00FF41' : '#27272a'">` - UI element definition.
+- Line 13: `{{ hub.status }}` - UI element definition.
+- Line 14: `</p>` - UI element definition.
+- Line 15: `<p class="hub-capacity" [style.color]="hub.status === 'OPTIMAL' || hub.status === 'ONLINE' ? '#00FF41' : '#3f3f46'">` - UI element definition.
+- Line 16: `{{ hub.capacity }}` - UI element definition.
+- Line 17: `</p>` - UI element definition.
+- Line 18: `</div>` - UI element definition.
+- Line 19: `}` - Ends a logic block.
+- Line 20: `</div>` - UI element definition.
+- Line 21: `` - Blank line for readability.
+- Line 22: `<!-- Quantum Sync Stability Chart -->` - UI element definition.
+- Line 23: `@if (quantumChart(); as chart) {` - Starts a logic block.
+- Line 24: `<div class="quantum-chart-container">` - Structural container.
+- Line 25: `<p class="quantum-chart-title">QUANTUM SYNC STABILITY</p>` - UI element definition.
+- Line 26: `<div class="quantum-chart">` - Structural container.
+- Line 27: `@for (value of chart.dataPoints; track $index) {` - Starts a logic block.
+- Line 28: `<div` - Structural container.
+- Line 29: `class="quantum-bar"` - UI element definition.
+- Line 30: `[class.highlighted]="$index === chart.highlightedIndex"` - UI element definition.
+- Line 31: `[style.height.%]="value"` - UI element definition.
+- Line 32: `></div>` - UI element definition.
+- Line 33: `}` - Ends a logic block.
+- Line 34: `</div>` - UI element definition.
+- Line 35: `<div class="quantum-chart-footer">` - Structural container.
+- Line 36: `<span>-24H HISTORY</span>` - UI element definition.
+- Line 37: `<span>LIVE STREAM</span>` - UI element definition.
+- Line 38: `</div>` - UI element definition.
+- Line 39: `</div>` - UI element definition.
+- Line 40: `}` - Ends a logic block.
+- Line 41: `` - Blank line for readability.
+- Line 42: `<!-- Global Override Button -->` - UI element definition.
+- Line 43: `<div class="global-override-section">` - Structural container.
+- Line 44: `<button class="global-override-btn" type="button" (click)="onAddCompany()">` - Clickable button.
+- Line 45: `ADD COMPANY` - UI element definition.
+- Line 46: `</button>` - UI element definition.
+- Line 47: `</div>` - UI element definition.
+- Line 48: `</div>` - UI element definition.
+
+## Spruha/src/app/components/apps/war-room/components/war-room-hub-status/war-room-hub-status.component.scss
+- Line 1: `@use '../../war-room.component.scss' as *;` - Styling rule.
+- Line 2: `` - Blank line for readability.
+- Line 3: `.hub-status-container {` - Starts a logic block.
+- Line 4: `padding: 0.5rem 0 0.75rem;` - Defines a visual property.
+- Line 5: `flex: 1;` - Defines a visual property.
+- Line 6: `display: flex;` - Defines a visual property.
+- Line 7: `flex-direction: column;` - Defines a visual property.
+- Line 8: `min-width: 0;` - Defines a visual property.
+- Line 9: `}` - Ends a logic block.
+- Line 10: `` - Blank line for readability.
+- Line 11: `.hub-status-header {` - Starts a logic block.
+- Line 12: `margin-bottom: 0.625rem;` - Defines a visual property.
+- Line 13: `}` - Ends a logic block.
+- Line 14: `` - Blank line for readability.
+- Line 15: `.section-title {` - Starts a logic block.
+- Line 16: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 17: `font-size: 10px;` - Defines a visual property.
+- Line 18: `font-weight: 600;` - Defines a visual property.
+- Line 19: `letter-spacing: 0.1em;` - Defines a visual property.
+- Line 20: `text-transform: uppercase;` - Defines a visual property.
+- Line 21: `color: $zinc-600;` - Defines a visual property.
+- Line 22: `margin: 0;` - Defines a visual property.
+- Line 23: `}` - Ends a logic block.
+- Line 24: `` - Blank line for readability.
+- Line 25: `.hub-status-grid {` - Starts a logic block.
+- Line 26: `display: grid;` - Defines a visual property.
+- Line 27: `grid-template-columns: repeat(2, 1fr);` - Defines a visual property.
+- Line 28: `gap: 0.5rem;` - Defines a visual property.
+- Line 29: `margin-bottom: 1rem;` - Defines a visual property.
+- Line 30: `}` - Ends a logic block.
+- Line 31: `` - Blank line for readability.
+- Line 32: `.hub-status-card {` - Starts a logic block.
+- Line 33: `// Card structure matching website's .card.custom-card` - Developer comment or documentation.
+- Line 34: `position: relative;` - Defines a visual property.
+- Line 35: `padding: 0.625rem 0.75rem;` - Defines a visual property.
+- Line 36: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 37: `border: 1px solid transparent;` - Defines a visual property.
+- Line 38: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 39: `box-shadow: 0 10px 30px 0 var(--primary005, rgba(98, 89, 202, 0.05));` - Defines a visual property.
+- Line 40: `margin-block-end: 0;` - Defines a visual property.
+- Line 41: `width: 100%;` - Defines a visual property.
+- Line 42: `transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;` - Defines a visual property.
+- Line 43: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 44: `` - Blank line for readability.
+- Line 45: `&.border-tactical-green {` - Starts a logic block.
+- Line 46: `border-color: $tactical-green;` - Defines a visual property.
+- Line 47: `box-shadow: 0 10px 30px 0 rgba(0, 255, 65, 0.15);` - Defines a visual property.
+- Line 48: `}` - Ends a logic block.
+- Line 49: `` - Blank line for readability.
+- Line 50: `&.border-zinc-700 {` - Starts a logic block.
+- Line 51: `border-color: $zinc-700;` - Defines a visual property.
+- Line 52: `box-shadow: 0 10px 30px 0 rgba(63, 63, 70, 0.15);` - Defines a visual property.
+- Line 53: `}` - Ends a logic block.
+- Line 54: `}` - Ends a logic block.
+- Line 55: `` - Blank line for readability.
+- Line 56: `.hub-code {` - Starts a logic block.
+- Line 57: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 58: `font-size: 9px;` - Defines a visual property.
+- Line 59: `font-weight: 600;` - Defines a visual property.
+- Line 60: `letter-spacing: 0.06em;` - Defines a visual property.
+- Line 61: `margin: 0 0 0.2rem 0;` - Defines a visual property.
+- Line 62: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 63: `}` - Ends a logic block.
+- Line 64: `` - Blank line for readability.
+- Line 65: `.hub-status-value {` - Starts a logic block.
+- Line 66: `font-family: 'Plus Jakarta Sans', sans-serif;` - Defines a visual property.
+- Line 67: `font-size: 0.95rem;` - Defines a visual property.
+- Line 68: `font-weight: 600;` - Defines a visual property.
+- Line 69: `line-height: 1.2;` - Defines a visual property.
+- Line 70: `margin: 0 0 0.2rem 0;` - Defines a visual property.
+- Line 71: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 72: `}` - Ends a logic block.
+- Line 73: `` - Blank line for readability.
+- Line 74: `.hub-capacity {` - Starts a logic block.
+- Line 75: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 76: `font-size: 9px;` - Defines a visual property.
+- Line 77: `font-weight: 500;` - Defines a visual property.
+- Line 78: `letter-spacing: 0.02em;` - Defines a visual property.
+- Line 79: `margin: 0;` - Defines a visual property.
+- Line 80: `color: var(--text-muted, #8f8fb1);` - Defines a visual property.
+- Line 81: `}` - Ends a logic block.
+- Line 82: `` - Blank line for readability.
+- Line 83: `.quantum-chart-container {` - Starts a logic block.
+- Line 84: `// Card structure matching website's .card.custom-card` - Developer comment or documentation.
+- Line 85: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 86: `border: 0;` - Defines a visual property.
+- Line 87: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 88: `box-shadow: 0 10px 30px 0 var(--primary005, rgba(98, 89, 202, 0.05));` - Defines a visual property.
+- Line 89: `position: relative;` - Defines a visual property.
+- Line 90: `margin-block-end: 1.25rem;` - Defines a visual property.
+- Line 91: `width: 100%;` - Defines a visual property.
+- Line 92: `transition: box-shadow 0.3s ease, background 0.3s ease;` - Defines a visual property.
+- Line 93: `` - Blank line for readability.
+- Line 94: `// Card body padding matching website` - Developer comment or documentation.
+- Line 95: `padding: 1.563rem;` - Defines a visual property.
+- Line 96: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 97: `}` - Ends a logic block.
+- Line 98: `` - Blank line for readability.
+- Line 99: `.quantum-chart-title {` - Starts a logic block.
+- Line 100: `// Chart title matching website's card-title structure` - Developer comment or documentation.
+- Line 101: `position: relative;` - Defines a visual property.
+- Line 102: `margin-block-end: 0;` - Defines a visual property.
+- Line 103: `font-size: 0.875rem;` - Defines a visual property.
+- Line 104: `font-weight: 800;` - Defines a visual property.
+- Line 105: `text-transform: uppercase;` - Defines a visual property.
+- Line 106: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 107: `margin: 0 0 1rem 0;` - Defines a visual property.
+- Line 108: `transition: color 0.25s ease;` - Defines a visual property.
+- Line 109: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 110: `letter-spacing: 0.1em;` - Defines a visual property.
+- Line 111: `}` - Ends a logic block.
+- Line 112: `` - Blank line for readability.
+- Line 113: `.quantum-chart {` - Starts a logic block.
+- Line 114: `// Chart area matching website's chart container` - Developer comment or documentation.
+- Line 115: `height: 4rem;` - Defines a visual property.
+- Line 116: `width: 100%;` - Defines a visual property.
+- Line 117: `display: flex;` - Defines a visual property.
+- Line 118: `align-items: flex-end;` - Defines a visual property.
+- Line 119: `gap: 0.2rem;` - Defines a visual property.
+- Line 120: `margin-bottom: 0.75rem;` - Defines a visual property.
+- Line 121: `position: relative;` - Defines a visual property.
+- Line 122: `}` - Ends a logic block.
+- Line 123: `` - Blank line for readability.
+- Line 124: `.quantum-bar {` - Starts a logic block.
+- Line 125: `// Bar chart bars matching website's chart bar styles` - Developer comment or documentation.
+- Line 126: `flex: 1;` - Defines a visual property.
+- Line 127: `background: var(--primary01, rgba(98, 89, 202, 0.1));` - Defines a visual property.
+- Line 128: `border-radius: 0.188rem 0.188rem 0 0;` - Defines a visual property.
+- Line 129: `transition: background 0.2s ease, transform 0.2s ease;` - Defines a visual property.
+- Line 130: `min-height: 4px;` - Defines a visual property.
+- Line 131: `` - Blank line for readability.
+- Line 132: `&:hover {` - Starts a logic block.
+- Line 133: `transform: translateY(-2px);` - Defines a visual property.
+- Line 134: `background: var(--primary02, rgba(98, 89, 202, 0.2));` - Defines a visual property.
+- Line 135: `}` - Ends a logic block.
+- Line 136: `` - Blank line for readability.
+- Line 137: `&.highlighted {` - Starts a logic block.
+- Line 138: `background: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 139: `box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);` - Defines a visual property.
+- Line 140: `}` - Ends a logic block.
+- Line 141: `}` - Ends a logic block.
+- Line 142: `` - Blank line for readability.
+- Line 143: `.quantum-chart-footer {` - Starts a logic block.
+- Line 144: `// Chart footer matching website's chart footer styles` - Developer comment or documentation.
+- Line 145: `display: flex;` - Defines a visual property.
+- Line 146: `justify-content: space-between;` - Defines a visual property.
+- Line 147: `font-size: 0.813rem;` - Defines a visual property.
+- Line 148: `font-weight: 400;` - Defines a visual property.
+- Line 149: `color: var(--text-muted, #8f8fb1);` - Defines a visual property.
+- Line 150: `margin-top: 0.5rem;` - Defines a visual property.
+- Line 151: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 152: `letter-spacing: 0.05em;` - Defines a visual property.
+- Line 153: `}` - Ends a logic block.
+- Line 154: `` - Blank line for readability.
+- Line 155: `.global-override-section {` - Starts a logic block.
+- Line 156: `padding: 0.5rem 0 0;` - Defines a visual property.
+- Line 157: `margin-top: auto;` - Defines a visual property.
+- Line 158: `background: transparent;` - Defines a visual property.
+- Line 159: `border-top: none;` - Defines a visual property.
+- Line 160: `}` - Ends a logic block.
+- Line 161: `` - Blank line for readability.
+- Line 162: `.global-override-btn {` - Starts a logic block.
+- Line 163: `// Base button structure from website` - Developer comment or documentation.
+- Line 164: `width: 100%;` - Defines a visual property.
+- Line 165: `position: relative;` - Defines a visual property.
+- Line 166: `font-size: 0.85rem;` - Defines a visual property.
+- Line 167: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 168: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 169: `box-shadow: none;` - Defines a visual property.
+- Line 170: `font-weight: 400;` - Defines a visual property.
+- Line 171: `` - Blank line for readability.
+- Line 172: `// Primary button styling matching website structure` - Developer comment or documentation.
+- Line 173: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 174: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 175: `color: #fff !important;` - Loads external tools or data types.
+- Line 176: `border: 1px solid rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 177: `cursor: pointer;` - Defines a visual property.
+- Line 178: `transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 179: `font-family: 'JetBrains Mono', monospace;` - Defines a visual property.
+- Line 180: `letter-spacing: 0.08em;` - Defines a visual property.
+- Line 181: `text-transform: uppercase;` - Defines a visual property.
+- Line 182: `` - Blank line for readability.
+- Line 183: `&::before {` - Starts a logic block.
+- Line 184: `content: '';` - Defines a visual property.
+- Line 185: `position: absolute;` - Defines a visual property.
+- Line 186: `left: 0;` - Defines a visual property.
+- Line 187: `top: 22%;` - Defines a visual property.
+- Line 188: `height: 56%;` - Defines a visual property.
+- Line 189: `width: 3px;` - Defines a visual property.
+- Line 190: `background: $tactical-green;` - Defines a visual property.
+- Line 191: `border-radius: 0 2px 2px 0;` - Defines a visual property.
+- Line 192: `}` - Ends a logic block.
+- Line 193: `` - Blank line for readability.
+- Line 194: `// Hover state matching website button structure` - Developer comment or documentation.
+- Line 195: `&:hover {` - Starts a logic block.
+- Line 196: `background-color: rgba(var(--primary-rgb), 0.9) !important;` - Loads external tools or data types.
+- Line 197: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 198: `color: #fff !important;` - Loads external tools or data types.
+- Line 199: `box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 200: `transform: translateY(-1px);` - Defines a visual property.
+- Line 201: `}` - Ends a logic block.
+- Line 202: `` - Blank line for readability.
+- Line 203: `// Active/Focus state matching website button structure` - Developer comment or documentation.
+- Line 204: `&:active,` - Defines a visual property.
+- Line 205: `&:focus {` - Starts a logic block.
+- Line 206: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 207: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 208: `color: #fff !important;` - Loads external tools or data types.
+- Line 209: `box-shadow: 0 0.25rem 1rem rgba(var(--primary-rgb), 0.5);` - Defines a visual property.
+- Line 210: `outline: 0;` - Defines a visual property.
+- Line 211: `}` - Ends a logic block.
+- Line 212: `` - Blank line for readability.
+- Line 213: `// Disabled state` - Developer comment or documentation.
+- Line 214: `&:disabled {` - Starts a logic block.
+- Line 215: `opacity: 0.6;` - Defines a visual property.
+- Line 216: `cursor: not-allowed;` - Defines a visual property.
+- Line 217: `transform: none !important;` - Loads external tools or data types.
+- Line 218: `}` - Ends a logic block.
+- Line 219: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/add-company-modal/add-company-modal.component.ts
+- Line 1: `import { Component, input, output, signal, inject, HostListener, effect, ElementRef, Renderer2, OnDestroy, HostBinding } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { CommonModule } from '@angular/common';` - Loads external tools or data types.
+- Line 3: `import { FormsModule } from '@angular/forms';` - Loads external tools or data types.
+- Line 4: `import { WarRoomService } from '../../../../../shared/services/war-room.service';` - Loads external tools or data types.
+- Line 5: `` - Blank line for readability.
+- Line 6: `export interface CompanyFormData {` - Starts a logic block.
+- Line 7: `companyName: string;` - App logic step.
+- Line 8: `location: string;` - App logic step.
+- Line 9: `description?: string;` - App logic step.
+- Line 10: `logo?: string | ArrayBuffer | null;` - App logic step.
+- Line 11: `logoFile?: File;` - App logic step.
+- Line 12: `}` - Ends a logic block.
+- Line 13: `` - Blank line for readability.
+- Line 14: `@Component({` - Marks this class as a UI component.
+- Line 15: `selector: 'app-add-company-modal',` - Defines the HTML tag name for this component.
+- Line 16: `imports: [CommonModule, FormsModule],` - Loads external tools or data types.
+- Line 17: `templateUrl: './add-company-modal.component.html',` - Links to the layout file.
+- Line 18: `styleUrl: './add-company-modal.component.scss',` - Links to the styling file.
+- Line 19: `})` - Ends a logic block.
+- Line 20: `export class AddCompanyModalComponent implements OnDestroy {` - Starts the logic class for this component.
+- Line 21: `// Inputs` - Developer comment or documentation.
+- Line 22: `isVisible = input<boolean>(false);` - App logic step.
+- Line 23: `/** When true, overlay is positioned over the map area only (no moveToBody, absolute positioning) */` - Developer comment or documentation.
+- Line 24: `useMapPositioning = input<boolean>(false);` - App logic step.
+- Line 25: `` - Blank line for readability.
+- Line 26: `// Outputs` - Developer comment or documentation.
+- Line 27: `companyAdded = output<CompanyFormData>();` - App logic step.
+- Line 28: `companyAddedComplete = output<void>();` - App logic step.
+- Line 29: `close = output<void>();` - App logic step.
+- Line 30: `` - Blank line for readability.
+- Line 31: `// Services` - Developer comment or documentation.
+- Line 32: `private warRoomService = inject(WarRoomService);` - Retrieves a service.
+- Line 33: `private elementRef = inject(ElementRef);` - Retrieves a service.
+- Line 34: `private renderer = inject(Renderer2);` - Retrieves a service.
+- Line 35: `` - Blank line for readability.
+- Line 36: `// Form data` - Developer comment or documentation.
+- Line 37: `companyName = signal<string>('');` - Creates a reactive variable.
+- Line 38: `location = signal<string>('');` - Creates a reactive variable.
+- Line 39: `description = signal<string>('');` - Creates a reactive variable.
+- Line 40: `logoFile = signal<File | null>(null);` - Creates a reactive variable.
+- Line 41: `logoPreview = signal<string | null>(null);` - Creates a reactive variable.
+- Line 42: `` - Blank line for readability.
+- Line 43: `// Form state` - Developer comment or documentation.
+- Line 44: `isSubmitting = signal<boolean>(false);` - Creates a reactive variable.
+- Line 45: `errorMessage = signal<string | null>(null);` - Creates a reactive variable.
+- Line 46: `` - Blank line for readability.
+- Line 47: `@HostBinding('class.map-positioned') get isMapPositioned(): boolean {` - Starts a logic block.
+- Line 48: `return this.useMapPositioning();` - Returns a value.
+- Line 49: `}` - Ends a logic block.
+- Line 50: `` - Blank line for readability.
+- Line 51: `constructor() {` - Initializes the component.
+- Line 52: `// Move modal to body when visible and NOT using map positioning` - Developer comment or documentation.
+- Line 53: `effect(() => {` - Starts a logic block.
+- Line 54: `const visible = this.isVisible();` - App logic step.
+- Line 55: `const mapPos = this.useMapPositioning();` - App logic step.
+- Line 56: `if (visible && !mapPos) {` - Starts a logic block.
+- Line 57: `setTimeout(() => this.moveToBody(), 0);` - App logic step.
+- Line 58: `}` - Ends a logic block.
+- Line 59: `});` - Ends a logic block.
+- Line 60: `}` - Ends a logic block.
+- Line 61: `` - Blank line for readability.
+- Line 62: `ngOnDestroy(): void {` - Runs before component is removed.
+- Line 63: `const element = this.elementRef.nativeElement;` - App logic step.
+- Line 64: `if (element.parentNode === document.body) {` - Starts a logic block.
+- Line 65: `this.renderer.removeChild(document.body, element);` - App logic step.
+- Line 66: `}` - Ends a logic block.
+- Line 67: `}` - Ends a logic block.
+- Line 68: `` - Blank line for readability.
+- Line 69: `private moveToBody(): void {` - Starts a logic block.
+- Line 70: `const element = this.elementRef.nativeElement;` - App logic step.
+- Line 71: `if (element.parentNode !== document.body) {` - Starts a logic block.
+- Line 72: `this.renderer.appendChild(document.body, element);` - App logic step.
+- Line 73: `}` - Ends a logic block.
+- Line 74: `}` - Ends a logic block.
+- Line 75: `` - Blank line for readability.
+- Line 76: `/**` - Developer comment or documentation.
+- Line 77: `* Handle escape key to close modal` - Developer comment or documentation.
+- Line 78: `*/` - Developer comment or documentation.
+- Line 79: `@HostListener('document:keydown.escape', ['$event'])` - App logic step.
+- Line 80: `onEscapeKey(): void {` - Starts a logic block.
+- Line 81: `if (this.isVisible()) {` - Starts a logic block.
+- Line 82: `this.onClose();` - App logic step.
+- Line 83: `}` - Ends a logic block.
+- Line 84: `}` - Ends a logic block.
+- Line 85: `` - Blank line for readability.
+- Line 86: `/**` - Developer comment or documentation.
+- Line 87: `* Handle file selection for logo` - Developer comment or documentation.
+- Line 88: `*/` - Developer comment or documentation.
+- Line 89: `onFileSelected(event: Event): void {` - Starts a logic block.
+- Line 90: `const input = event.target as HTMLInputElement;` - App logic step.
+- Line 91: `if (input.files && input.files.length > 0) {` - Starts a logic block.
+- Line 92: `const file = input.files[0];` - App logic step.
+- Line 93: `` - Blank line for readability.
+- Line 94: `// Check if it's an image file (SVG, PNG, JPG, JPEG, GIF, WEBP)` - Developer comment or documentation.
+- Line 95: `const validImageTypes = [` - App logic step.
+- Line 96: `'image/svg+xml',` - App logic step.
+- Line 97: `'image/png',` - App logic step.
+- Line 98: `'image/jpeg',` - App logic step.
+- Line 99: `'image/gif',` - App logic step.
+- Line 100: `'image/webp'` - App logic step.
+- Line 101: `];` - App logic step.
+- Line 102: `` - Blank line for readability.
+- Line 103: `const validExtensions = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp'];` - App logic step.
+- Line 104: `const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));` - App logic step.
+- Line 105: `` - Blank line for readability.
+- Line 106: `if (validImageTypes.includes(file.type) || validExtensions.includes(fileExtension)) {` - Starts a logic block.
+- Line 107: `this.logoFile.set(file);` - App logic step.
+- Line 108: `` - Blank line for readability.
+- Line 109: `// Create preview` - Developer comment or documentation.
+- Line 110: `const reader = new FileReader();` - App logic step.
+- Line 111: `reader.onload = (e) => {` - Starts a logic block.
+- Line 112: `this.logoPreview.set(e.target?.result as string);` - App logic step.
+- Line 113: `};` - Ends a logic block.
+- Line 114: `reader.readAsDataURL(file);` - App logic step.
+- Line 115: `} else {` - App logic step.
+- Line 116: `this.errorMessage.set('Please select an image file (SVG, PNG, JPG, GIF, or WEBP)');` - App logic step.
+- Line 117: `setTimeout(() => this.errorMessage.set(null), 3000);` - App logic step.
+- Line 118: `}` - Ends a logic block.
+- Line 119: `}` - Ends a logic block.
+- Line 120: `}` - Ends a logic block.
+- Line 121: `` - Blank line for readability.
+- Line 122: `/**` - Developer comment or documentation.
+- Line 123: `* Remove selected logo` - Developer comment or documentation.
+- Line 124: `*/` - Developer comment or documentation.
+- Line 125: `removeLogo(): void {` - Starts a logic block.
+- Line 126: `this.logoFile.set(null);` - App logic step.
+- Line 127: `this.logoPreview.set(null);` - App logic step.
+- Line 128: `}` - Ends a logic block.
+- Line 129: `` - Blank line for readability.
+- Line 130: `/**` - Developer comment or documentation.
+- Line 131: `* Validate form` - Developer comment or documentation.
+- Line 132: `*/` - Developer comment or documentation.
+- Line 133: `private validateForm(): boolean {` - Starts a logic block.
+- Line 134: `if (!this.companyName().trim()) {` - Starts a logic block.
+- Line 135: `this.errorMessage.set('Company name is required');` - App logic step.
+- Line 136: `return false;` - Returns a value.
+- Line 137: `}` - Ends a logic block.
+- Line 138: `` - Blank line for readability.
+- Line 139: `if (!this.location().trim()) {` - Starts a logic block.
+- Line 140: `this.errorMessage.set('Location is required');` - App logic step.
+- Line 141: `return false;` - Returns a value.
+- Line 142: `}` - Ends a logic block.
+- Line 143: `` - Blank line for readability.
+- Line 144: `return true;` - Returns a value.
+- Line 145: `}` - Ends a logic block.
+- Line 146: `` - Blank line for readability.
+- Line 147: `/**` - Developer comment or documentation.
+- Line 148: `* Parse location input (coordinates or address)` - Developer comment or documentation.
+- Line 149: `*/` - Developer comment or documentation.
+- Line 150: `private async parseLocation(locationInput: string): Promise<{ latitude: number | null; longitude: number | null; city: string; needsGeocoding?: boolean } | null> {` - App logic step.
+- Line 151: `const trimmed = locationInput.trim();` - App logic step.
+- Line 152: `` - Blank line for readability.
+- Line 153: `// Extract city from input (everything after the coordinates if coordinates are provided)` - Developer comment or documentation.
+- Line 154: `let city = trimmed;` - App logic step.
+- Line 155: `` - Blank line for readability.
+- Line 156: `// Try to parse as coordinates (format: "lat, lng" or "lat,lng")` - Developer comment or documentation.
+- Line 157: `const coordinateMatch = trimmed.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)(?:\s*,\s*(.+))?$/);` - App logic step.
+- Line 158: `if (coordinateMatch) {` - Starts a logic block.
+- Line 159: `const latitude = parseFloat(coordinateMatch[1]);` - App logic step.
+- Line 160: `const longitude = parseFloat(coordinateMatch[2]);` - App logic step.
+- Line 161: `city = coordinateMatch[3] ? coordinateMatch[3].trim() : trimmed;` - App logic step.
+- Line 162: `` - Blank line for readability.
+- Line 163: `// Validate coordinate ranges` - Developer comment or documentation.
+- Line 164: `if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180) {` - Starts a logic block.
+- Line 165: `return { latitude, longitude, city: city || 'Unknown' };` - Returns a value.
+- Line 166: `} else {` - App logic step.
+- Line 167: `throw new Error('Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180');` - App logic step.
+- Line 168: `}` - Ends a logic block.
+- Line 169: `}` - Ends a logic block.
+- Line 170: `` - Blank line for readability.
+- Line 171: `// Check if it's a "City, Province" format (e.g., "Toronto, Ontario")` - Developer comment or documentation.
+- Line 172: `// Pattern: text, text (at least one comma with text on both sides, not coordinates)` - Developer comment or documentation.
+- Line 173: `const cityProvinceMatch = trimmed.match(/^([^,]+),\s*([^,]+)$/);` - App logic step.
+- Line 174: `if (cityProvinceMatch && !coordinateMatch) {` - Starts a logic block.
+- Line 175: `// Valid "City, Province" format - accept it even if geocoding isn't available` - Developer comment or documentation.
+- Line 176: `// Return null coordinates with needsGeocoding flag so downstream consumers can detect this` - Developer comment or documentation.
+- Line 177: `city = trimmed;` - App logic step.
+- Line 178: `return { latitude: null, longitude: null, city: trimmed, needsGeocoding: true };` - Returns a value.
+- Line 179: `}` - Ends a logic block.
+- Line 180: `` - Blank line for readability.
+- Line 181: `// If not coordinates or city/province format, try geocoding service` - Developer comment or documentation.
+- Line 182: `try {` - Starts a logic block.
+- Line 183: `const coords = await this.warRoomService.parseLocationInput(trimmed);` - App logic step.
+- Line 184: `// Use the input as city name if it's an address` - Developer comment or documentation.
+- Line 185: `return { ...coords, city: trimmed };` - Returns a value.
+- Line 186: `} catch (error) {` - App logic step.
+- Line 187: `// If geocoding fails but it looks like a valid location string, accept it` - Developer comment or documentation.
+- Line 188: `// This allows "City, Province" format to work even without geocoding` - Developer comment or documentation.
+- Line 189: `if (trimmed.length > 0 && !trimmed.match(/^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/)) {` - Starts a logic block.
+- Line 190: `// Not coordinates, treat as location string (e.g., "Toronto, Ontario")` - Developer comment or documentation.
+- Line 191: `return { latitude: null, longitude: null, city: trimmed, needsGeocoding: true };` - Returns a value.
+- Line 192: `}` - Ends a logic block.
+- Line 193: `throw error instanceof Error ? error : new Error('Could not parse location. Please enter coordinates in format "latitude, longitude" or a location like "City, Province"');` - App logic step.
+- Line 194: `}` - Ends a logic block.
+- Line 195: `}` - Ends a logic block.
+- Line 196: `` - Blank line for readability.
+- Line 197: `/**` - Developer comment or documentation.
+- Line 198: `* Handle form submission` - Developer comment or documentation.
+- Line 199: `*/` - Developer comment or documentation.
+- Line 200: `async onSubmit(): Promise<void> {` - Starts a logic block.
+- Line 201: `// Clear previous errors` - Developer comment or documentation.
+- Line 202: `this.errorMessage.set(null);` - App logic step.
+- Line 203: `` - Blank line for readability.
+- Line 204: `// Validate form` - Developer comment or documentation.
+- Line 205: `if (!this.validateForm()) {` - Starts a logic block.
+- Line 206: `setTimeout(() => this.errorMessage.set(null), 3000);` - App logic step.
+- Line 207: `return;` - App logic step.
+- Line 208: `}` - Ends a logic block.
+- Line 209: `` - Blank line for readability.
+- Line 210: `this.isSubmitting.set(true);` - App logic step.
+- Line 211: `` - Blank line for readability.
+- Line 212: `try {` - Starts a logic block.
+- Line 213: `// Parse location` - Developer comment or documentation.
+- Line 214: `const locationData = await this.parseLocation(this.location());` - App logic step.
+- Line 215: `if (!locationData) {` - Starts a logic block.
+- Line 216: `throw new Error('Failed to parse location');` - App logic step.
+- Line 217: `}` - Ends a logic block.
+- Line 218: `` - Blank line for readability.
+- Line 219: `// Prepare form data` - Developer comment or documentation.
+- Line 220: `const formData: CompanyFormData = {` - Starts a logic block.
+- Line 221: `companyName: this.companyName().trim(),` - App logic step.
+- Line 222: `location: this.location().trim(),` - App logic step.
+- Line 223: `description: this.description().trim() || undefined,` - App logic step.
+- Line 224: `logo: this.logoPreview(),` - App logic step.
+- Line 225: `logoFile: this.logoFile() || undefined,` - App logic step.
+- Line 226: `};` - Ends a logic block.
+- Line 227: `` - Blank line for readability.
+- Line 228: `// Emit company added event` - Developer comment or documentation.
+- Line 229: `this.companyAdded.emit(formData);` - App logic step.
+- Line 230: `` - Blank line for readability.
+- Line 231: `// Wait for parent to signal completion via companyAddedComplete event` - Developer comment or documentation.
+- Line 232: `// The parent should call closeAfterSuccess() or emit companyAddedComplete when done` - Developer comment or documentation.
+- Line 233: `} catch (error) {` - App logic step.
+- Line 234: `console.error('Error in onSubmit:', error);` - App logic step.
+- Line 235: `const errorMsg = error instanceof Error ? error.message : 'An error occurred while processing the form';` - App logic step.
+- Line 236: `this.errorMessage.set(errorMsg);` - App logic step.
+- Line 237: `console.error('Error message set:', errorMsg);` - App logic step.
+- Line 238: `// Don't auto-hide error - let user see it and fix the issue` - Developer comment or documentation.
+- Line 239: `} finally {` - App logic step.
+- Line 240: `this.isSubmitting.set(false);` - App logic step.
+- Line 241: `}` - Ends a logic block.
+- Line 242: `}` - Ends a logic block.
+- Line 243: `` - Blank line for readability.
+- Line 244: `/**` - Developer comment or documentation.
+- Line 245: `* Reset form` - Developer comment or documentation.
+- Line 246: `*/` - Developer comment or documentation.
+- Line 247: `private resetForm(): void {` - Starts a logic block.
+- Line 248: `this.companyName.set('');` - App logic step.
+- Line 249: `this.location.set('');` - App logic step.
+- Line 250: `this.description.set('');` - App logic step.
+- Line 251: `this.logoFile.set(null);` - App logic step.
+- Line 252: `this.logoPreview.set(null);` - App logic step.
+- Line 253: `this.errorMessage.set(null);` - App logic step.
+- Line 254: `}` - Ends a logic block.
+- Line 255: `` - Blank line for readability.
+- Line 256: `/**` - Developer comment or documentation.
+- Line 257: `* Handle close button click` - Developer comment or documentation.
+- Line 258: `*/` - Developer comment or documentation.
+- Line 259: `onClose(): void {` - Starts a logic block.
+- Line 260: `this.resetForm();` - App logic step.
+- Line 261: `this.close.emit();` - App logic step.
+- Line 262: `}` - Ends a logic block.
+- Line 263: `` - Blank line for readability.
+- Line 264: `/**` - Developer comment or documentation.
+- Line 265: `* Close modal after successful company addition` - Developer comment or documentation.
+- Line 266: `* Called by parent when processing is complete` - Developer comment or documentation.
+- Line 267: `*/` - Developer comment or documentation.
+- Line 268: `closeAfterSuccess(): void {` - Starts a logic block.
+- Line 269: `this.resetForm();` - App logic step.
+- Line 270: `this.onClose();` - App logic step.
+- Line 271: `}` - Ends a logic block.
+- Line 272: `` - Blank line for readability.
+- Line 273: `/**` - Developer comment or documentation.
+- Line 274: `* Handle backdrop click` - Developer comment or documentation.
+- Line 275: `*/` - Developer comment or documentation.
+- Line 276: `onBackdropClick(event: MouseEvent): void {` - Starts a logic block.
+- Line 277: `// Only close if clicking the backdrop itself, not the modal content` - Developer comment or documentation.
+- Line 278: `if ((event.target as HTMLElement).classList.contains('modal-overlay')) {` - Starts a logic block.
+- Line 279: `this.onClose();` - App logic step.
+- Line 280: `}` - Ends a logic block.
+- Line 281: `}` - Ends a logic block.
+- Line 282: `` - Blank line for readability.
+- Line 283: `/**` - Developer comment or documentation.
+- Line 284: `* Stop event propagation for modal content clicks` - Developer comment or documentation.
+- Line 285: `*/` - Developer comment or documentation.
+- Line 286: `stopPropagation(event: MouseEvent): void {` - Starts a logic block.
+- Line 287: `event.stopPropagation();` - App logic step.
+- Line 288: `}` - Ends a logic block.
+- Line 289: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/add-company-modal/add-company-modal.component.html
+- Line 1: `@if (isVisible()) {` - Starts a logic block.
+- Line 2: `<div class="modal-overlay" (click)="onBackdropClick($event)">` - Structural container.
+- Line 3: `<div class="modal-container" (click)="stopPropagation($event)">` - Structural container.
+- Line 4: `<!-- Modal Header -->` - UI element definition.
+- Line 5: `<div class="modal-header">` - Structural container.
+- Line 6: `<div class="modal-title-section">` - Structural container.
+- Line 7: `<h1 class="modal-title">ADD COMPANY NODE</h1>` - UI element definition.
+- Line 8: `<p class="modal-subtitle">FLEET REGISTRATION MODULE // ACCESS TIER 01</p>` - UI element definition.
+- Line 9: `</div>` - UI element definition.
+- Line 10: `<button class="modal-close-btn" type="button" (click)="onClose()" aria-label="Close">` - Clickable button.
+- Line 11: `<span class="material-symbols-outlined">close</span>` - UI element definition.
+- Line 12: `</button>` - UI element definition.
+- Line 13: `</div>` - UI element definition.
+- Line 14: `` - Blank line for readability.
+- Line 15: `<!-- Modal Body -->` - UI element definition.
+- Line 16: `<div class="modal-body">` - Structural container.
+- Line 17: `<!-- Error Message -->` - UI element definition.
+- Line 18: `@if (errorMessage()) {` - Starts a logic block.
+- Line 19: `<div class="error-message">` - Structural container.
+- Line 20: `{{ errorMessage() }}` - UI element definition.
+- Line 21: `</div>` - UI element definition.
+- Line 22: `}` - Ends a logic block.
+- Line 23: `` - Blank line for readability.
+- Line 24: `<!-- Company Name Field -->` - UI element definition.
+- Line 25: `<div class="form-field">` - Structural container.
+- Line 26: `<label class="form-label" for="company-name">` - UI element definition.
+- Line 27: `COMPANY NAME <span class="required-indicator">*</span>` - UI element definition.
+- Line 28: `</label>` - UI element definition.
+- Line 29: `<input` - UI element definition.
+- Line 30: `type="text"` - UI element definition.
+- Line 31: `id="company-name"` - UI element definition.
+- Line 32: `class="form-input"` - UI element definition.
+- Line 33: `placeholder="INPUT OFFICIAL ENTITY NAME..."` - UI element definition.
+- Line 34: `[value]="companyName()"` - UI element definition.
+- Line 35: `(input)="companyName.set($any($event.target).value)"` - UI element definition.
+- Line 36: `[disabled]="isSubmitting()"` - UI element definition.
+- Line 37: `/>` - UI element definition.
+- Line 38: `</div>` - UI element definition.
+- Line 39: `` - Blank line for readability.
+- Line 40: `<!-- Location Field -->` - UI element definition.
+- Line 41: `<div class="form-field">` - Structural container.
+- Line 42: `<label class="form-label" for="location">` - UI element definition.
+- Line 43: `LOCATION <span class="required-indicator">*</span>` - UI element definition.
+- Line 44: `</label>` - UI element definition.
+- Line 45: `<div class="location-input-wrapper">` - Structural container.
+- Line 46: `<span class="location-icon material-symbols-outlined">public</span>` - UI element definition.
+- Line 47: `<input` - UI element definition.
+- Line 48: `type="text"` - UI element definition.
+- Line 49: `id="location"` - UI element definition.
+- Line 50: `class="form-input location-input"` - UI element definition.
+- Line 51: `placeholder="CITY, PROVINCE (e.g., Toronto, Ontario)..."` - UI element definition.
+- Line 52: `[value]="location()"` - UI element definition.
+- Line 53: `(input)="location.set($any($event.target).value)"` - UI element definition.
+- Line 54: `[disabled]="isSubmitting()"` - UI element definition.
+- Line 55: `/>` - UI element definition.
+- Line 56: `</div>` - UI element definition.
+- Line 57: `<p class="form-hint">ENTER CITY AND PROVINCE (E.G., "TORONTO, ONTARIO") OR COORDINATES (E.G., "49.8951, -97.1384")</p>` - UI element definition.
+- Line 58: `</div>` - UI element definition.
+- Line 59: `` - Blank line for readability.
+- Line 60: `<!-- Description Field -->` - UI element definition.
+- Line 61: `<div class="form-field">` - Structural container.
+- Line 62: `<label class="form-label" for="company-description">` - UI element definition.
+- Line 63: `DESCRIPTION` - UI element definition.
+- Line 64: `</label>` - UI element definition.
+- Line 65: `<textarea` - UI element definition.
+- Line 66: `id="company-description"` - UI element definition.
+- Line 67: `class="form-input form-textarea"` - UI element definition.
+- Line 68: `placeholder="ENTER COMPANY DESCRIPTION..."` - UI element definition.
+- Line 69: `[value]="description()"` - UI element definition.
+- Line 70: `(input)="description.set($any($event.target).value)"` - UI element definition.
+- Line 71: `[disabled]="isSubmitting()"` - UI element definition.
+- Line 72: `></textarea>` - UI element definition.
+- Line 73: `</div>` - UI element definition.
+- Line 74: `` - Blank line for readability.
+- Line 75: `<!-- Company Logo Field -->` - UI element definition.
+- Line 76: `<div class="form-field">` - Structural container.
+- Line 77: `<label class="form-label" for="company-logo">` - UI element definition.
+- Line 78: `COMPANY LOGO` - UI element definition.
+- Line 79: `</label>` - UI element definition.
+- Line 80: `<div class="logo-upload-area" [class.has-logo]="logoPreview()">` - Structural container.
+- Line 81: `@if (logoPreview()) {` - Starts a logic block.
+- Line 82: `<div class="logo-preview">` - Structural container.
+- Line 83: `<img [src]="logoPreview()" alt="Logo preview" />` - UI element definition.
+- Line 84: `<button type="button" class="remove-logo-btn" (click)="removeLogo()" aria-label="Remove logo">` - Clickable button.
+- Line 85: `<span class="material-symbols-outlined">close</span>` - UI element definition.
+- Line 86: `</button>` - UI element definition.
+- Line 87: `</div>` - UI element definition.
+- Line 88: `} @else {` - UI element definition.
+- Line 89: `<input` - UI element definition.
+- Line 90: `type="file"` - UI element definition.
+- Line 91: `id="company-logo"` - UI element definition.
+- Line 92: `class="logo-file-input"` - UI element definition.
+- Line 93: `accept=".svg,.png,.jpg,.jpeg,.gif,.webp,image/svg+xml,image/png,image/jpeg,image/gif,image/webp"` - UI element definition.
+- Line 94: `(change)="onFileSelected($event)"` - UI element definition.
+- Line 95: `[disabled]="isSubmitting()"` - UI element definition.
+- Line 96: `/>` - UI element definition.
+- Line 97: `<label for="company-logo" class="logo-upload-label">` - UI element definition.
+- Line 98: `<span class="upload-icon">` - UI element definition.
+- Line 99: `<span class="material-symbols-outlined">add</span>` - UI element definition.
+- Line 100: `</span>` - UI element definition.
+- Line 101: `<span class="upload-text">UPLOAD ASSET SIGNATURE</span>` - UI element definition.
+- Line 102: `<span class="upload-hint">SVG, PNG, JPG, GIF, OR WEBP</span>` - UI element definition.
+- Line 103: `</label>` - UI element definition.
+- Line 104: `}` - Ends a logic block.
+- Line 105: `</div>` - UI element definition.
+- Line 106: `</div>` - UI element definition.
+- Line 107: `</div>` - UI element definition.
+- Line 108: `` - Blank line for readability.
+- Line 109: `<!-- Modal Footer -->` - UI element definition.
+- Line 110: `<div class="modal-footer">` - Structural container.
+- Line 111: `<button` - Clickable button.
+- Line 112: `type="button"` - UI element definition.
+- Line 113: `class="btn-abort"` - UI element definition.
+- Line 114: `(click)="onClose()"` - UI element definition.
+- Line 115: `[disabled]="isSubmitting()"` - UI element definition.
+- Line 116: `>` - UI element definition.
+- Line 117: `ABORT` - UI element definition.
+- Line 118: `</button>` - UI element definition.
+- Line 119: `<button` - Clickable button.
+- Line 120: `type="button"` - UI element definition.
+- Line 121: `class="btn-execute"` - UI element definition.
+- Line 122: `(click)="onSubmit()"` - UI element definition.
+- Line 123: `[disabled]="isSubmitting()"` - UI element definition.
+- Line 124: `>` - UI element definition.
+- Line 125: `@if (isSubmitting()) {` - Starts a logic block.
+- Line 126: `EXECUTING...` - UI element definition.
+- Line 127: `} @else {` - UI element definition.
+- Line 128: `EXECUTE SYNC` - UI element definition.
+- Line 129: `}` - Ends a logic block.
+- Line 130: `</button>` - UI element definition.
+- Line 131: `</div>` - UI element definition.
+- Line 132: `</div>` - UI element definition.
+- Line 133: `</div>` - UI element definition.
+- Line 134: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/components/add-company-modal/add-company-modal.component.scss
+- Line 1: `@use '../../war-room.component.scss' as *;` - Styling rule.
+- Line 2: `` - Blank line for readability.
+- Line 3: `// Breakpoints (align with war-room)` - Developer comment or documentation.
+- Line 4: `$bp-mobile: 575.98px;` - Defines a visual property.
+- Line 5: `$bp-tablet: 767.98px;` - Defines a visual property.
+- Line 6: `$bp-laptop: 991.98px;` - Defines a visual property.
+- Line 7: `$bp-desktop: 1199.98px;` - Defines a visual property.
+- Line 8: `` - Blank line for readability.
+- Line 9: `// Ensure component host is positioned correctly` - Developer comment or documentation.
+- Line 10: `:host {` - Starts a logic block.
+- Line 11: `position: fixed;` - Defines a visual property.
+- Line 12: `top: 0;` - Defines a visual property.
+- Line 13: `left: 0;` - Defines a visual property.
+- Line 14: `right: 0;` - Defines a visual property.
+- Line 15: `bottom: 0;` - Defines a visual property.
+- Line 16: `width: 100%;` - Defines a visual property.
+- Line 17: `min-width: 100vw;` - Defines a visual property.
+- Line 18: `height: 100%;` - Defines a visual property.
+- Line 19: `min-height: 100vh;` - Defines a visual property.
+- Line 20: `min-height: 100dvh;` - Defines a visual property.
+- Line 21: `z-index: 99999;` - Defines a visual property.
+- Line 22: `pointer-events: none;` - Defines a visual property.
+- Line 23: `}` - Ends a logic block.
+- Line 24: `` - Blank line for readability.
+- Line 25: `// Map-positioned: overlay only over map area (parent = .war-room-map-area)` - Developer comment or documentation.
+- Line 26: `:host.map-positioned {` - Starts a logic block.
+- Line 27: `position: absolute;` - Defines a visual property.
+- Line 28: `inset: 0;` - Defines a visual property.
+- Line 29: `width: 100%;` - Defines a visual property.
+- Line 30: `height: 100%;` - Defines a visual property.
+- Line 31: `min-width: 0;` - Defines a visual property.
+- Line 32: `min-height: 0;` - Defines a visual property.
+- Line 33: `}` - Ends a logic block.
+- Line 34: `` - Blank line for readability.
+- Line 35: `// Modal overlay - viewport (fixed) or map (absolute when .map-positioned)` - Developer comment or documentation.
+- Line 36: `:host ::ng-deep .modal-overlay,` - Defines a visual property.
+- Line 37: `.modal-overlay {` - Starts a logic block.
+- Line 38: `position: fixed;` - Defines a visual property.
+- Line 39: `top: 0;` - Defines a visual property.
+- Line 40: `right: 0;` - Defines a visual property.
+- Line 41: `bottom: 0;` - Defines a visual property.
+- Line 42: `left: auto;` - Defines a visual property.
+- Line 43: `width: min(520px, 42vw);` - Defines a visual property.
+- Line 44: `margin: 0;` - Defines a visual property.
+- Line 45: `padding: 1rem;` - Defines a visual property.
+- Line 46: `padding-left: max(1rem, env(safe-area-inset-left));` - Defines a visual property.
+- Line 47: `padding-right: max(1rem, env(safe-area-inset-right));` - Defines a visual property.
+- Line 48: `padding-top: max(1rem, env(safe-area-inset-top));` - Defines a visual property.
+- Line 49: `padding-bottom: max(1rem, env(safe-area-inset-bottom));` - Defines a visual property.
+- Line 50: `display: flex;` - Defines a visual property.
+- Line 51: `align-items: flex-start;` - Defines a visual property.
+- Line 52: `justify-content: flex-end;` - Defines a visual property.
+- Line 53: `z-index: 99999;` - Defines a visual property.
+- Line 54: `animation: fadeIn 0.2s ease-in-out;` - Defines a visual property.
+- Line 55: `overflow-x: hidden;` - Defines a visual property.
+- Line 56: `overflow-y: auto;` - Defines a visual property.
+- Line 57: `-webkit-overflow-scrolling: touch;` - Defines a visual property.
+- Line 58: `transform: none;` - Defines a visual property.
+- Line 59: `isolation: isolate;` - Defines a visual property.
+- Line 60: `pointer-events: auto;` - Defines a visual property.
+- Line 61: `` - Blank line for readability.
+- Line 62: `&::before {` - Starts a logic block.
+- Line 63: `content: '';` - Defines a visual property.
+- Line 64: `position: absolute;` - Defines a visual property.
+- Line 65: `inset: 0;` - Defines a visual property.
+- Line 66: `background-color: rgba(15, 23, 42, 0.35);` - Defines a visual property.
+- Line 67: `backdrop-filter: blur(6px);` - Defines a visual property.
+- Line 68: `-webkit-backdrop-filter: blur(6px);` - Defines a visual property.
+- Line 69: `z-index: -1;` - Defines a visual property.
+- Line 70: `}` - Ends a logic block.
+- Line 71: `` - Blank line for readability.
+- Line 72: `// Map-positioned: overlay fills map area, modal centered, responsive padding` - Developer comment or documentation.
+- Line 73: `:host.map-positioned & {` - Starts a logic block.
+- Line 74: `position: absolute;` - Defines a visual property.
+- Line 75: `inset: 0;` - Defines a visual property.
+- Line 76: `width: 100%;` - Defines a visual property.
+- Line 77: `left: 0;` - Defines a visual property.
+- Line 78: `right: 0;` - Defines a visual property.
+- Line 79: `align-items: center;` - Defines a visual property.
+- Line 80: `justify-content: center;` - Defines a visual property.
+- Line 81: `padding: 1rem;` - Defines a visual property.
+- Line 82: `` - Blank line for readability.
+- Line 83: `&::before {` - Starts a logic block.
+- Line 84: `background-color: rgba(15, 23, 42, 0.4);` - Defines a visual property.
+- Line 85: `backdrop-filter: blur(8px);` - Defines a visual property.
+- Line 86: `-webkit-backdrop-filter: blur(8px);` - Defines a visual property.
+- Line 87: `}` - Ends a logic block.
+- Line 88: `` - Blank line for readability.
+- Line 89: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 90: `padding: 0.75rem;` - Defines a visual property.
+- Line 91: `}` - Ends a logic block.
+- Line 92: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 93: `padding: 0.5rem;` - Defines a visual property.
+- Line 94: `align-items: flex-start;` - Defines a visual property.
+- Line 95: `justify-content: flex-start;` - Defines a visual property.
+- Line 96: `overflow-y: auto;` - Defines a visual property.
+- Line 97: `}` - Ends a logic block.
+- Line 98: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 99: `padding: 0.375rem;` - Defines a visual property.
+- Line 100: `}` - Ends a logic block.
+- Line 101: `}` - Ends a logic block.
+- Line 102: `` - Blank line for readability.
+- Line 103: `// Map-positioned: reset modal container margins for centering` - Developer comment or documentation.
+- Line 104: `:host.map-positioned & .modal-container {` - Starts a logic block.
+- Line 105: `margin-left: auto;` - Defines a visual property.
+- Line 106: `margin-right: auto;` - Defines a visual property.
+- Line 107: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 108: `margin-top: 0;` - Defines a visual property.
+- Line 109: `margin-bottom: auto;` - Defines a visual property.
+- Line 110: `}` - Ends a logic block.
+- Line 111: `}` - Ends a logic block.
+- Line 112: `` - Blank line for readability.
+- Line 113: `// Tablet and below: use full-screen overlay again (less space)` - Developer comment or documentation.
+- Line 114: `@media (max-width: $bp-laptop) {` - Starts a logic block.
+- Line 115: `inset: 0;` - Defines a visual property.
+- Line 116: `left: 0;` - Defines a visual property.
+- Line 117: `width: 100%;` - Defines a visual property.
+- Line 118: `min-width: 100vw;` - Defines a visual property.
+- Line 119: `min-height: 100vh;` - Defines a visual property.
+- Line 120: `min-height: 100dvh;` - Defines a visual property.
+- Line 121: `align-items: center;` - Defines a visual property.
+- Line 122: `justify-content: center;` - Defines a visual property.
+- Line 123: `` - Blank line for readability.
+- Line 124: `&::before {` - Starts a logic block.
+- Line 125: `background-color: rgba(15, 23, 42, 0.4);` - Defines a visual property.
+- Line 126: `backdrop-filter: blur(8px);` - Defines a visual property.
+- Line 127: `-webkit-backdrop-filter: blur(8px);` - Defines a visual property.
+- Line 128: `}` - Ends a logic block.
+- Line 129: `}` - Ends a logic block.
+- Line 130: `` - Blank line for readability.
+- Line 131: `// Tablet` - Developer comment or documentation.
+- Line 132: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 133: `padding: 0.75rem;` - Defines a visual property.
+- Line 134: `padding-left: max(0.75rem, env(safe-area-inset-left));` - Defines a visual property.
+- Line 135: `padding-right: max(0.75rem, env(safe-area-inset-right));` - Defines a visual property.
+- Line 136: `padding-bottom: max(0.75rem, env(safe-area-inset-bottom));` - Defines a visual property.
+- Line 137: `align-items: flex-start !important;` - Loads external tools or data types.
+- Line 138: `padding-top: max(1.5rem, env(safe-area-inset-top));` - Defines a visual property.
+- Line 139: `}` - Ends a logic block.
+- Line 140: `` - Blank line for readability.
+- Line 141: `// Mobile` - Developer comment or documentation.
+- Line 142: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 143: `padding: 0.5rem;` - Defines a visual property.
+- Line 144: `padding-left: max(0.5rem, env(safe-area-inset-left));` - Defines a visual property.
+- Line 145: `padding-right: max(0.5rem, env(safe-area-inset-right));` - Defines a visual property.
+- Line 146: `padding-bottom: max(0.5rem, env(safe-area-inset-bottom));` - Defines a visual property.
+- Line 147: `align-items: flex-start !important;` - Loads external tools or data types.
+- Line 148: `padding-top: max(1rem, env(safe-area-inset-top));` - Defines a visual property.
+- Line 149: `}` - Ends a logic block.
+- Line 150: `` - Blank line for readability.
+- Line 151: `// Small mobile` - Developer comment or documentation.
+- Line 152: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 153: `padding: 0.375rem;` - Defines a visual property.
+- Line 154: `padding-left: max(0.375rem, env(safe-area-inset-left));` - Defines a visual property.
+- Line 155: `padding-right: max(0.375rem, env(safe-area-inset-right));` - Defines a visual property.
+- Line 156: `padding-bottom: max(0.375rem, env(safe-area-inset-bottom));` - Defines a visual property.
+- Line 157: `padding-top: max(0.75rem, env(safe-area-inset-top));` - Defines a visual property.
+- Line 158: `}` - Ends a logic block.
+- Line 159: `` - Blank line for readability.
+- Line 160: `// Right-strip layout: align modal to the right (above laptop breakpoint)` - Developer comment or documentation.
+- Line 161: `@media (min-width: 992px) {` - Starts a logic block.
+- Line 162: `:host:not(.map-positioned) & .modal-container {` - Starts a logic block.
+- Line 163: `margin-left: auto;` - Defines a visual property.
+- Line 164: `margin-right: 0;` - Defines a visual property.
+- Line 165: `}` - Ends a logic block.
+- Line 166: `}` - Ends a logic block.
+- Line 167: `}` - Ends a logic block.
+- Line 168: `` - Blank line for readability.
+- Line 169: `.modal-container {` - Starts a logic block.
+- Line 170: `// Modal structure matching website's .modal-content` - Developer comment or documentation.
+- Line 171: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 172: `border: 1px solid var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 173: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 174: `box-shadow: 0 10px 30px 0 var(--primary005, rgba(98, 89, 202, 0.05));` - Defines a visual property.
+- Line 175: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 176: `` - Blank line for readability.
+- Line 177: `// Layout and sizing` - Developer comment or documentation.
+- Line 178: `width: 100%;` - Defines a visual property.
+- Line 179: `max-width: min(360px, 92vw);` - Defines a visual property.
+- Line 180: `max-height: calc(100vh - 2rem);` - Defines a visual property.
+- Line 181: `max-height: calc(100dvh - 2rem);` - Defines a visual property.
+- Line 182: `overflow: hidden;` - Defines a visual property.
+- Line 183: `animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);` - Defines a visual property.
+- Line 184: `display: flex;` - Defines a visual property.
+- Line 185: `flex-direction: column;` - Defines a visual property.
+- Line 186: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 187: `margin: 0 auto;` - Defines a visual property.
+- Line 188: `position: relative;` - Defines a visual property.
+- Line 189: `z-index: 1;` - Defines a visual property.
+- Line 190: `transform: translateZ(0);` - Defines a visual property.
+- Line 191: `backface-visibility: hidden;` - Defines a visual property.
+- Line 192: `-webkit-font-smoothing: antialiased;` - Defines a visual property.
+- Line 193: `filter: none !important;` - Loads external tools or data types.
+- Line 194: `backdrop-filter: none !important;` - Loads external tools or data types.
+- Line 195: `-webkit-backdrop-filter: none !important;` - Loads external tools or data types.
+- Line 196: `will-change: transform;` - Defines a visual property.
+- Line 197: `flex-shrink: 0;` - Defines a visual property.
+- Line 198: `isolation: isolate;` - Defines a visual property.
+- Line 199: `` - Blank line for readability.
+- Line 200: `// Desktop (992px–1200px): smaller` - Developer comment or documentation.
+- Line 201: `@media (max-width: $bp-desktop) {` - Starts a logic block.
+- Line 202: `max-width: min(340px, 90vw);` - Defines a visual property.
+- Line 203: `max-height: calc(100vh - 1.5rem);` - Defines a visual property.
+- Line 204: `max-height: calc(100dvh - 1.5rem);` - Defines a visual property.
+- Line 205: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 206: `}` - Ends a logic block.
+- Line 207: `` - Blank line for readability.
+- Line 208: `// Laptop / tablet (768px–992px)` - Developer comment or documentation.
+- Line 209: `@media (max-width: $bp-laptop) {` - Starts a logic block.
+- Line 210: `max-width: min(320px, 88vw);` - Defines a visual property.
+- Line 211: `max-height: calc(100vh - 1.5rem);` - Defines a visual property.
+- Line 212: `max-height: calc(100dvh - 1.5rem);` - Defines a visual property.
+- Line 213: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 214: `}` - Ends a logic block.
+- Line 215: `` - Blank line for readability.
+- Line 216: `// Tablet (576px–768px)` - Developer comment or documentation.
+- Line 217: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 218: `max-width: min(300px, calc(100vw - 1.5rem));` - Defines a visual property.
+- Line 219: `max-height: calc(100vh - 1.5rem);` - Defines a visual property.
+- Line 220: `max-height: calc(100dvh - 1.5rem);` - Defines a visual property.
+- Line 221: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 222: `}` - Ends a logic block.
+- Line 223: `` - Blank line for readability.
+- Line 224: `// Mobile (< 576px)` - Developer comment or documentation.
+- Line 225: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 226: `max-width: calc(100vw - 1rem);` - Defines a visual property.
+- Line 227: `max-height: calc(100vh - 1rem);` - Defines a visual property.
+- Line 228: `max-height: calc(100dvh - 1rem);` - Defines a visual property.
+- Line 229: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 230: `}` - Ends a logic block.
+- Line 231: `` - Blank line for readability.
+- Line 232: `// Small mobile (< 400px)` - Developer comment or documentation.
+- Line 233: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 234: `max-width: calc(100vw - 0.75rem);` - Defines a visual property.
+- Line 235: `max-height: calc(100vh - 0.75rem);` - Defines a visual property.
+- Line 236: `max-height: calc(100dvh - 0.75rem);` - Defines a visual property.
+- Line 237: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 238: `}` - Ends a logic block.
+- Line 239: `}` - Ends a logic block.
+- Line 240: `` - Blank line for readability.
+- Line 241: `@keyframes fadeIn {` - Starts a logic block.
+- Line 242: `from {` - Starts a logic block.
+- Line 243: `opacity: 0;` - Defines a visual property.
+- Line 244: `}` - Ends a logic block.
+- Line 245: `to {` - Starts a logic block.
+- Line 246: `opacity: 1;` - Defines a visual property.
+- Line 247: `}` - Ends a logic block.
+- Line 248: `}` - Ends a logic block.
+- Line 249: `` - Blank line for readability.
+- Line 250: `@keyframes slideUp {` - Starts a logic block.
+- Line 251: `from {` - Starts a logic block.
+- Line 252: `transform: translateY(24px) scale(0.96);` - Defines a visual property.
+- Line 253: `opacity: 0;` - Defines a visual property.
+- Line 254: `}` - Ends a logic block.
+- Line 255: `to {` - Starts a logic block.
+- Line 256: `transform: translateY(0) scale(1);` - Defines a visual property.
+- Line 257: `opacity: 1;` - Defines a visual property.
+- Line 258: `}` - Ends a logic block.
+- Line 259: `}` - Ends a logic block.
+- Line 260: `` - Blank line for readability.
+- Line 261: `.modal-header {` - Starts a logic block.
+- Line 262: `// Modal header structure matching website` - Developer comment or documentation.
+- Line 263: `display: flex;` - Defines a visual property.
+- Line 264: `flex-shrink: 0;` - Defines a visual property.
+- Line 265: `align-items: center;` - Defines a visual property.
+- Line 266: `justify-content: space-between;` - Defines a visual property.
+- Line 267: `padding: 1rem 1.25rem;` - Defines a visual property.
+- Line 268: `border-block-end: 1px solid var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 269: `border-start-start-radius: 0.688rem;` - Defines a visual property.
+- Line 270: `border-start-end-radius: 0.688rem;` - Defines a visual property.
+- Line 271: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 272: `` - Blank line for readability.
+- Line 273: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 274: `padding: 1rem 1rem;` - Defines a visual property.
+- Line 275: `}` - Ends a logic block.
+- Line 276: `` - Blank line for readability.
+- Line 277: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 278: `padding: 0.875rem 0.875rem;` - Defines a visual property.
+- Line 279: `}` - Ends a logic block.
+- Line 280: `` - Blank line for readability.
+- Line 281: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 282: `padding: 0.75rem 0.75rem;` - Defines a visual property.
+- Line 283: `}` - Ends a logic block.
+- Line 284: `}` - Ends a logic block.
+- Line 285: `` - Blank line for readability.
+- Line 286: `.modal-title-section {` - Starts a logic block.
+- Line 287: `flex: 1;` - Defines a visual property.
+- Line 288: `}` - Ends a logic block.
+- Line 289: `` - Blank line for readability.
+- Line 290: `.modal-title {` - Starts a logic block.
+- Line 291: `// Modal title matching website structure` - Developer comment or documentation.
+- Line 292: `margin-block-end: 0;` - Defines a visual property.
+- Line 293: `line-height: 1.5;` - Defines a visual property.
+- Line 294: `font-weight: 600;` - Defines a visual property.
+- Line 295: `font-size: 1.25rem;` - Defines a visual property.
+- Line 296: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 297: `margin: 0 0 0.375rem 0;` - Defines a visual property.
+- Line 298: `letter-spacing: -0.025em;` - Defines a visual property.
+- Line 299: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 300: `` - Blank line for readability.
+- Line 301: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 302: `font-size: 1.3125rem;` - Defines a visual property.
+- Line 303: `}` - Ends a logic block.
+- Line 304: `` - Blank line for readability.
+- Line 305: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 306: `font-size: 1.125rem;` - Defines a visual property.
+- Line 307: `margin-bottom: 0.25rem;` - Defines a visual property.
+- Line 308: `}` - Ends a logic block.
+- Line 309: `` - Blank line for readability.
+- Line 310: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 311: `font-size: 1rem;` - Defines a visual property.
+- Line 312: `}` - Ends a logic block.
+- Line 313: `` - Blank line for readability.
+- Line 314: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 315: `font-size: 0.9375rem;` - Defines a visual property.
+- Line 316: `}` - Ends a logic block.
+- Line 317: `}` - Ends a logic block.
+- Line 318: `` - Blank line for readability.
+- Line 319: `.modal-subtitle {` - Starts a logic block.
+- Line 320: `font-size: 0.75rem;` - Defines a visual property.
+- Line 321: `font-weight: 400;` - Defines a visual property.
+- Line 322: `color: #64748B;` - Defines a visual property.
+- Line 323: `margin: 0;` - Defines a visual property.
+- Line 324: `letter-spacing: 0;` - Defines a visual property.
+- Line 325: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 326: `line-height: 1.4;` - Defines a visual property.
+- Line 327: `` - Blank line for readability.
+- Line 328: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 329: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 330: `}` - Ends a logic block.
+- Line 331: `` - Blank line for readability.
+- Line 332: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 333: `font-size: 0.6875rem;` - Defines a visual property.
+- Line 334: `}` - Ends a logic block.
+- Line 335: `` - Blank line for readability.
+- Line 336: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 337: `font-size: 0.625rem;` - Defines a visual property.
+- Line 338: `}` - Ends a logic block.
+- Line 339: `}` - Ends a logic block.
+- Line 340: `` - Blank line for readability.
+- Line 341: `.modal-close-btn {` - Starts a logic block.
+- Line 342: `background: transparent;` - Defines a visual property.
+- Line 343: `border: none;` - Defines a visual property.
+- Line 344: `color: #94A3B8;` - Defines a visual property.
+- Line 345: `cursor: pointer;` - Defines a visual property.
+- Line 346: `padding: 0.375rem;` - Defines a visual property.
+- Line 347: `display: flex;` - Defines a visual property.
+- Line 348: `align-items: center;` - Defines a visual property.
+- Line 349: `justify-content: center;` - Defines a visual property.
+- Line 350: `transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 351: `border-radius: 8px;` - Defines a visual property.
+- Line 352: `width: 2rem;` - Defines a visual property.
+- Line 353: `height: 2rem;` - Defines a visual property.
+- Line 354: `min-width: 44px;` - Defines a visual property.
+- Line 355: `min-height: 44px;` - Defines a visual property.
+- Line 356: `` - Blank line for readability.
+- Line 357: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 358: `width: 2.25rem;` - Defines a visual property.
+- Line 359: `height: 2.25rem;` - Defines a visual property.
+- Line 360: `min-width: 44px;` - Defines a visual property.
+- Line 361: `min-height: 44px;` - Defines a visual property.
+- Line 362: `padding: 0.5rem;` - Defines a visual property.
+- Line 363: `}` - Ends a logic block.
+- Line 364: `` - Blank line for readability.
+- Line 365: `@media (min-width: 768px) {` - Starts a logic block.
+- Line 366: `min-width: 2rem;` - Defines a visual property.
+- Line 367: `min-height: 2rem;` - Defines a visual property.
+- Line 368: `}` - Ends a logic block.
+- Line 369: `` - Blank line for readability.
+- Line 370: `&:hover {` - Starts a logic block.
+- Line 371: `color: #1B4332;` - Defines a visual property.
+- Line 372: `background-color: #F1F5F9;` - Defines a visual property.
+- Line 373: `transform: rotate(90deg);` - Defines a visual property.
+- Line 374: `}` - Ends a logic block.
+- Line 375: `` - Blank line for readability.
+- Line 376: `&:active {` - Starts a logic block.
+- Line 377: `transform: rotate(90deg) scale(0.95);` - Defines a visual property.
+- Line 378: `}` - Ends a logic block.
+- Line 379: `` - Blank line for readability.
+- Line 380: `.material-symbols-outlined {` - Starts a logic block.
+- Line 381: `font-size: 1.125rem;` - Defines a visual property.
+- Line 382: `font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;` - Defines a visual property.
+- Line 383: `}` - Ends a logic block.
+- Line 384: `` - Blank line for readability.
+- Line 385: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 386: `.material-symbols-outlined {` - Starts a logic block.
+- Line 387: `font-size: 1.25rem;` - Defines a visual property.
+- Line 388: `}` - Ends a logic block.
+- Line 389: `}` - Ends a logic block.
+- Line 390: `}` - Ends a logic block.
+- Line 391: `` - Blank line for readability.
+- Line 392: `.modal-body {` - Starts a logic block.
+- Line 393: `// Modal body structure matching website` - Developer comment or documentation.
+- Line 394: `position: relative;` - Defines a visual property.
+- Line 395: `flex: 1 1 auto;` - Defines a visual property.
+- Line 396: `padding: 1rem;` - Defines a visual property.
+- Line 397: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 398: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 399: `min-height: 0;` - Defines a visual property.
+- Line 400: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 401: `overflow-y: auto;` - Defines a visual property.
+- Line 402: `overflow-x: hidden;` - Defines a visual property.
+- Line 403: `-webkit-overflow-scrolling: touch;` - Defines a visual property.
+- Line 404: `` - Blank line for readability.
+- Line 405: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 406: `padding: 0.75rem;` - Defines a visual property.
+- Line 407: `}` - Ends a logic block.
+- Line 408: `}` - Ends a logic block.
+- Line 409: `` - Blank line for readability.
+- Line 410: `.error-message {` - Starts a logic block.
+- Line 411: `background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);` - Defines a visual property.
+- Line 412: `border: 1.5px solid #FCA5A5;` - Defines a visual property.
+- Line 413: `color: #DC2626;` - Defines a visual property.
+- Line 414: `padding: 0.75rem 1rem;` - Defines a visual property.
+- Line 415: `border-radius: 12px;` - Defines a visual property.
+- Line 416: `margin-bottom: 1.5rem;` - Defines a visual property.
+- Line 417: `font-size: 0.875rem;` - Defines a visual property.
+- Line 418: `font-weight: 500;` - Defines a visual property.
+- Line 419: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 420: `box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);` - Defines a visual property.
+- Line 421: `display: flex;` - Defines a visual property.
+- Line 422: `align-items: center;` - Defines a visual property.
+- Line 423: `gap: 0.5rem;` - Defines a visual property.
+- Line 424: `` - Blank line for readability.
+- Line 425: `&::before {` - Starts a logic block.
+- Line 426: `content: '⚠';` - Defines a visual property.
+- Line 427: `font-size: 1rem;` - Defines a visual property.
+- Line 428: `opacity: 0.8;` - Defines a visual property.
+- Line 429: `}` - Ends a logic block.
+- Line 430: `` - Blank line for readability.
+- Line 431: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 432: `padding: 0.625rem 0.875rem;` - Defines a visual property.
+- Line 433: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 434: `border-radius: 10px;` - Defines a visual property.
+- Line 435: `margin-bottom: 1.25rem;` - Defines a visual property.
+- Line 436: `}` - Ends a logic block.
+- Line 437: `` - Blank line for readability.
+- Line 438: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 439: `padding: 0.5rem 0.75rem;` - Defines a visual property.
+- Line 440: `font-size: 0.75rem;` - Defines a visual property.
+- Line 441: `border-radius: 8px;` - Defines a visual property.
+- Line 442: `margin-bottom: 1rem;` - Defines a visual property.
+- Line 443: `}` - Ends a logic block.
+- Line 444: `}` - Ends a logic block.
+- Line 445: `` - Blank line for readability.
+- Line 446: `.form-field {` - Starts a logic block.
+- Line 447: `margin-bottom: 1.25rem;` - Defines a visual property.
+- Line 448: `` - Blank line for readability.
+- Line 449: `&:last-of-type {` - Starts a logic block.
+- Line 450: `margin-bottom: 0;` - Defines a visual property.
+- Line 451: `}` - Ends a logic block.
+- Line 452: `` - Blank line for readability.
+- Line 453: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 454: `margin-bottom: 1rem;` - Defines a visual property.
+- Line 455: `}` - Ends a logic block.
+- Line 456: `` - Blank line for readability.
+- Line 457: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 458: `margin-bottom: 0.875rem;` - Defines a visual property.
+- Line 459: `}` - Ends a logic block.
+- Line 460: `` - Blank line for readability.
+- Line 461: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 462: `margin-bottom: 0.75rem;` - Defines a visual property.
+- Line 463: `}` - Ends a logic block.
+- Line 464: `}` - Ends a logic block.
+- Line 465: `` - Blank line for readability.
+- Line 466: `.form-label {` - Starts a logic block.
+- Line 467: `// Form label matching website structure` - Developer comment or documentation.
+- Line 468: `display: block;` - Defines a visual property.
+- Line 469: `font-size: 0.85rem;` - Defines a visual property.
+- Line 470: `font-weight: 400;` - Defines a visual property.
+- Line 471: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 472: `margin-bottom: 0.5rem;` - Defines a visual property.
+- Line 473: `letter-spacing: -0.01em;` - Defines a visual property.
+- Line 474: `text-transform: none;` - Defines a visual property.
+- Line 475: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 476: `` - Blank line for readability.
+- Line 477: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 478: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 479: `margin-bottom: 0.375rem;` - Defines a visual property.
+- Line 480: `}` - Ends a logic block.
+- Line 481: `` - Blank line for readability.
+- Line 482: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 483: `font-size: 0.75rem;` - Defines a visual property.
+- Line 484: `margin-bottom: 0.25rem;` - Defines a visual property.
+- Line 485: `}` - Ends a logic block.
+- Line 486: `}` - Ends a logic block.
+- Line 487: `` - Blank line for readability.
+- Line 488: `.required-indicator {` - Starts a logic block.
+- Line 489: `color: #DC2626;` - Defines a visual property.
+- Line 490: `margin-left: 0.25rem;` - Defines a visual property.
+- Line 491: `}` - Ends a logic block.
+- Line 492: `` - Blank line for readability.
+- Line 493: `.form-input {` - Starts a logic block.
+- Line 494: `// Form input matching website's form-control structure` - Developer comment or documentation.
+- Line 495: `width: 100%;` - Defines a visual property.
+- Line 496: `background-color: var(--form-control-bg, #ffffff);` - Defines a visual property.
+- Line 497: `border: 1px solid var(--input-border, #e9edf6);` - Defines a visual property.
+- Line 498: `color: var(--default-text-color, #1d212f);` - Defines a visual property.
+- Line 499: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 500: `font-size: 0.85rem;` - Defines a visual property.
+- Line 501: `font-weight: 400;` - Defines a visual property.
+- Line 502: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 503: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 504: `transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 505: `box-shadow: none;` - Defines a visual property.
+- Line 506: `min-height: 42px;` - Defines a visual property.
+- Line 507: `` - Blank line for readability.
+- Line 508: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 509: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 510: `font-size: 0.85rem;` - Defines a visual property.
+- Line 511: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 512: `min-height: 44px;` - Defines a visual property.
+- Line 513: `}` - Ends a logic block.
+- Line 514: `` - Blank line for readability.
+- Line 515: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 516: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 517: `font-size: 0.85rem;` - Defines a visual property.
+- Line 518: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 519: `min-height: 42px;` - Defines a visual property.
+- Line 520: `}` - Ends a logic block.
+- Line 521: `` - Blank line for readability.
+- Line 522: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 523: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 524: `font-size: 0.85rem;` - Defines a visual property.
+- Line 525: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 526: `min-height: 42px;` - Defines a visual property.
+- Line 527: `}` - Ends a logic block.
+- Line 528: `` - Blank line for readability.
+- Line 529: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 530: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 531: `font-size: 0.85rem;` - Defines a visual property.
+- Line 532: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 533: `min-height: 40px;` - Defines a visual property.
+- Line 534: `}` - Ends a logic block.
+- Line 535: `` - Blank line for readability.
+- Line 536: `&::placeholder {` - Starts a logic block.
+- Line 537: `color: var(--text-muted, #8f8fb1);` - Defines a visual property.
+- Line 538: `opacity: 1;` - Defines a visual property.
+- Line 539: `}` - Ends a logic block.
+- Line 540: `` - Blank line for readability.
+- Line 541: `&:hover {` - Starts a logic block.
+- Line 542: `border-color: var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 543: `}` - Ends a logic block.
+- Line 544: `` - Blank line for readability.
+- Line 545: `&:focus {` - Starts a logic block.
+- Line 546: `outline: none;` - Defines a visual property.
+- Line 547: `border-color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 548: `box-shadow: none;` - Defines a visual property.
+- Line 549: `background-color: var(--form-control-bg, #ffffff);` - Defines a visual property.
+- Line 550: `}` - Ends a logic block.
+- Line 551: `` - Blank line for readability.
+- Line 552: `&:disabled {` - Starts a logic block.
+- Line 553: `opacity: 0.5;` - Defines a visual property.
+- Line 554: `cursor: not-allowed;` - Defines a visual property.
+- Line 555: `background-color: var(--form-control-bg, #ffffff);` - Defines a visual property.
+- Line 556: `border-color: var(--input-border, #e9edf6);` - Defines a visual property.
+- Line 557: `}` - Ends a logic block.
+- Line 558: `}` - Ends a logic block.
+- Line 559: `` - Blank line for readability.
+- Line 560: `.form-textarea {` - Starts a logic block.
+- Line 561: `min-height: 90px;` - Defines a visual property.
+- Line 562: `resize: vertical;` - Defines a visual property.
+- Line 563: `line-height: 1.5;` - Defines a visual property.
+- Line 564: `padding-top: 0.6rem;` - Defines a visual property.
+- Line 565: `padding-bottom: 0.6rem;` - Defines a visual property.
+- Line 566: `` - Blank line for readability.
+- Line 567: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 568: `min-height: 80px;` - Defines a visual property.
+- Line 569: `}` - Ends a logic block.
+- Line 570: `}` - Ends a logic block.
+- Line 571: `` - Blank line for readability.
+- Line 572: `.location-input-wrapper {` - Starts a logic block.
+- Line 573: `position: relative;` - Defines a visual property.
+- Line 574: `display: flex;` - Defines a visual property.
+- Line 575: `align-items: center;` - Defines a visual property.
+- Line 576: `}` - Ends a logic block.
+- Line 577: `` - Blank line for readability.
+- Line 578: `.location-icon {` - Starts a logic block.
+- Line 579: `position: absolute;` - Defines a visual property.
+- Line 580: `left: 0.875rem;` - Defines a visual property.
+- Line 581: `color: #2D6A4F;` - Defines a visual property.
+- Line 582: `font-size: 1.125rem;` - Defines a visual property.
+- Line 583: `pointer-events: none;` - Defines a visual property.
+- Line 584: `z-index: 1;` - Defines a visual property.
+- Line 585: `font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;` - Defines a visual property.
+- Line 586: `opacity: 0.7;` - Defines a visual property.
+- Line 587: `transition: opacity 0.2s ease;` - Defines a visual property.
+- Line 588: `` - Blank line for readability.
+- Line 589: `.location-input-wrapper:focus-within & {` - Starts a logic block.
+- Line 590: `opacity: 1;` - Defines a visual property.
+- Line 591: `}` - Ends a logic block.
+- Line 592: `` - Blank line for readability.
+- Line 593: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 594: `left: 1rem;` - Defines a visual property.
+- Line 595: `font-size: 1.25rem;` - Defines a visual property.
+- Line 596: `}` - Ends a logic block.
+- Line 597: `` - Blank line for readability.
+- Line 598: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 599: `left: 0.75rem;` - Defines a visual property.
+- Line 600: `font-size: 1rem;` - Defines a visual property.
+- Line 601: `}` - Ends a logic block.
+- Line 602: `` - Blank line for readability.
+- Line 603: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 604: `left: 0.625rem;` - Defines a visual property.
+- Line 605: `font-size: 0.9375rem;` - Defines a visual property.
+- Line 606: `}` - Ends a logic block.
+- Line 607: `}` - Ends a logic block.
+- Line 608: `` - Blank line for readability.
+- Line 609: `.location-input {` - Starts a logic block.
+- Line 610: `padding-left: 2.75rem;` - Defines a visual property.
+- Line 611: `` - Blank line for readability.
+- Line 612: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 613: `padding-left: 3rem;` - Defines a visual property.
+- Line 614: `}` - Ends a logic block.
+- Line 615: `` - Blank line for readability.
+- Line 616: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 617: `padding-left: 2.5rem;` - Defines a visual property.
+- Line 618: `}` - Ends a logic block.
+- Line 619: `` - Blank line for readability.
+- Line 620: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 621: `padding-left: 2.25rem;` - Defines a visual property.
+- Line 622: `}` - Ends a logic block.
+- Line 623: `}` - Ends a logic block.
+- Line 624: `` - Blank line for readability.
+- Line 625: `.form-hint {` - Starts a logic block.
+- Line 626: `// Form hint matching website structure` - Developer comment or documentation.
+- Line 627: `font-size: 0.813rem;` - Defines a visual property.
+- Line 628: `color: var(--text-muted, #8f8fb1);` - Defines a visual property.
+- Line 629: `margin-top: 0.5rem;` - Defines a visual property.
+- Line 630: `font-style: normal;` - Defines a visual property.
+- Line 631: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 632: `line-height: 1.5;` - Defines a visual property.
+- Line 633: `` - Blank line for readability.
+- Line 634: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 635: `font-size: 0.6875rem;` - Defines a visual property.
+- Line 636: `margin-top: 0.375rem;` - Defines a visual property.
+- Line 637: `}` - Ends a logic block.
+- Line 638: `` - Blank line for readability.
+- Line 639: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 640: `font-size: 0.625rem;` - Defines a visual property.
+- Line 641: `margin-top: 0.25rem;` - Defines a visual property.
+- Line 642: `}` - Ends a logic block.
+- Line 643: `}` - Ends a logic block.
+- Line 644: `` - Blank line for readability.
+- Line 645: `.logo-upload-area {` - Starts a logic block.
+- Line 646: `// Upload area matching website card structure` - Developer comment or documentation.
+- Line 647: `border: 2px dashed var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 648: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 649: `padding: 1.25rem 1rem;` - Defines a visual property.
+- Line 650: `text-align: center;` - Defines a visual property.
+- Line 651: `background-image: url('/assets/images/logo-upload-bg.png'), linear-gradient(135deg, var(--default-background, #eaedf7) 0%, var(--default-background, #eaedf7) 100%);` - Defines a visual property.
+- Line 652: `background-size: cover;` - Defines a visual property.
+- Line 653: `background-position: center;` - Defines a visual property.
+- Line 654: `background-repeat: no-repeat;` - Defines a visual property.
+- Line 655: `transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 656: `position: relative;` - Defines a visual property.
+- Line 657: `min-height: 110px;` - Defines a visual property.
+- Line 658: `display: flex;` - Defines a visual property.
+- Line 659: `align-items: center;` - Defines a visual property.
+- Line 660: `justify-content: center;` - Defines a visual property.
+- Line 661: `background-color: var(--default-background, #eaedf7);` - Defines a visual property.
+- Line 662: `cursor: pointer;` - Defines a visual property.
+- Line 663: `` - Blank line for readability.
+- Line 664: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 665: `padding: 1.5rem 1.25rem;` - Defines a visual property.
+- Line 666: `min-height: 130px;` - Defines a visual property.
+- Line 667: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 668: `}` - Ends a logic block.
+- Line 669: `` - Blank line for readability.
+- Line 670: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 671: `padding: 1.25rem 1rem;` - Defines a visual property.
+- Line 672: `min-height: 105px;` - Defines a visual property.
+- Line 673: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 674: `}` - Ends a logic block.
+- Line 675: `` - Blank line for readability.
+- Line 676: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 677: `padding: 1rem 0.875rem;` - Defines a visual property.
+- Line 678: `min-height: 95px;` - Defines a visual property.
+- Line 679: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 680: `}` - Ends a logic block.
+- Line 681: `` - Blank line for readability.
+- Line 682: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 683: `padding: 0.875rem 0.75rem;` - Defines a visual property.
+- Line 684: `min-height: 85px;` - Defines a visual property.
+- Line 685: `border-radius: 0.688rem;` - Defines a visual property.
+- Line 686: `}` - Ends a logic block.
+- Line 687: `` - Blank line for readability.
+- Line 688: `&:hover {` - Starts a logic block.
+- Line 689: `border-color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 690: `background-color: var(--primary01, rgba(98, 89, 202, 0.1));` - Defines a visual property.
+- Line 691: `transform: translateY(-1px);` - Defines a visual property.
+- Line 692: `box-shadow: 0 10px 30px 0 var(--primary005, rgba(98, 89, 202, 0.05));` - Defines a visual property.
+- Line 693: `}` - Ends a logic block.
+- Line 694: `` - Blank line for readability.
+- Line 695: `&.has-logo {` - Starts a logic block.
+- Line 696: `padding: 0.875rem;` - Defines a visual property.
+- Line 697: `border-style: solid;` - Defines a visual property.
+- Line 698: `border-color: rgb(var(--primary-rgb));` - Defines a visual property.
+- Line 699: `background-image: none;` - Defines a visual property.
+- Line 700: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 701: `cursor: default;` - Defines a visual property.
+- Line 702: `` - Blank line for readability.
+- Line 703: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 704: `padding: 0.75rem;` - Defines a visual property.
+- Line 705: `}` - Ends a logic block.
+- Line 706: `` - Blank line for readability.
+- Line 707: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 708: `padding: 0.625rem;` - Defines a visual property.
+- Line 709: `}` - Ends a logic block.
+- Line 710: `}` - Ends a logic block.
+- Line 711: `}` - Ends a logic block.
+- Line 712: `` - Blank line for readability.
+- Line 713: `.logo-file-input {` - Starts a logic block.
+- Line 714: `display: none;` - Defines a visual property.
+- Line 715: `}` - Ends a logic block.
+- Line 716: `` - Blank line for readability.
+- Line 717: `.logo-upload-label {` - Starts a logic block.
+- Line 718: `display: flex;` - Defines a visual property.
+- Line 719: `flex-direction: column;` - Defines a visual property.
+- Line 720: `align-items: center;` - Defines a visual property.
+- Line 721: `gap: 0.75rem;` - Defines a visual property.
+- Line 722: `cursor: pointer;` - Defines a visual property.
+- Line 723: `width: 100%;` - Defines a visual property.
+- Line 724: `min-height: 44px;` - Defines a visual property.
+- Line 725: `justify-content: center;` - Defines a visual property.
+- Line 726: `` - Blank line for readability.
+- Line 727: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 728: `gap: 0.5rem;` - Defines a visual property.
+- Line 729: `}` - Ends a logic block.
+- Line 730: `}` - Ends a logic block.
+- Line 731: `` - Blank line for readability.
+- Line 732: `.upload-icon {` - Starts a logic block.
+- Line 733: `width: 2.5rem;` - Defines a visual property.
+- Line 734: `height: 2.5rem;` - Defines a visual property.
+- Line 735: `background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);` - Defines a visual property.
+- Line 736: `border-radius: 10px;` - Defines a visual property.
+- Line 737: `display: flex;` - Defines a visual property.
+- Line 738: `align-items: center;` - Defines a visual property.
+- Line 739: `justify-content: center;` - Defines a visual property.
+- Line 740: `transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 741: `box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);` - Defines a visual property.
+- Line 742: `border: 1px solid rgba(45, 106, 79, 0.1);` - Defines a visual property.
+- Line 743: `` - Blank line for readability.
+- Line 744: `.material-symbols-outlined {` - Starts a logic block.
+- Line 745: `font-size: 1.25rem;` - Defines a visual property.
+- Line 746: `color: #2D6A4F;` - Defines a visual property.
+- Line 747: `font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;` - Defines a visual property.
+- Line 748: `}` - Ends a logic block.
+- Line 749: `` - Blank line for readability.
+- Line 750: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 751: `width: 2.75rem;` - Defines a visual property.
+- Line 752: `height: 2.75rem;` - Defines a visual property.
+- Line 753: `border-radius: 12px;` - Defines a visual property.
+- Line 754: `` - Blank line for readability.
+- Line 755: `.material-symbols-outlined {` - Starts a logic block.
+- Line 756: `font-size: 1.375rem;` - Defines a visual property.
+- Line 757: `}` - Ends a logic block.
+- Line 758: `}` - Ends a logic block.
+- Line 759: `` - Blank line for readability.
+- Line 760: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 761: `width: 2.25rem;` - Defines a visual property.
+- Line 762: `height: 2.25rem;` - Defines a visual property.
+- Line 763: `border-radius: 8px;` - Defines a visual property.
+- Line 764: `` - Blank line for readability.
+- Line 765: `.material-symbols-outlined {` - Starts a logic block.
+- Line 766: `font-size: 1.125rem;` - Defines a visual property.
+- Line 767: `}` - Ends a logic block.
+- Line 768: `}` - Ends a logic block.
+- Line 769: `` - Blank line for readability.
+- Line 770: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 771: `width: 2rem;` - Defines a visual property.
+- Line 772: `height: 2rem;` - Defines a visual property.
+- Line 773: `border-radius: 8px;` - Defines a visual property.
+- Line 774: `` - Blank line for readability.
+- Line 775: `.material-symbols-outlined {` - Starts a logic block.
+- Line 776: `font-size: 1rem;` - Defines a visual property.
+- Line 777: `}` - Ends a logic block.
+- Line 778: `}` - Ends a logic block.
+- Line 779: `` - Blank line for readability.
+- Line 780: `.logo-upload-area:hover & {` - Starts a logic block.
+- Line 781: `background: linear-gradient(135deg, #2D6A4F 0%, #1B4332 100%);` - Defines a visual property.
+- Line 782: `transform: scale(1.08) rotate(5deg);` - Defines a visual property.
+- Line 783: `box-shadow: 0 4px 16px rgba(45, 106, 79, 0.25), 0 2px 4px rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 784: `border-color: transparent;` - Defines a visual property.
+- Line 785: `` - Blank line for readability.
+- Line 786: `.material-symbols-outlined {` - Starts a logic block.
+- Line 787: `color: #FFFFFF;` - Defines a visual property.
+- Line 788: `}` - Ends a logic block.
+- Line 789: `}` - Ends a logic block.
+- Line 790: `}` - Ends a logic block.
+- Line 791: `` - Blank line for readability.
+- Line 792: `.upload-text {` - Starts a logic block.
+- Line 793: `font-size: 0.875rem;` - Defines a visual property.
+- Line 794: `font-weight: 600;` - Defines a visual property.
+- Line 795: `color: #0F172A;` - Defines a visual property.
+- Line 796: `letter-spacing: -0.01em;` - Defines a visual property.
+- Line 797: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 798: `margin-top: 0.5rem;` - Defines a visual property.
+- Line 799: `` - Blank line for readability.
+- Line 800: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 801: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 802: `margin-top: 0.375rem;` - Defines a visual property.
+- Line 803: `}` - Ends a logic block.
+- Line 804: `` - Blank line for readability.
+- Line 805: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 806: `font-size: 0.75rem;` - Defines a visual property.
+- Line 807: `margin-top: 0.25rem;` - Defines a visual property.
+- Line 808: `}` - Ends a logic block.
+- Line 809: `}` - Ends a logic block.
+- Line 810: `` - Blank line for readability.
+- Line 811: `.upload-hint {` - Starts a logic block.
+- Line 812: `font-size: 0.75rem;` - Defines a visual property.
+- Line 813: `color: #64748B;` - Defines a visual property.
+- Line 814: `font-style: normal;` - Defines a visual property.
+- Line 815: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 816: `margin-top: 0.375rem;` - Defines a visual property.
+- Line 817: `line-height: 1.5;` - Defines a visual property.
+- Line 818: `` - Blank line for readability.
+- Line 819: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 820: `font-size: 0.6875rem;` - Defines a visual property.
+- Line 821: `margin-top: 0.25rem;` - Defines a visual property.
+- Line 822: `}` - Ends a logic block.
+- Line 823: `` - Blank line for readability.
+- Line 824: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 825: `font-size: 0.625rem;` - Defines a visual property.
+- Line 826: `margin-top: 0.2rem;` - Defines a visual property.
+- Line 827: `}` - Ends a logic block.
+- Line 828: `}` - Ends a logic block.
+- Line 829: `` - Blank line for readability.
+- Line 830: `.logo-preview {` - Starts a logic block.
+- Line 831: `position: relative;` - Defines a visual property.
+- Line 832: `width: 100%;` - Defines a visual property.
+- Line 833: `display: flex;` - Defines a visual property.
+- Line 834: `align-items: center;` - Defines a visual property.
+- Line 835: `justify-content: center;` - Defines a visual property.
+- Line 836: `padding: 0.5rem;` - Defines a visual property.
+- Line 837: `` - Blank line for readability.
+- Line 838: `img {` - Starts a logic block.
+- Line 839: `max-width: 100%;` - Defines a visual property.
+- Line 840: `max-height: 150px;` - Defines a visual property.
+- Line 841: `object-fit: contain;` - Defines a visual property.
+- Line 842: `border-radius: 8px;` - Defines a visual property.
+- Line 843: `box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);` - Defines a visual property.
+- Line 844: `}` - Ends a logic block.
+- Line 845: `` - Blank line for readability.
+- Line 846: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 847: `img {` - Starts a logic block.
+- Line 848: `max-height: 120px;` - Defines a visual property.
+- Line 849: `}` - Ends a logic block.
+- Line 850: `}` - Ends a logic block.
+- Line 851: `` - Blank line for readability.
+- Line 852: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 853: `padding: 0.375rem;` - Defines a visual property.
+- Line 854: `` - Blank line for readability.
+- Line 855: `img {` - Starts a logic block.
+- Line 856: `max-height: 100px;` - Defines a visual property.
+- Line 857: `border-radius: 6px;` - Defines a visual property.
+- Line 858: `}` - Ends a logic block.
+- Line 859: `}` - Ends a logic block.
+- Line 860: `}` - Ends a logic block.
+- Line 861: `` - Blank line for readability.
+- Line 862: `.remove-logo-btn {` - Starts a logic block.
+- Line 863: `position: absolute;` - Defines a visual property.
+- Line 864: `top: -0.5rem;` - Defines a visual property.
+- Line 865: `right: -0.5rem;` - Defines a visual property.
+- Line 866: `background-color: #FFFFFF;` - Defines a visual property.
+- Line 867: `border: 2px solid #E2E8F0;` - Defines a visual property.
+- Line 868: `border-radius: 50%;` - Defines a visual property.
+- Line 869: `width: 2.25rem;` - Defines a visual property.
+- Line 870: `height: 2.25rem;` - Defines a visual property.
+- Line 871: `display: flex;` - Defines a visual property.
+- Line 872: `align-items: center;` - Defines a visual property.
+- Line 873: `justify-content: center;` - Defines a visual property.
+- Line 874: `cursor: pointer;` - Defines a visual property.
+- Line 875: `transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 876: `box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);` - Defines a visual property.
+- Line 877: `` - Blank line for readability.
+- Line 878: `&:hover {` - Starts a logic block.
+- Line 879: `background-color: #DC2626;` - Defines a visual property.
+- Line 880: `border-color: #DC2626;` - Defines a visual property.
+- Line 881: `transform: scale(1.1) rotate(90deg);` - Defines a visual property.
+- Line 882: `box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1);` - Defines a visual property.
+- Line 883: `}` - Ends a logic block.
+- Line 884: `` - Blank line for readability.
+- Line 885: `&:active {` - Starts a logic block.
+- Line 886: `transform: scale(1.05) rotate(90deg);` - Defines a visual property.
+- Line 887: `}` - Ends a logic block.
+- Line 888: `` - Blank line for readability.
+- Line 889: `.material-symbols-outlined {` - Starts a logic block.
+- Line 890: `font-size: 1.125rem;` - Defines a visual property.
+- Line 891: `color: #64748B;` - Defines a visual property.
+- Line 892: `font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;` - Defines a visual property.
+- Line 893: `transition: color 0.2s ease;` - Defines a visual property.
+- Line 894: `}` - Ends a logic block.
+- Line 895: `` - Blank line for readability.
+- Line 896: `&:hover .material-symbols-outlined {` - Starts a logic block.
+- Line 897: `color: #FFFFFF;` - Defines a visual property.
+- Line 898: `}` - Ends a logic block.
+- Line 899: `}` - Ends a logic block.
+- Line 900: `` - Blank line for readability.
+- Line 901: `.modal-footer {` - Starts a logic block.
+- Line 902: `// Modal footer matching website structure` - Developer comment or documentation.
+- Line 903: `display: flex;` - Defines a visual property.
+- Line 904: `padding: 1rem 1.25rem;` - Defines a visual property.
+- Line 905: `border-block-start: 1px solid var(--default-border, #e8e8f7);` - Defines a visual property.
+- Line 906: `justify-content: flex-end;` - Defines a visual property.
+- Line 907: `flex-shrink: 0;` - Defines a visual property.
+- Line 908: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 909: `gap: 0.625rem;` - Defines a visual property.
+- Line 910: `` - Blank line for readability.
+- Line 911: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 912: `padding: 1rem 1rem;` - Defines a visual property.
+- Line 913: `flex-direction: column-reverse;` - Defines a visual property.
+- Line 914: `gap: 0.5rem;` - Defines a visual property.
+- Line 915: `` - Blank line for readability.
+- Line 916: `button {` - Starts a logic block.
+- Line 917: `width: 100%;` - Defines a visual property.
+- Line 918: `}` - Ends a logic block.
+- Line 919: `}` - Ends a logic block.
+- Line 920: `` - Blank line for readability.
+- Line 921: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 922: `padding: 0.875rem 0.875rem;` - Defines a visual property.
+- Line 923: `gap: 0.5rem;` - Defines a visual property.
+- Line 924: `}` - Ends a logic block.
+- Line 925: `` - Blank line for readability.
+- Line 926: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 927: `padding: 0.75rem 0.75rem;` - Defines a visual property.
+- Line 928: `gap: 0.5rem;` - Defines a visual property.
+- Line 929: `}` - Ends a logic block.
+- Line 930: `}` - Ends a logic block.
+- Line 931: `` - Blank line for readability.
+- Line 932: `.btn-abort,` - Styling rule.
+- Line 933: `.btn-execute {` - Starts a logic block.
+- Line 934: `// Base button structure from website` - Developer comment or documentation.
+- Line 935: `font-size: 0.85rem;` - Defines a visual property.
+- Line 936: `border-radius: 0.188rem;` - Defines a visual property.
+- Line 937: `padding: 0.5rem 0.85rem;` - Defines a visual property.
+- Line 938: `box-shadow: none;` - Defines a visual property.
+- Line 939: `font-weight: 400;` - Defines a visual property.
+- Line 940: `` - Blank line for readability.
+- Line 941: `// Additional styling` - Developer comment or documentation.
+- Line 942: `letter-spacing: -0.01em;` - Defines a visual property.
+- Line 943: `border: 1px solid;` - Defines a visual property.
+- Line 944: `cursor: pointer;` - Defines a visual property.
+- Line 945: `transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);` - Defines a visual property.
+- Line 946: `text-transform: none;` - Defines a visual property.
+- Line 947: `min-width: 100px;` - Defines a visual property.
+- Line 948: `min-height: 42px;` - Defines a visual property.
+- Line 949: `font-family: "Inter", sans-serif;` - Defines a visual property.
+- Line 950: `position: relative;` - Defines a visual property.
+- Line 951: `overflow: hidden;` - Defines a visual property.
+- Line 952: `` - Blank line for readability.
+- Line 953: `@media (min-width: 1200px) {` - Starts a logic block.
+- Line 954: `padding: 0.75rem 1.5rem;` - Defines a visual property.
+- Line 955: `font-size: 0.875rem;` - Defines a visual property.
+- Line 956: `min-width: 110px;` - Defines a visual property.
+- Line 957: `min-height: 44px;` - Defines a visual property.
+- Line 958: `}` - Ends a logic block.
+- Line 959: `` - Blank line for readability.
+- Line 960: `@media (max-width: $bp-tablet) {` - Starts a logic block.
+- Line 961: `min-width: auto;` - Defines a visual property.
+- Line 962: `width: 100%;` - Defines a visual property.
+- Line 963: `padding: 0.625rem 1rem;` - Defines a visual property.
+- Line 964: `font-size: 0.8125rem;` - Defines a visual property.
+- Line 965: `min-height: 42px;` - Defines a visual property.
+- Line 966: `}` - Ends a logic block.
+- Line 967: `` - Blank line for readability.
+- Line 968: `@media (max-width: $bp-mobile) {` - Starts a logic block.
+- Line 969: `padding: 0.5rem 0.875rem;` - Defines a visual property.
+- Line 970: `font-size: 0.75rem;` - Defines a visual property.
+- Line 971: `border-radius: 8px;` - Defines a visual property.
+- Line 972: `min-height: 42px;` - Defines a visual property.
+- Line 973: `}` - Ends a logic block.
+- Line 974: `` - Blank line for readability.
+- Line 975: `@media (max-width: 399.98px) {` - Starts a logic block.
+- Line 976: `padding: 0.5rem 0.75rem;` - Defines a visual property.
+- Line 977: `font-size: 0.75rem;` - Defines a visual property.
+- Line 978: `border-radius: 8px;` - Defines a visual property.
+- Line 979: `min-height: 40px;` - Defines a visual property.
+- Line 980: `}` - Ends a logic block.
+- Line 981: `` - Blank line for readability.
+- Line 982: `&:disabled {` - Starts a logic block.
+- Line 983: `opacity: 0.5;` - Defines a visual property.
+- Line 984: `cursor: not-allowed;` - Defines a visual property.
+- Line 985: `transform: none !important;` - Loads external tools or data types.
+- Line 986: `}` - Ends a logic block.
+- Line 987: `}` - Ends a logic block.
+- Line 988: `` - Blank line for readability.
+- Line 989: `.btn-abort {` - Starts a logic block.
+- Line 990: `// Light button style matching website structure` - Developer comment or documentation.
+- Line 991: `background-color: var(--custom-white, #ffffff);` - Defines a visual property.
+- Line 992: `color: var(--gray-4, #71717a);` - Defines a visual property.
+- Line 993: `border-color: var(--light, #dbe0ea);` - Defines a visual property.
+- Line 994: `` - Blank line for readability.
+- Line 995: `&:hover:not(:disabled) {` - Starts a logic block.
+- Line 996: `background-color: #dbe0ea;` - Defines a visual property.
+- Line 997: `border-color: var(--light, #dbe0ea);` - Defines a visual property.
+- Line 998: `color: var(--default-text-color, #334155);` - Defines a visual property.
+- Line 999: `box-shadow: none;` - Defines a visual property.
+- Line 1000: `}` - Ends a logic block.
+- Line 1001: `` - Blank line for readability.
+- Line 1002: `&:focus:not(:disabled) {` - Starts a logic block.
+- Line 1003: `background-color: var(--light, #dbe0ea);` - Defines a visual property.
+- Line 1004: `border-color: var(--light, #dbe0ea);` - Defines a visual property.
+- Line 1005: `box-shadow: none;` - Defines a visual property.
+- Line 1006: `color: var(--default-text-color, #334155);` - Defines a visual property.
+- Line 1007: `outline: 0;` - Defines a visual property.
+- Line 1008: `}` - Ends a logic block.
+- Line 1009: `` - Blank line for readability.
+- Line 1010: `&:active:not(:disabled) {` - Starts a logic block.
+- Line 1011: `background-color: var(--light, #dbe0ea) !important;` - Loads external tools or data types.
+- Line 1012: `border-color: var(--light, #dbe0ea) !important;` - Loads external tools or data types.
+- Line 1013: `color: var(--default-text-color, #334155) !important;` - Loads external tools or data types.
+- Line 1014: `box-shadow: none;` - Defines a visual property.
+- Line 1015: `}` - Ends a logic block.
+- Line 1016: `}` - Ends a logic block.
+- Line 1017: `` - Blank line for readability.
+- Line 1018: `.btn-execute {` - Starts a logic block.
+- Line 1019: `// Primary button style matching website structure` - Developer comment or documentation.
+- Line 1020: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1021: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1022: `color: #fff !important;` - Loads external tools or data types.
+- Line 1023: `position: relative;` - Defines a visual property.
+- Line 1024: `` - Blank line for readability.
+- Line 1025: `// Hover state matching website button structure` - Developer comment or documentation.
+- Line 1026: `&:hover:not(:disabled) {` - Starts a logic block.
+- Line 1027: `background-color: rgba(var(--primary-rgb), 0.9) !important;` - Loads external tools or data types.
+- Line 1028: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1029: `color: #fff !important;` - Loads external tools or data types.
+- Line 1030: `box-shadow: none;` - Defines a visual property.
+- Line 1031: `}` - Ends a logic block.
+- Line 1032: `` - Blank line for readability.
+- Line 1033: `// Focus state matching website button structure` - Developer comment or documentation.
+- Line 1034: `&:focus:not(:disabled) {` - Starts a logic block.
+- Line 1035: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1036: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1037: `color: #fff !important;` - Loads external tools or data types.
+- Line 1038: `box-shadow: 0 0.25rem 1rem rgba(var(--primary-rgb), 0.5);` - Defines a visual property.
+- Line 1039: `outline: 0;` - Defines a visual property.
+- Line 1040: `}` - Ends a logic block.
+- Line 1041: `` - Blank line for readability.
+- Line 1042: `// Active state matching website button structure` - Developer comment or documentation.
+- Line 1043: `&:active:not(:disabled) {` - Starts a logic block.
+- Line 1044: `background-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1045: `border-color: rgb(var(--primary-rgb)) !important;` - Loads external tools or data types.
+- Line 1046: `color: #fff !important;` - Loads external tools or data types.
+- Line 1047: `box-shadow: 0 0.25rem 1rem rgba(var(--primary-rgb), 0.5);` - Defines a visual property.
+- Line 1048: `}` - Ends a logic block.
+- Line 1049: `}` - Ends a logic block.
+- Line 1050: `` - Blank line for readability.
+- Line 1051: `// Scrollbar styling for modal` - Developer comment or documentation.
+- Line 1052: `.modal-container::-webkit-scrollbar {` - Starts a logic block.
+- Line 1053: `width: 6px;` - Defines a visual property.
+- Line 1054: `}` - Ends a logic block.
+- Line 1055: `` - Blank line for readability.
+- Line 1056: `.modal-container::-webkit-scrollbar-track {` - Starts a logic block.
+- Line 1057: `background: transparent;` - Defines a visual property.
+- Line 1058: `}` - Ends a logic block.
+- Line 1059: `` - Blank line for readability.
+- Line 1060: `.modal-container::-webkit-scrollbar-thumb {` - Starts a logic block.
+- Line 1061: `background: #CBD5E1;` - Defines a visual property.
+- Line 1062: `border-radius: 3px;` - Defines a visual property.
+- Line 1063: `transition: background 0.2s ease;` - Defines a visual property.
+- Line 1064: `` - Blank line for readability.
+- Line 1065: `&:hover {` - Starts a logic block.
+- Line 1066: `background: #2D6A4F;` - Defines a visual property.
+- Line 1067: `}` - Ends a logic block.
+- Line 1068: `}` - Ends a logic block.
+- Line 1069: `` - Blank line for readability.
+- Line 1070: `// Material symbols styling` - Developer comment or documentation.
+- Line 1071: `.material-symbols-outlined {` - Starts a logic block.
+- Line 1072: `font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;` - Defines a visual property.
+- Line 1073: `}` - Ends a logic block.
+
+## Spruha/src/app/shared/services/war-room.service.ts
+- Line 1: `import { Injectable, signal, computed } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { Observable, of, delay } from 'rxjs';` - Loads external tools or data types.
+- Line 3: `import {` - Loads external tools or data types.
+- Line 4: `Node,` - App logic step.
+- Line 5: `Hub,` - App logic step.
+- Line 6: `ActivityLog,` - App logic step.
+- Line 7: `NetworkMetrics,` - App logic step.
+- Line 8: `NetworkThroughput,` - App logic step.
+- Line 9: `GeopoliticalHeatmap,` - App logic step.
+- Line 10: `SatelliteStatus,` - App logic step.
+- Line 11: `CompanyData,` - App logic step.
+- Line 12: `TransitRoute,` - App logic step.
+- Line 13: `WarRoomState,` - App logic step.
+- Line 14: `} from '../models/war-room.interface';` - Ends a logic block.
+- Line 15: `import { mockWarRoomData } from '../data/war-room-mock-data';` - Loads external tools or data types.
+- Line 16: `` - Blank line for readability.
+- Line 17: `@Injectable({` - Starts a logic block.
+- Line 18: `providedIn: 'root',` - App logic step.
+- Line 19: `})` - Ends a logic block.
+- Line 20: `export class WarRoomService {` - Starts the logic class for this component.
+- Line 21: `// Signal-based state management` - Developer comment or documentation.
+- Line 22: `private _nodes = signal<Node[]>([]);` - Creates a reactive variable.
+- Line 23: `private _transitRoutes = signal<TransitRoute[]>([]);` - Creates a reactive variable.
+- Line 24: `private _activityLogs = signal<ActivityLog[]>([]);` - Creates a reactive variable.
+- Line 25: `private _networkMetrics = signal<NetworkMetrics | null>(null);` - Creates a reactive variable.
+- Line 26: `private _networkThroughput = signal<NetworkThroughput | null>(null);` - Creates a reactive variable.
+- Line 27: `private _geopoliticalHeatmap = signal<GeopoliticalHeatmap | null>(null);` - Creates a reactive variable.
+- Line 28: `private _satelliteStatuses = signal<SatelliteStatus[]>([]);` - Creates a reactive variable.
+- Line 29: `private _companies = signal<CompanyData[]>([]);` - Creates a reactive variable.
+- Line 30: `private _selectedCompanyId = signal<string | null>(null);` - Creates a reactive variable.
+- Line 31: `` - Blank line for readability.
+- Line 32: `// Public readonly signals` - Developer comment or documentation.
+- Line 33: `readonly nodes = this._nodes.asReadonly();` - App logic step.
+- Line 34: `readonly transitRoutes = this._transitRoutes.asReadonly();` - App logic step.
+- Line 35: `readonly activityLogs = this._activityLogs.asReadonly();` - App logic step.
+- Line 36: `readonly networkMetrics = this._networkMetrics.asReadonly();` - App logic step.
+- Line 37: `readonly networkThroughput = this._networkThroughput.asReadonly();` - App logic step.
+- Line 38: `readonly geopoliticalHeatmap = this._geopoliticalHeatmap.asReadonly();` - App logic step.
+- Line 39: `readonly satelliteStatuses = this._satelliteStatuses.asReadonly();` - App logic step.
+- Line 40: `readonly companies = this._companies.asReadonly();` - App logic step.
+- Line 41: `readonly selectedCompanyId = this._selectedCompanyId.asReadonly();` - App logic step.
+- Line 42: `` - Blank line for readability.
+- Line 43: `// Computed signals` - Developer comment or documentation.
+- Line 44: `readonly selectedCompany = computed(() => {` - Starts a logic block.
+- Line 45: `const companyId = this._selectedCompanyId();` - App logic step.
+- Line 46: `if (!companyId) return null;` - Checks a condition.
+- Line 47: `return this._companies().find((c) => c.id === companyId) || null;` - Returns a value.
+- Line 48: `});` - Ends a logic block.
+- Line 49: `` - Blank line for readability.
+- Line 50: `readonly filteredActivityLogs = computed(() => {` - Starts a logic block.
+- Line 51: `const selectedId = this._selectedCompanyId();` - App logic step.
+- Line 52: `if (!selectedId) return this._activityLogs();` - Checks a condition.
+- Line 53: `return this._activityLogs().filter((log) => log.companyId === selectedId);` - Returns a value.
+- Line 54: `});` - Ends a logic block.
+- Line 55: `` - Blank line for readability.
+- Line 56: `constructor() {` - Initializes the component.
+- Line 57: `this.initializeData();` - App logic step.
+- Line 58: `}` - Ends a logic block.
+- Line 59: `` - Blank line for readability.
+- Line 60: `/**` - Developer comment or documentation.
+- Line 61: `* Initialize data from mock data` - Developer comment or documentation.
+- Line 62: `*/` - Developer comment or documentation.
+- Line 63: `private initializeData(): void {` - Starts a logic block.
+- Line 64: `const mockData = mockWarRoomData;` - App logic step.
+- Line 65: `this._nodes.set(mockData.nodes);` - App logic step.
+- Line 66: `this._transitRoutes.set(mockData.transitRoutes);` - App logic step.
+- Line 67: `this._activityLogs.set(mockData.activityLogs);` - App logic step.
+- Line 68: `this._networkMetrics.set(mockData.networkMetrics);` - App logic step.
+- Line 69: `this._networkThroughput.set(mockData.networkThroughput);` - App logic step.
+- Line 70: `this._geopoliticalHeatmap.set(mockData.geopoliticalHeatmap);` - App logic step.
+- Line 71: `this._satelliteStatuses.set(mockData.satelliteStatuses);` - App logic step.
+- Line 72: `this._companies.set(mockData.companies);` - App logic step.
+- Line 73: `` - Blank line for readability.
+- Line 74: `// Set default selected company (TAM - first in list)` - Developer comment or documentation.
+- Line 75: `if (mockData.companies.length > 0) {` - Starts a logic block.
+- Line 76: `this._selectedCompanyId.set(mockData.companies[0].id);` - App logic step.
+- Line 77: `}` - Ends a logic block.
+- Line 78: `}` - Ends a logic block.
+- Line 79: `` - Blank line for readability.
+- Line 80: `/**` - Developer comment or documentation.
+- Line 81: `* Get all nodes` - Developer comment or documentation.
+- Line 82: `*/` - Developer comment or documentation.
+- Line 83: `getNodes(): Observable<Node[]> {` - Starts a logic block.
+- Line 84: `return of(this._nodes()).pipe(delay(100));` - Returns a value.
+- Line 85: `}` - Ends a logic block.
+- Line 86: `` - Blank line for readability.
+- Line 87: `/**` - Developer comment or documentation.
+- Line 88: `* Get all transit routes` - Developer comment or documentation.
+- Line 89: `*/` - Developer comment or documentation.
+- Line 90: `getTransitRoutes(): Observable<TransitRoute[]> {` - Starts a logic block.
+- Line 91: `return of(this._transitRoutes()).pipe(delay(100));` - Returns a value.
+- Line 92: `}` - Ends a logic block.
+- Line 93: `` - Blank line for readability.
+- Line 94: `/**` - Developer comment or documentation.
+- Line 95: `* Get all activity logs` - Developer comment or documentation.
+- Line 96: `*/` - Developer comment or documentation.
+- Line 97: `getActivityLogs(): Observable<ActivityLog[]> {` - Starts a logic block.
+- Line 98: `return of(this._activityLogs()).pipe(delay(100));` - Returns a value.
+- Line 99: `}` - Ends a logic block.
+- Line 100: `` - Blank line for readability.
+- Line 101: `/**` - Developer comment or documentation.
+- Line 102: `* Get hub status for a specific company` - Developer comment or documentation.
+- Line 103: `*/` - Developer comment or documentation.
+- Line 104: `getHubStatus(companyId: string): Hub[] {` - Starts a logic block.
+- Line 105: `const company = this._companies().find((c) => c.id === companyId);` - App logic step.
+- Line 106: `return company?.hubs || [];` - Returns a value.
+- Line 107: `}` - Ends a logic block.
+- Line 108: `` - Blank line for readability.
+- Line 109: `/**` - Developer comment or documentation.
+- Line 110: `* Get network metrics` - Developer comment or documentation.
+- Line 111: `*/` - Developer comment or documentation.
+- Line 112: `getNetworkMetrics(): Observable<NetworkMetrics> {` - Starts a logic block.
+- Line 113: `const metrics = this._networkMetrics();` - App logic step.
+- Line 114: `if (!metrics) {` - Starts a logic block.
+- Line 115: `throw new Error('Network metrics not initialized');` - App logic step.
+- Line 116: `}` - Ends a logic block.
+- Line 117: `return of(metrics).pipe(delay(100));` - Returns a value.
+- Line 118: `}` - Ends a logic block.
+- Line 119: `` - Blank line for readability.
+- Line 120: `/**` - Developer comment or documentation.
+- Line 121: `* Get company data including quantum chart` - Developer comment or documentation.
+- Line 122: `*/` - Developer comment or documentation.
+- Line 123: `getCompanyData(companyId: string): CompanyData | null {` - Starts a logic block.
+- Line 124: `return this._companies().find((c) => c.id === companyId) || null;` - Returns a value.
+- Line 125: `}` - Ends a logic block.
+- Line 126: `` - Blank line for readability.
+- Line 127: `/**` - Developer comment or documentation.
+- Line 128: `* Select a company` - Developer comment or documentation.
+- Line 129: `*/` - Developer comment or documentation.
+- Line 130: `selectCompany(companyId: string | null): void {` - Starts a logic block.
+- Line 131: `this._selectedCompanyId.set(companyId);` - App logic step.
+- Line 132: `}` - Ends a logic block.
+- Line 133: `` - Blank line for readability.
+- Line 134: `/**` - Developer comment or documentation.
+- Line 135: `* Get selected company` - Developer comment or documentation.
+- Line 136: `*/` - Developer comment or documentation.
+- Line 137: `getSelectedCompany(): CompanyData | null {` - Starts a logic block.
+- Line 138: `return this.selectedCompany();` - Returns a value.
+- Line 139: `}` - Ends a logic block.
+- Line 140: `` - Blank line for readability.
+- Line 141: `/**` - Developer comment or documentation.
+- Line 142: `* Add a new activity log entry` - Developer comment or documentation.
+- Line 143: `* Keeps only the most recent entry per company (max 7 entries, one per company)` - Developer comment or documentation.
+- Line 144: `*/` - Developer comment or documentation.
+- Line 145: `addActivityLog(log: ActivityLog): void {` - Starts a logic block.
+- Line 146: `const currentLogs = this._activityLogs();` - App logic step.
+- Line 147: `` - Blank line for readability.
+- Line 148: `// Remove any existing entry for this company to ensure only one entry per company` - Developer comment or documentation.
+- Line 149: `const filteredLogs = currentLogs.filter((l) => l.companyId !== log.companyId);` - App logic step.
+- Line 150: `` - Blank line for readability.
+- Line 151: `// Add the new log at the beginning (most recent first)` - Developer comment or documentation.
+- Line 152: `const updatedLogs = [log, ...filteredLogs];` - App logic step.
+- Line 153: `` - Blank line for readability.
+- Line 154: `// Group by company and keep only the most recent entry per company` - Developer comment or documentation.
+- Line 155: `const companyMap = new Map<string, ActivityLog>();` - App logic step.
+- Line 156: `updatedLogs.forEach((l) => {` - Starts a logic block.
+- Line 157: `const existing = companyMap.get(l.companyId);` - App logic step.
+- Line 158: `if (!existing) {` - Starts a logic block.
+- Line 159: `companyMap.set(l.companyId, l);` - App logic step.
+- Line 160: `} else {` - App logic step.
+- Line 161: `// Keep the most recent entry` - Developer comment or documentation.
+- Line 162: `const dateExisting = typeof existing.timestamp === 'string' ? new Date(existing.timestamp) : existing.timestamp;` - App logic step.
+- Line 163: `const dateNew = typeof l.timestamp === 'string' ? new Date(l.timestamp) : l.timestamp;` - App logic step.
+- Line 164: `if (dateNew.getTime() > dateExisting.getTime()) {` - Starts a logic block.
+- Line 165: `companyMap.set(l.companyId, l);` - App logic step.
+- Line 166: `}` - Ends a logic block.
+- Line 167: `}` - Ends a logic block.
+- Line 168: `});` - Ends a logic block.
+- Line 169: `` - Blank line for readability.
+- Line 170: `// Convert map to array, sort by timestamp (most recent first), and limit to 7` - Developer comment or documentation.
+- Line 171: `const sortedLogs = Array.from(companyMap.values())` - App logic step.
+- Line 172: `.sort((a, b) => {` - Starts a logic block.
+- Line 173: `const dateA = typeof a.timestamp === 'string' ? new Date(a.timestamp) : a.timestamp;` - App logic step.
+- Line 174: `const dateB = typeof b.timestamp === 'string' ? new Date(b.timestamp) : b.timestamp;` - App logic step.
+- Line 175: `return dateB.getTime() - dateA.getTime();` - Returns a value.
+- Line 176: `})` - Ends a logic block.
+- Line 177: `.slice(0, 7); // Keep only 7 entries (one per company)` - App logic step.
+- Line 178: `` - Blank line for readability.
+- Line 179: `this._activityLogs.set(sortedLogs);` - App logic step.
+- Line 180: `}` - Ends a logic block.
+- Line 181: `` - Blank line for readability.
+- Line 182: `/**` - Developer comment or documentation.
+- Line 183: `* Update network metrics` - Developer comment or documentation.
+- Line 184: `*/` - Developer comment or documentation.
+- Line 185: `updateNetworkMetrics(metrics: Partial<NetworkMetrics>): void {` - Starts a logic block.
+- Line 186: `const current = this._networkMetrics();` - App logic step.
+- Line 187: `if (current) {` - Starts a logic block.
+- Line 188: `this._networkMetrics.set({ ...current, ...metrics });` - App logic step.
+- Line 189: `}` - Ends a logic block.
+- Line 190: `}` - Ends a logic block.
+- Line 191: `` - Blank line for readability.
+- Line 192: `/**` - Developer comment or documentation.
+- Line 193: `* Update network throughput` - Developer comment or documentation.
+- Line 194: `*/` - Developer comment or documentation.
+- Line 195: `updateNetworkThroughput(throughput: Partial<NetworkThroughput>): void {` - Starts a logic block.
+- Line 196: `const current = this._networkThroughput();` - App logic step.
+- Line 197: `if (current) {` - Starts a logic block.
+- Line 198: `this._networkThroughput.set({ ...current, ...throughput });` - App logic step.
+- Line 199: `}` - Ends a logic block.
+- Line 200: `}` - Ends a logic block.
+- Line 201: `` - Blank line for readability.
+- Line 202: `/**` - Developer comment or documentation.
+- Line 203: `* Update hub status for a company` - Developer comment or documentation.
+- Line 204: `*/` - Developer comment or documentation.
+- Line 205: `updateHubStatus(companyId: string, hubCode: string, updates: Partial<Hub>): void {` - Starts a logic block.
+- Line 206: `const companies = this._companies();` - App logic step.
+- Line 207: `const companyIndex = companies.findIndex((c) => c.id === companyId);` - App logic step.
+- Line 208: `if (companyIndex === -1) return;` - Checks a condition.
+- Line 209: `` - Blank line for readability.
+- Line 210: `const company = companies[companyIndex];` - App logic step.
+- Line 211: `const hubIndex = company.hubs.findIndex((h) => h.code === hubCode);` - App logic step.
+- Line 212: `if (hubIndex === -1) return;` - Checks a condition.
+- Line 213: `` - Blank line for readability.
+- Line 214: `const updatedHubs = [...company.hubs];` - App logic step.
+- Line 215: `updatedHubs[hubIndex] = { ...updatedHubs[hubIndex], ...updates };` - App logic step.
+- Line 216: `` - Blank line for readability.
+- Line 217: `const updatedCompanies = [...companies];` - App logic step.
+- Line 218: `updatedCompanies[companyIndex] = {` - Starts a logic block.
+- Line 219: `...company,` - App logic step.
+- Line 220: `hubs: updatedHubs,` - App logic step.
+- Line 221: `};` - Ends a logic block.
+- Line 222: `` - Blank line for readability.
+- Line 223: `this._companies.set(updatedCompanies);` - App logic step.
+- Line 224: `}` - Ends a logic block.
+- Line 225: `` - Blank line for readability.
+- Line 226: `/**` - Developer comment or documentation.
+- Line 227: `* Get complete war room state` - Developer comment or documentation.
+- Line 228: `*/` - Developer comment or documentation.
+- Line 229: `getWarRoomState(): WarRoomState {` - Starts a logic block.
+- Line 230: `const networkMetrics = this._networkMetrics();` - App logic step.
+- Line 231: `const networkThroughput = this._networkThroughput();` - App logic step.
+- Line 232: `const geopoliticalHeatmap = this._geopoliticalHeatmap();` - App logic step.
+- Line 233: `` - Blank line for readability.
+- Line 234: `// Provide fallback values if signals are not initialized` - Developer comment or documentation.
+- Line 235: `return {` - Starts a logic block.
+- Line 236: `nodes: this._nodes(),` - App logic step.
+- Line 237: `transitRoutes: this._transitRoutes(),` - App logic step.
+- Line 238: `activityLogs: this._activityLogs(),` - App logic step.
+- Line 239: `networkMetrics: networkMetrics || {` - Starts a logic block.
+- Line 240: `dataFlowIntegrity: 0,` - App logic step.
+- Line 241: `fleetSyncRate: 0,` - App logic step.
+- Line 242: `networkLatency: 0,` - App logic step.
+- Line 243: `nodeDensity: 0,` - App logic step.
+- Line 244: `encryptionProtocol: '',` - App logic step.
+- Line 245: `encryptionStatus: '',` - App logic step.
+- Line 246: `},` - Ends a logic block.
+- Line 247: `networkThroughput: networkThroughput || {` - Starts a logic block.
+- Line 248: `bars: [],` - App logic step.
+- Line 249: `channelStatus: '',` - App logic step.
+- Line 250: `throughput: '',` - App logic step.
+- Line 251: `},` - Ends a logic block.
+- Line 252: `geopoliticalHeatmap: geopoliticalHeatmap || {` - Starts a logic block.
+- Line 253: `grid: [],` - App logic step.
+- Line 254: `rows: 0,` - App logic step.
+- Line 255: `cols: 0,` - App logic step.
+- Line 256: `},` - Ends a logic block.
+- Line 257: `satelliteStatuses: this._satelliteStatuses(),` - App logic step.
+- Line 258: `companies: this._companies(),` - App logic step.
+- Line 259: `selectedCompanyId: this._selectedCompanyId(),` - App logic step.
+- Line 260: `};` - Ends a logic block.
+- Line 261: `}` - Ends a logic block.
+- Line 262: `` - Blank line for readability.
+- Line 263: `/**` - Developer comment or documentation.
+- Line 264: `* City lookup table for common cities` - Developer comment or documentation.
+- Line 265: `* Format: "city, province/state" -> { latitude, longitude }` - Developer comment or documentation.
+- Line 266: `*/` - Developer comment or documentation.
+- Line 267: `private cityLookup: Map<string, { latitude: number; longitude: number }> = new Map([` - App logic step.
+- Line 268: `// Canadian Cities` - Developer comment or documentation.
+- Line 269: `['toronto, ontario', { latitude: 43.6532, longitude: -79.3832 }],` - App logic step.
+- Line 270: `['vancouver, british columbia', { latitude: 49.2827, longitude: -123.1207 }],` - App logic step.
+- Line 271: `['montreal, quebec', { latitude: 45.5017, longitude: -73.5673 }],` - App logic step.
+- Line 272: `['calgary, alberta', { latitude: 51.0447, longitude: -114.0719 }],` - App logic step.
+- Line 273: `['ottawa, ontario', { latitude: 45.4215, longitude: -75.6972 }],` - App logic step.
+- Line 274: `['edmonton, alberta', { latitude: 53.5461, longitude: -113.4938 }],` - App logic step.
+- Line 275: `['winnipeg, manitoba', { latitude: 49.8951, longitude: -97.1384 }],` - App logic step.
+- Line 276: `['halifax, nova scotia', { latitude: 44.6488, longitude: -63.5752 }],` - App logic step.
+- Line 277: `['victoria, british columbia', { latitude: 48.4284, longitude: -123.3656 }],` - App logic step.
+- Line 278: `['saskatoon, saskatchewan', { latitude: 52.1332, longitude: -106.6700 }],` - App logic step.
+- Line 279: `['regina, saskatchewan', { latitude: 50.4452, longitude: -104.6189 }],` - App logic step.
+- Line 280: `['quebec city, quebec', { latitude: 46.8139, longitude: -71.2080 }],` - App logic step.
+- Line 281: `['hamilton, ontario', { latitude: 43.2557, longitude: -79.8711 }],` - App logic step.
+- Line 282: `['london, ontario', { latitude: 42.9849, longitude: -81.2453 }],` - App logic step.
+- Line 283: `['kitchener, ontario', { latitude: 43.4516, longitude: -80.4925 }],` - App logic step.
+- Line 284: `['windsor, ontario', { latitude: 42.3149, longitude: -83.0364 }],` - App logic step.
+- Line 285: `['oshawa, ontario', { latitude: 43.8975, longitude: -78.8659 }],` - App logic step.
+- Line 286: `['barrie, ontario', { latitude: 44.3894, longitude: -79.6903 }],` - App logic step.
+- Line 287: `['sudbury, ontario', { latitude: 46.4920, longitude: -80.9940 }],` - App logic step.
+- Line 288: `['kingston, ontario', { latitude: 44.2312, longitude: -76.4860 }],` - App logic step.
+- Line 289: `['paris, ontario', { latitude: 43.2000, longitude: -80.3833 }],` - App logic step.
+- Line 290: `['st. eustache, quebec', { latitude: 45.5650, longitude: -73.9050 }],` - App logic step.
+- Line 291: `// US Cities (common ones)` - Developer comment or documentation.
+- Line 292: `['new york, new york', { latitude: 40.7128, longitude: -74.0060 }],` - App logic step.
+- Line 293: `['los angeles, california', { latitude: 34.0522, longitude: -118.2437 }],` - App logic step.
+- Line 294: `['chicago, illinois', { latitude: 41.8781, longitude: -87.6298 }],` - App logic step.
+- Line 295: `['houston, texas', { latitude: 29.7604, longitude: -95.3698 }],` - App logic step.
+- Line 296: `['phoenix, arizona', { latitude: 33.4484, longitude: -112.0740 }],` - App logic step.
+- Line 297: `['philadelphia, pennsylvania', { latitude: 39.9526, longitude: -75.1652 }],` - App logic step.
+- Line 298: `['san antonio, texas', { latitude: 29.4241, longitude: -98.4936 }],` - App logic step.
+- Line 299: `['san diego, california', { latitude: 32.7157, longitude: -117.1611 }],` - App logic step.
+- Line 300: `['dallas, texas', { latitude: 32.7767, longitude: -96.7970 }],` - App logic step.
+- Line 301: `['san jose, california', { latitude: 37.3382, longitude: -121.8863 }],` - App logic step.
+- Line 302: `['austin, texas', { latitude: 30.2672, longitude: -97.7431 }],` - App logic step.
+- Line 303: `['jacksonville, florida', { latitude: 30.3322, longitude: -81.6557 }],` - App logic step.
+- Line 304: `['san francisco, california', { latitude: 37.7749, longitude: -122.4194 }],` - App logic step.
+- Line 305: `['indianapolis, indiana', { latitude: 39.7684, longitude: -86.1581 }],` - App logic step.
+- Line 306: `['columbus, ohio', { latitude: 39.9612, longitude: -82.9988 }],` - App logic step.
+- Line 307: `['fort worth, texas', { latitude: 32.7555, longitude: -97.3308 }],` - App logic step.
+- Line 308: `['charlotte, north carolina', { latitude: 35.2271, longitude: -80.8431 }],` - App logic step.
+- Line 309: `['seattle, washington', { latitude: 47.6062, longitude: -122.3321 }],` - App logic step.
+- Line 310: `['denver, colorado', { latitude: 39.7392, longitude: -104.9903 }],` - App logic step.
+- Line 311: `['washington, district of columbia', { latitude: 38.9072, longitude: -77.0369 }],` - App logic step.
+- Line 312: `['boston, massachusetts', { latitude: 42.3601, longitude: -71.0589 }],` - App logic step.
+- Line 313: `['el paso, texas', { latitude: 31.7619, longitude: -106.4850 }],` - App logic step.
+- Line 314: `['detroit, michigan', { latitude: 42.3314, longitude: -83.0458 }],` - App logic step.
+- Line 315: `['nashville, tennessee', { latitude: 36.1627, longitude: -86.7816 }],` - App logic step.
+- Line 316: `['portland, oregon', { latitude: 45.5152, longitude: -122.6784 }],` - App logic step.
+- Line 317: `['oklahoma city, oklahoma', { latitude: 35.4676, longitude: -97.5164 }],` - App logic step.
+- Line 318: `['las vegas, nevada', { latitude: 36.1699, longitude: -115.1398 }],` - App logic step.
+- Line 319: `['memphis, tennessee', { latitude: 35.1495, longitude: -90.0490 }],` - App logic step.
+- Line 320: `['louisville, kentucky', { latitude: 38.2527, longitude: -85.7585 }],` - App logic step.
+- Line 321: `['baltimore, maryland', { latitude: 39.2904, longitude: -76.6122 }],` - App logic step.
+- Line 322: `['milwaukee, wisconsin', { latitude: 43.0389, longitude: -87.9065 }],` - App logic step.
+- Line 323: `['albuquerque, new mexico', { latitude: 35.0844, longitude: -106.6504 }],` - App logic step.
+- Line 324: `['tucson, arizona', { latitude: 32.2226, longitude: -110.9747 }],` - App logic step.
+- Line 325: `['fresno, california', { latitude: 36.7378, longitude: -119.7871 }],` - App logic step.
+- Line 326: `['sacramento, california', { latitude: 38.5816, longitude: -121.4944 }],` - App logic step.
+- Line 327: `['kansas city, missouri', { latitude: 39.0997, longitude: -94.5786 }],` - App logic step.
+- Line 328: `['mesa, arizona', { latitude: 33.4152, longitude: -111.8315 }],` - App logic step.
+- Line 329: `['atlanta, georgia', { latitude: 33.7490, longitude: -84.3880 }],` - App logic step.
+- Line 330: `['omaha, nebraska', { latitude: 41.2565, longitude: -95.9345 }],` - App logic step.
+- Line 331: `['colorado springs, colorado', { latitude: 38.8339, longitude: -104.8214 }],` - App logic step.
+- Line 332: `['raleigh, north carolina', { latitude: 35.7796, longitude: -78.6382 }],` - App logic step.
+- Line 333: `['virginia beach, virginia', { latitude: 36.8529, longitude: -75.9780 }],` - App logic step.
+- Line 334: `['miami, florida', { latitude: 25.7617, longitude: -80.1918 }],` - App logic step.
+- Line 335: `['oakland, california', { latitude: 37.8044, longitude: -122.2712 }],` - App logic step.
+- Line 336: `['minneapolis, minnesota', { latitude: 44.9778, longitude: -93.2650 }],` - App logic step.
+- Line 337: `['tulsa, oklahoma', { latitude: 36.1540, longitude: -95.9928 }],` - App logic step.
+- Line 338: `['cleveland, ohio', { latitude: 41.4993, longitude: -81.6944 }],` - App logic step.
+- Line 339: `['wichita, kansas', { latitude: 37.6872, longitude: -97.3301 }],` - App logic step.
+- Line 340: `['arlington, texas', { latitude: 32.7357, longitude: -97.1081 }],` - App logic step.
+- Line 341: `['new orleans, louisiana', { latitude: 29.9511, longitude: -90.0715 }],` - App logic step.
+- Line 342: `['honolulu, hawaii', { latitude: 21.3099, longitude: -157.8581 }],` - App logic step.
+- Line 343: `]);` - App logic step.
+- Line 344: `` - Blank line for readability.
+- Line 345: `/**` - Developer comment or documentation.
+- Line 346: `* Parse location input (coordinates or address)` - Developer comment or documentation.
+- Line 347: `* Supports coordinate format: "latitude, longitude" or "City, Province/State" format` - Developer comment or documentation.
+- Line 348: `* For addresses, uses a lookup table for common cities or returns placeholder coordinates` - Developer comment or documentation.
+- Line 349: `*/` - Developer comment or documentation.
+- Line 350: `async parseLocationInput(input: string): Promise<{ latitude: number; longitude: number }> {` - App logic step.
+- Line 351: `const trimmed = input.trim();` - App logic step.
+- Line 352: `` - Blank line for readability.
+- Line 353: `// Try to parse as coordinates (format: "lat, lng" or "lat,lng")` - Developer comment or documentation.
+- Line 354: `const coordinateMatch = trimmed.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);` - App logic step.
+- Line 355: `if (coordinateMatch) {` - Starts a logic block.
+- Line 356: `const latitude = parseFloat(coordinateMatch[1]);` - App logic step.
+- Line 357: `const longitude = parseFloat(coordinateMatch[2]);` - App logic step.
+- Line 358: `` - Blank line for readability.
+- Line 359: `// Validate coordinate ranges` - Developer comment or documentation.
+- Line 360: `if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180) {` - Starts a logic block.
+- Line 361: `return { latitude, longitude };` - Returns a value.
+- Line 362: `} else {` - App logic step.
+- Line 363: `throw new Error('Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180');` - App logic step.
+- Line 364: `}` - Ends a logic block.
+- Line 365: `}` - Ends a logic block.
+- Line 366: `` - Blank line for readability.
+- Line 367: `// Try to parse as "City, Province/State" format` - Developer comment or documentation.
+- Line 368: `const cityProvinceMatch = trimmed.match(/^([^,]+),\s*(.+)$/i);` - App logic step.
+- Line 369: `if (cityProvinceMatch) {` - Starts a logic block.
+- Line 370: `const city = cityProvinceMatch[1].trim().toLowerCase();` - App logic step.
+- Line 371: `const province = cityProvinceMatch[2].trim().toLowerCase();` - App logic step.
+- Line 372: `const lookupKey = '${city}, ${province}';` - App logic step.
+- Line 373: `` - Blank line for readability.
+- Line 374: `// Try exact match first` - Developer comment or documentation.
+- Line 375: `const exactMatch = this.cityLookup.get(lookupKey);` - App logic step.
+- Line 376: `if (exactMatch) {` - Starts a logic block.
+- Line 377: `return exactMatch;` - Returns a value.
+- Line 378: `}` - Ends a logic block.
+- Line 379: `` - Blank line for readability.
+- Line 380: `// Try case-insensitive search` - Developer comment or documentation.
+- Line 381: `for (const [key, coords] of this.cityLookup.entries()) {` - Starts a logic block.
+- Line 382: `if (key.toLowerCase() === lookupKey) {` - Starts a logic block.
+- Line 383: `return coords;` - Returns a value.
+- Line 384: `}` - Ends a logic block.
+- Line 385: `}` - Ends a logic block.
+- Line 386: `` - Blank line for readability.
+- Line 387: `// If not found in lookup, return placeholder coordinates (0, 0)` - Developer comment or documentation.
+- Line 388: `// This allows the system to work while real geocoding can be added later` - Developer comment or documentation.
+- Line 389: `console.warn('City "${lookupKey}" not found in lookup table. Using placeholder coordinates.');` - App logic step.
+- Line 390: `return { latitude: 0, longitude: 0 };` - Returns a value.
+- Line 391: `}` - Ends a logic block.
+- Line 392: `` - Blank line for readability.
+- Line 393: `// If not coordinates or city/province format, return placeholder` - Developer comment or documentation.
+- Line 394: `// This allows the system to work while real geocoding can be added later` - Developer comment or documentation.
+- Line 395: `console.warn('Could not parse location "${trimmed}". Using placeholder coordinates.');` - App logic step.
+- Line 396: `return { latitude: 0, longitude: 0 };` - Returns a value.
+- Line 397: `}` - Ends a logic block.
+- Line 398: `` - Blank line for readability.
+- Line 399: `/**` - Developer comment or documentation.
+- Line 400: `* Add a new node to the map` - Developer comment or documentation.
+- Line 401: `*/` - Developer comment or documentation.
+- Line 402: `addNode(node: Node): void {` - Starts a logic block.
+- Line 403: `const currentNodes = this._nodes();` - App logic step.
+- Line 404: `` - Blank line for readability.
+- Line 405: `// Check if node with same ID already exists` - Developer comment or documentation.
+- Line 406: `if (currentNodes.find(n => n.id === node.id)) {` - Starts a logic block.
+- Line 407: `console.warn('Node with ID ${node.id} already exists. Updating instead.');` - App logic step.
+- Line 408: `this.updateNode(node);` - App logic step.
+- Line 409: `return;` - App logic step.
+- Line 410: `}` - Ends a logic block.
+- Line 411: `` - Blank line for readability.
+- Line 412: `// Add new node` - Developer comment or documentation.
+- Line 413: `this._nodes.set([...currentNodes, node]);` - App logic step.
+- Line 414: `console.log('Node added:', node);` - App logic step.
+- Line 415: `}` - Ends a logic block.
+- Line 416: `` - Blank line for readability.
+- Line 417: `/**` - Developer comment or documentation.
+- Line 418: `* Update an existing node` - Developer comment or documentation.
+- Line 419: `*/` - Developer comment or documentation.
+- Line 420: `updateNode(node: Node): void {` - Starts a logic block.
+- Line 421: `const currentNodes = this._nodes();` - App logic step.
+- Line 422: `const index = currentNodes.findIndex(n => n.id === node.id);` - App logic step.
+- Line 423: `` - Blank line for readability.
+- Line 424: `if (index === -1) {` - Starts a logic block.
+- Line 425: `console.warn('Node with ID ${node.id} not found. Adding as new node.');` - App logic step.
+- Line 426: `this.addNode(node);` - App logic step.
+- Line 427: `return;` - App logic step.
+- Line 428: `}` - Ends a logic block.
+- Line 429: `` - Blank line for readability.
+- Line 430: `const updatedNodes = [...currentNodes];` - App logic step.
+- Line 431: `updatedNodes[index] = node;` - App logic step.
+- Line 432: `this._nodes.set(updatedNodes);` - App logic step.
+- Line 433: `}` - Ends a logic block.
+- Line 434: `` - Blank line for readability.
+- Line 435: `/**` - Developer comment or documentation.
+- Line 436: `* Add a new company` - Developer comment or documentation.
+- Line 437: `*/` - Developer comment or documentation.
+- Line 438: `addCompany(company: CompanyData): void {` - Starts a logic block.
+- Line 439: `const currentCompanies = this._companies();` - App logic step.
+- Line 440: `` - Blank line for readability.
+- Line 441: `// Check if company with same ID already exists` - Developer comment or documentation.
+- Line 442: `if (currentCompanies.find(c => c.id === company.id)) {` - Starts a logic block.
+- Line 443: `console.warn('Company with ID ${company.id} already exists. Updating instead.');` - App logic step.
+- Line 444: `this.updateCompany(company);` - App logic step.
+- Line 445: `return;` - App logic step.
+- Line 446: `}` - Ends a logic block.
+- Line 447: `` - Blank line for readability.
+- Line 448: `// Add new company` - Developer comment or documentation.
+- Line 449: `this._companies.set([...currentCompanies, company]);` - App logic step.
+- Line 450: `console.log('Company added:', company);` - App logic step.
+- Line 451: `}` - Ends a logic block.
+- Line 452: `` - Blank line for readability.
+- Line 453: `/**` - Developer comment or documentation.
+- Line 454: `* Update an existing company` - Developer comment or documentation.
+- Line 455: `*/` - Developer comment or documentation.
+- Line 456: `updateCompany(company: CompanyData): void {` - Starts a logic block.
+- Line 457: `const currentCompanies = this._companies();` - App logic step.
+- Line 458: `const index = currentCompanies.findIndex(c => c.id === company.id);` - App logic step.
+- Line 459: `` - Blank line for readability.
+- Line 460: `if (index === -1) {` - Starts a logic block.
+- Line 461: `console.warn('Company with ID ${company.id} not found. Adding as new company.');` - App logic step.
+- Line 462: `this.addCompany(company);` - App logic step.
+- Line 463: `return;` - App logic step.
+- Line 464: `}` - Ends a logic block.
+- Line 465: `` - Blank line for readability.
+- Line 466: `const updatedCompanies = [...currentCompanies];` - App logic step.
+- Line 467: `updatedCompanies[index] = company;` - App logic step.
+- Line 468: `this._companies.set(updatedCompanies);` - App logic step.
+- Line 469: `}` - Ends a logic block.
+- Line 470: `` - Blank line for readability.
+- Line 471: `/**` - Developer comment or documentation.
+- Line 472: `* Generate a unique company ID from company name` - Developer comment or documentation.
+- Line 473: `*/` - Developer comment or documentation.
+- Line 474: `generateCompanyId(companyName: string): string {` - Starts a logic block.
+- Line 475: `const slug = companyName` - App logic step.
+- Line 476: `.toLowerCase()` - App logic step.
+- Line 477: `.replace(/[^a-z0-9]+/g, '-')` - App logic step.
+- Line 478: `.replace(/^-+|-+$/g, '');` - App logic step.
+- Line 479: `// Append timestamp to ensure uniqueness (matching generateNodeId behavior)` - Developer comment or documentation.
+- Line 480: `const timestamp = Date.now();` - App logic step.
+- Line 481: `return '${slug}-${timestamp}';` - Returns a value.
+- Line 482: `}` - Ends a logic block.
+- Line 483: `` - Blank line for readability.
+- Line 484: `/**` - Developer comment or documentation.
+- Line 485: `* Generate a unique node ID from company name` - Developer comment or documentation.
+- Line 486: `*/` - Developer comment or documentation.
+- Line 487: `generateNodeId(companyName: string): string {` - Starts a logic block.
+- Line 488: `const slug = companyName` - App logic step.
+- Line 489: `.toLowerCase()` - App logic step.
+- Line 490: `.replace(/[^a-z0-9]+/g, '-')` - App logic step.
+- Line 491: `.replace(/^-+|-+$/g, '');` - App logic step.
+- Line 492: `const timestamp = Date.now();` - App logic step.
+- Line 493: `return 'node-${slug}-${timestamp}';` - Returns a value.
+- Line 494: `}` - Ends a logic block.
+- Line 495: `}` - Ends a logic block.
+
+## Spruha/src/app/shared/services/war-room-realtime.service.ts
+- Line 1: `import { Injectable, OnDestroy } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { interval, Subscription } from 'rxjs';` - Loads external tools or data types.
+- Line 3: `import { take } from 'rxjs/operators';` - Loads external tools or data types.
+- Line 4: `import { WarRoomService } from './war-room.service';` - Loads external tools or data types.
+- Line 5: `import {` - Loads external tools or data types.
+- Line 6: `ActivityLog,` - App logic step.
+- Line 7: `ActivityStatus,` - App logic step.
+- Line 8: `NetworkMetrics,` - App logic step.
+- Line 9: `NetworkThroughput,` - App logic step.
+- Line 10: `} from '../models/war-room.interface';` - Ends a logic block.
+- Line 11: `` - Blank line for readability.
+- Line 12: `@Injectable({` - Starts a logic block.
+- Line 13: `providedIn: 'root',` - App logic step.
+- Line 14: `})` - Ends a logic block.
+- Line 15: `export class WarRoomRealtimeService implements OnDestroy {` - Starts the logic class for this component.
+- Line 16: `private updateInterval: Subscription | null = null;` - App logic step.
+- Line 17: `private activityLogIntervalSub: Subscription | null = null;` - App logic step.
+- Line 18: `private isRunning = false;` - App logic step.
+- Line 19: `private readonly companyLogos: Record<string, string> = {` - Starts a logic block.
+- Line 20: `'creative carriage': '/assets/images/creative-carriage-logo.png',` - App logic step.
+- Line 21: `'alexander dennis': '/assets/images/alexander-dennis.jpg',` - App logic step.
+- Line 22: `'karsan': '/assets/images/KARSAN.jpg',` - App logic step.
+- Line 23: `'karzan': '/assets/images/KARSAN.jpg',` - App logic step.
+- Line 24: `'arboc': '/assets/images/ARBOC.jpg',` - App logic step.
+- Line 25: `'arbroc': '/assets/images/ARBOC.jpg',` - App logic step.
+- Line 26: `'tam': '/assets/images/tam-logo.png',` - App logic step.
+- Line 27: `'nfl': '/assets/images/New-Flyer.jpg',` - App logic step.
+- Line 28: `'new flyer': '/assets/images/New-Flyer.jpg',` - App logic step.
+- Line 29: `'nova': '/assets/images/Nova-Bus.jpg.png',` - App logic step.
+- Line 30: `'nova bus': '/assets/images/Nova-Bus.jpg.png',` - App logic step.
+- Line 31: `};` - Ends a logic block.
+- Line 32: `` - Blank line for readability.
+- Line 33: `constructor(private warRoomService: WarRoomService) {}` - Initializes the component.
+- Line 34: `` - Blank line for readability.
+- Line 35: `/**` - Developer comment or documentation.
+- Line 36: `* Start real-time updates` - Developer comment or documentation.
+- Line 37: `*/` - Developer comment or documentation.
+- Line 38: `startRealTimeUpdates(): void {` - Starts a logic block.
+- Line 39: `if (this.isRunning) return;` - Checks a condition.
+- Line 40: `` - Blank line for readability.
+- Line 41: `this.isRunning = true;` - App logic step.
+- Line 42: `// Update every 5 seconds` - Developer comment or documentation.
+- Line 43: `this.updateInterval = interval(5000).subscribe(() => {` - Starts a logic block.
+- Line 44: `this.updateMetrics();` - App logic step.
+- Line 45: `this.updateNetworkThroughput();` - App logic step.
+- Line 46: `});` - Ends a logic block.
+- Line 47: `` - Blank line for readability.
+- Line 48: `// Add new activity log every 30 seconds` - Developer comment or documentation.
+- Line 49: `interval(30000).subscribe(() => {` - Starts a logic block.
+- Line 50: `this.addRandomActivityLog();` - App logic step.
+- Line 51: `});` - Ends a logic block.
+- Line 52: `}` - Ends a logic block.
+- Line 53: `` - Blank line for readability.
+- Line 54: `/**` - Developer comment or documentation.
+- Line 55: `* Stop real-time updates` - Developer comment or documentation.
+- Line 56: `*/` - Developer comment or documentation.
+- Line 57: `stopRealTimeUpdates(): void {` - Starts a logic block.
+- Line 58: `if (this.updateInterval) {` - Starts a logic block.
+- Line 59: `this.updateInterval.unsubscribe();` - App logic step.
+- Line 60: `this.updateInterval = null;` - App logic step.
+- Line 61: `}` - Ends a logic block.
+- Line 62: `if (this.activityLogIntervalSub) {` - Starts a logic block.
+- Line 63: `this.activityLogIntervalSub.unsubscribe();` - App logic step.
+- Line 64: `this.activityLogIntervalSub = null;` - App logic step.
+- Line 65: `}` - Ends a logic block.
+- Line 66: `this.isRunning = false;` - App logic step.
+- Line 67: `}` - Ends a logic block.
+- Line 68: `` - Blank line for readability.
+- Line 69: `/**` - Developer comment or documentation.
+- Line 70: `* Update network metrics (fleet sync rate, data integrity, latency)` - Developer comment or documentation.
+- Line 71: `*/` - Developer comment or documentation.
+- Line 72: `private updateMetrics(): void {` - Starts a logic block.
+- Line 73: `const currentMetrics = this.warRoomService.getNetworkMetrics();` - App logic step.
+- Line 74: `if (!currentMetrics) return;` - Checks a condition.
+- Line 75: `` - Blank line for readability.
+- Line 76: `currentMetrics.subscribe((metrics) => {` - Starts a logic block.
+- Line 77: `// Simulate small variations in metrics` - Developer comment or documentation.
+- Line 78: `const updatedMetrics: Partial<NetworkMetrics> = {` - Starts a logic block.
+- Line 79: `dataFlowIntegrity: this.varyValue(metrics.dataFlowIntegrity, 0.1, 99.5, 100),` - App logic step.
+- Line 80: `fleetSyncRate: this.varyValue(metrics.fleetSyncRate, 10, 1400, 1450),` - App logic step.
+- Line 81: `networkLatency: this.varyValue(metrics.networkLatency, 1, 2, 8),` - App logic step.
+- Line 82: `nodeDensity: this.varyValue(metrics.nodeDensity, 0.5, 98, 100),` - App logic step.
+- Line 83: `};` - Ends a logic block.
+- Line 84: `` - Blank line for readability.
+- Line 85: `// Calculate latency change` - Developer comment or documentation.
+- Line 86: `const latencyChange = updatedMetrics.networkLatency` - App logic step.
+- Line 87: `? updatedMetrics.networkLatency - metrics.networkLatency` - App logic step.
+- Line 88: `: 0;` - App logic step.
+- Line 89: `updatedMetrics.latencyChange = latencyChange;` - App logic step.
+- Line 90: `` - Blank line for readability.
+- Line 91: `this.warRoomService.updateNetworkMetrics(updatedMetrics);` - App logic step.
+- Line 92: `});` - Ends a logic block.
+- Line 93: `}` - Ends a logic block.
+- Line 94: `` - Blank line for readability.
+- Line 95: `/**` - Developer comment or documentation.
+- Line 96: `* Update network throughput bars` - Developer comment or documentation.
+- Line 97: `*/` - Developer comment or documentation.
+- Line 98: `private updateNetworkThroughput(): void {` - Starts a logic block.
+- Line 99: `const currentThroughput = this.warRoomService.networkThroughput();` - App logic step.
+- Line 100: `if (!currentThroughput) return;` - Checks a condition.
+- Line 101: `` - Blank line for readability.
+- Line 102: `// Generate new random bar heights` - Developer comment or documentation.
+- Line 103: `const newBars = currentThroughput.bars.map((bar) =>` - App logic step.
+- Line 104: `this.varyValue(bar, 5, 40, 100)` - App logic step.
+- Line 105: `);` - App logic step.
+- Line 106: `` - Blank line for readability.
+- Line 107: `this.warRoomService.updateNetworkThroughput({` - Starts a logic block.
+- Line 108: `bars: newBars,` - App logic step.
+- Line 109: `});` - Ends a logic block.
+- Line 110: `}` - Ends a logic block.
+- Line 111: `` - Blank line for readability.
+- Line 112: `/**` - Developer comment or documentation.
+- Line 113: `* Add a random activity log entry` - Developer comment or documentation.
+- Line 114: `*/` - Developer comment or documentation.
+- Line 115: `private addRandomActivityLog(): void {` - Starts a logic block.
+- Line 116: `const companies = this.warRoomService.companies();` - App logic step.
+- Line 117: `if (companies.length === 0) return;` - Checks a condition.
+- Line 118: `` - Blank line for readability.
+- Line 119: `const randomCompany = companies[Math.floor(Math.random() * companies.length)];` - App logic step.
+- Line 120: `const statuses: ActivityStatus[] = ['ACTIVE', 'INFO'];` - App logic step.
+- Line 121: `const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];` - App logic step.
+- Line 122: `` - Blank line for readability.
+- Line 123: `const descriptions = [` - App logic step.
+- Line 124: `'SYSTEM OPTIMAL',` - App logic step.
+- Line 125: `'SYNC SUCCESS',` - App logic step.
+- Line 126: `'OPERATIONAL',` - App logic step.
+- Line 127: `'CONNECTED',` - App logic step.
+- Line 128: `'PEAK EFFICIENCY',` - App logic step.
+- Line 129: `'LOAD BALANCING COMPLETE',` - App logic step.
+- Line 130: `'LATENCY REDUCED',` - App logic step.
+- Line 131: `'HUB SHIFT START',` - App logic step.
+- Line 132: `];` - App logic step.
+- Line 133: `` - Blank line for readability.
+- Line 134: `const randomDescription =` - App logic step.
+- Line 135: `descriptions[Math.floor(Math.random() * descriptions.length)];` - App logic step.
+- Line 136: `` - Blank line for readability.
+- Line 137: `// Get the actual location for this company from nodes` - Developer comment or documentation.
+- Line 138: `const nodes = this.warRoomService.nodes();` - App logic step.
+- Line 139: `const companyNode = nodes.find((node) => node.companyId === randomCompany.id);` - App logic step.
+- Line 140: `const location = companyNode` - App logic step.
+- Line 141: `? companyNode.city.toUpperCase()` - App logic step.
+- Line 142: `: this.getRandomLocation(); // Fallback if node not found` - App logic step.
+- Line 143: `` - Blank line for readability.
+- Line 144: `const log: ActivityLog = {` - Starts a logic block.
+- Line 145: `id: 'log-${Date.now()}',` - App logic step.
+- Line 146: `timestamp: new Date(),` - App logic step.
+- Line 147: `company: randomCompany.name,` - App logic step.
+- Line 148: `companyId: randomCompany.id,` - App logic step.
+- Line 149: `status: randomStatus,` - App logic step.
+- Line 150: `title: '${randomCompany.name.toUpperCase()} | ${location}',` - App logic step.
+- Line 151: `description: randomDescription,` - App logic step.
+- Line 152: `location: companyNode?.city || location,` - App logic step.
+- Line 153: `logo: this.getCompanyLogo(randomCompany.name),` - App logic step.
+- Line 154: `};` - Ends a logic block.
+- Line 155: `` - Blank line for readability.
+- Line 156: `this.warRoomService.addActivityLog(log);` - App logic step.
+- Line 157: `}` - Ends a logic block.
+- Line 158: `` - Blank line for readability.
+- Line 159: `/**` - Developer comment or documentation.
+- Line 160: `* Update hub status for a random company` - Developer comment or documentation.
+- Line 161: `*/` - Developer comment or documentation.
+- Line 162: `updateHubStatus(): void {` - Starts a logic block.
+- Line 163: `const companies = this.warRoomService.companies();` - App logic step.
+- Line 164: `if (companies.length === 0) return;` - Checks a condition.
+- Line 165: `` - Blank line for readability.
+- Line 166: `const randomCompany = companies[Math.floor(Math.random() * companies.length)];` - App logic step.
+- Line 167: `if (randomCompany.hubs.length === 0) return;` - Checks a condition.
+- Line 168: `` - Blank line for readability.
+- Line 169: `const randomHub = randomCompany.hubs[Math.floor(Math.random() * randomCompany.hubs.length)];` - App logic step.
+- Line 170: `` - Blank line for readability.
+- Line 171: `// Simulate small capacity changes` - Developer comment or documentation.
+- Line 172: `if (randomHub.capacityPercentage !== undefined) {` - Starts a logic block.
+- Line 173: `const newCapacity = this.varyValue(` - App logic step.
+- Line 174: `randomHub.capacityPercentage,` - App logic step.
+- Line 175: `2,` - App logic step.
+- Line 176: `45,` - App logic step.
+- Line 177: `100` - App logic step.
+- Line 178: `);` - App logic step.
+- Line 179: `this.warRoomService.updateHubStatus(randomCompany.id, randomHub.code, {` - Starts a logic block.
+- Line 180: `capacityPercentage: newCapacity,` - App logic step.
+- Line 181: `capacity: '${Math.round(newCapacity)}% CAP',` - App logic step.
+- Line 182: `});` - Ends a logic block.
+- Line 183: `}` - Ends a logic block.
+- Line 184: `}` - Ends a logic block.
+- Line 185: `` - Blank line for readability.
+- Line 186: `/**` - Developer comment or documentation.
+- Line 187: `* Vary a value within a range` - Developer comment or documentation.
+- Line 188: `*/` - Developer comment or documentation.
+- Line 189: `private varyValue(` - App logic step.
+- Line 190: `current: number,` - App logic step.
+- Line 191: `variation: number,` - App logic step.
+- Line 192: `min: number,` - App logic step.
+- Line 193: `max: number` - App logic step.
+- Line 194: `): number {` - Starts a logic block.
+- Line 195: `const change = (Math.random() - 0.5) * 2 * variation;` - App logic step.
+- Line 196: `const newValue = current + change;` - App logic step.
+- Line 197: `return Math.max(min, Math.min(max, Math.round(newValue * 10) / 10));` - Returns a value.
+- Line 198: `}` - Ends a logic block.
+- Line 199: `` - Blank line for readability.
+- Line 200: `private getCompanyLogo(companyName: string): string | undefined {` - Starts a logic block.
+- Line 201: `const lowerName = companyName.toLowerCase();` - App logic step.
+- Line 202: `const match = Object.keys(this.companyLogos).find((key) => lowerName.includes(key));` - App logic step.
+- Line 203: `return match ? this.companyLogos[match] : undefined;` - Returns a value.
+- Line 204: `}` - Ends a logic block.
+- Line 205: `` - Blank line for readability.
+- Line 206: `/**` - Developer comment or documentation.
+- Line 207: `* Get random location for activity log` - Developer comment or documentation.
+- Line 208: `*/` - Developer comment or documentation.
+- Line 209: `private getRandomLocation(): string {` - Starts a logic block.
+- Line 210: `const locations = [` - App logic step.
+- Line 211: `'NANJING, CHINA',` - App logic step.
+- Line 212: `'PARIS, ONTARIO',` - App logic step.
+- Line 213: `'INDIANAPOLIS',` - App logic step.
+- Line 214: `'WINNIPEG',` - App logic step.
+- Line 215: `'ST. EUSTACHE',` - App logic step.
+- Line 216: `'LAS VEGAS',` - App logic step.
+- Line 217: `'TURKEY',` - App logic step.
+- Line 218: `];` - App logic step.
+- Line 219: `return locations[Math.floor(Math.random() * locations.length)];` - Returns a value.
+- Line 220: `}` - Ends a logic block.
+- Line 221: `` - Blank line for readability.
+- Line 222: `ngOnDestroy(): void {` - Runs before component is removed.
+- Line 223: `this.stopRealTimeUpdates();` - App logic step.
+- Line 224: `// Ensure all subscriptions are cleaned up` - Developer comment or documentation.
+- Line 225: `if (this.updateInterval) {` - Starts a logic block.
+- Line 226: `this.updateInterval.unsubscribe();` - App logic step.
+- Line 227: `this.updateInterval = null;` - App logic step.
+- Line 228: `}` - Ends a logic block.
+- Line 229: `if (this.activityLogIntervalSub) {` - Starts a logic block.
+- Line 230: `this.activityLogIntervalSub.unsubscribe();` - App logic step.
+- Line 231: `this.activityLogIntervalSub = null;` - App logic step.
+- Line 232: `}` - Ends a logic block.
+- Line 233: `}` - Ends a logic block.
+- Line 234: `}` - Ends a logic block.
+
+## Spruha/src/app/shared/data/war-room-mock-data.ts
+- Line 1: `import {` - Loads external tools or data types.
+- Line 2: `Node,` - App logic step.
+- Line 3: `Hub,` - App logic step.
+- Line 4: `ActivityLog,` - App logic step.
+- Line 5: `NetworkMetrics,` - App logic step.
+- Line 6: `NetworkThroughput,` - App logic step.
+- Line 7: `GeopoliticalHeatmap,` - App logic step.
+- Line 8: `SatelliteStatus,` - App logic step.
+- Line 9: `CompanyData,` - App logic step.
+- Line 10: `TransitRoute,` - App logic step.
+- Line 11: `WarRoomState,` - App logic step.
+- Line 12: `} from '../models/war-room.interface';` - Ends a logic block.
+- Line 13: `` - Blank line for readability.
+- Line 14: `/**` - Developer comment or documentation.
+- Line 15: `* Mock data for War Room Dashboard` - Developer comment or documentation.
+- Line 16: `* Based on the HTML mockup provided` - Developer comment or documentation.
+- Line 17: `*/` - Developer comment or documentation.
+- Line 18: `` - Blank line for readability.
+- Line 19: `// Company IDs` - Developer comment or documentation.
+- Line 20: `const COMPANY_IDS = {` - Starts a logic block.
+- Line 21: `TAM: 'tam',` - App logic step.
+- Line 22: `CREATIVE: 'creative',` - App logic step.
+- Line 23: `ARBOC: 'arboc',` - App logic step.
+- Line 24: `NFL: 'nfl',` - App logic step.
+- Line 25: `NOVA: 'nova',` - App logic step.
+- Line 26: `ALEXANDER: 'alexander',` - App logic step.
+- Line 27: `KARSAN: 'karsan',` - App logic step.
+- Line 28: `};` - Ends a logic block.
+- Line 29: `` - Blank line for readability.
+- Line 30: `const COMPANY_LOGOS = {` - Starts a logic block.
+- Line 31: `TAM: '/assets/images/tam-logo.png',` - App logic step.
+- Line 32: `CREATIVE: '/assets/images/creative-carriage-logo.png',` - App logic step.
+- Line 33: `ARBOC: '/assets/images/ARBOC.jpg',` - App logic step.
+- Line 34: `NFL: '/assets/images/New-Flyer.jpg',` - App logic step.
+- Line 35: `NOVA: '/assets/images/Nova-Bus.jpg.png',` - App logic step.
+- Line 36: `ALEXANDER: '/assets/images/alexander-dennis.jpg',` - App logic step.
+- Line 37: `KARSAN: '/assets/images/KARSAN.jpg',` - App logic step.
+- Line 38: `};` - Ends a logic block.
+- Line 39: `` - Blank line for readability.
+- Line 40: `// Nodes (locations on the map)` - Developer comment or documentation.
+- Line 41: `export const mockNodes: Node[] = [` - App logic step.
+- Line 42: `{` - Starts a logic block.
+- Line 43: `id: 'node-winnipeg',` - App logic step.
+- Line 44: `name: 'winnipeg',` - App logic step.
+- Line 45: `company: 'NFL',` - App logic step.
+- Line 46: `companyId: COMPANY_IDS.NFL,` - App logic step.
+- Line 47: `city: 'Winnipeg',` - App logic step.
+- Line 48: `coordinates: { latitude: 49.8951, longitude: -97.1384 },` - App logic step.
+- Line 49: `type: 'Facility',` - App logic step.
+- Line 50: `status: 'ONLINE',` - App logic step.
+- Line 51: `isHub: true,` - App logic step.
+- Line 52: `hubCode: 'WPG',` - App logic step.
+- Line 53: `},` - Ends a logic block.
+- Line 54: `{` - Starts a logic block.
+- Line 55: `id: 'node-indianapolis',` - App logic step.
+- Line 56: `name: 'indianapolis',` - App logic step.
+- Line 57: `company: 'ARBOC',` - App logic step.
+- Line 58: `companyId: COMPANY_IDS.ARBOC,` - App logic step.
+- Line 59: `city: 'Indianapolis',` - App logic step.
+- Line 60: `coordinates: { latitude: 39.7684, longitude: -86.1581 },` - App logic step.
+- Line 61: `type: 'Hub',` - App logic step.
+- Line 62: `status: 'OPTIMAL',` - App logic step.
+- Line 63: `isHub: true,` - App logic step.
+- Line 64: `hubCode: 'IND',` - App logic step.
+- Line 65: `},` - Ends a logic block.
+- Line 66: `{` - Starts a logic block.
+- Line 67: `id: 'node-st-eustache',` - App logic step.
+- Line 68: `name: 'st-eustache',` - App logic step.
+- Line 69: `company: 'Nova',` - App logic step.
+- Line 70: `companyId: COMPANY_IDS.NOVA,` - App logic step.
+- Line 71: `city: 'St. Eustache',` - App logic step.
+- Line 72: `coordinates: { latitude: 45.5650, longitude: -73.9055 },` - App logic step.
+- Line 73: `type: 'Facility',` - App logic step.
+- Line 74: `status: 'ACTIVE',` - App logic step.
+- Line 75: `isHub: true,` - App logic step.
+- Line 76: `hubCode: 'PRM-NVA',` - App logic step.
+- Line 77: `},` - Ends a logic block.
+- Line 78: `{` - Starts a logic block.
+- Line 79: `id: 'node-las-vegas',` - App logic step.
+- Line 80: `name: 'las-vegas',` - App logic step.
+- Line 81: `company: 'Alexander Dennis',` - App logic step.
+- Line 82: `companyId: COMPANY_IDS.ALEXANDER,` - App logic step.
+- Line 83: `city: 'Las Vegas',` - App logic step.
+- Line 84: `coordinates: { latitude: 36.1699, longitude: -115.1398 },` - App logic step.
+- Line 85: `type: 'Center',` - App logic step.
+- Line 86: `status: 'ACTIVE',` - App logic step.
+- Line 87: `isHub: true,` - App logic step.
+- Line 88: `hubCode: 'LVG',` - App logic step.
+- Line 89: `},` - Ends a logic block.
+- Line 90: `{` - Starts a logic block.
+- Line 91: `id: 'node-paris-ontario',` - App logic step.
+- Line 92: `name: 'paris-ontario',` - App logic step.
+- Line 93: `company: 'Creative Carriage',` - App logic step.
+- Line 94: `companyId: COMPANY_IDS.CREATIVE,` - App logic step.
+- Line 95: `city: 'Paris, Ontario',` - App logic step.
+- Line 96: `coordinates: { latitude: 43.1930, longitude: -80.3850 },` - App logic step.
+- Line 97: `type: 'Facility',` - App logic step.
+- Line 98: `status: 'ONLINE',` - App logic step.
+- Line 99: `isHub: true,` - App logic step.
+- Line 100: `hubCode: 'PRM',` - App logic step.
+- Line 101: `},` - Ends a logic block.
+- Line 102: `{` - Starts a logic block.
+- Line 103: `id: 'node-turkey',` - App logic step.
+- Line 104: `name: 'turkey',` - App logic step.
+- Line 105: `company: 'Karsan',` - App logic step.
+- Line 106: `companyId: COMPANY_IDS.KARSAN,` - App logic step.
+- Line 107: `city: 'Turkey',` - App logic step.
+- Line 108: `coordinates: { latitude: 39.9208, longitude: 32.8541 },` - App logic step.
+- Line 109: `type: 'Facility',` - App logic step.
+- Line 110: `status: 'ONLINE',` - App logic step.
+- Line 111: `isHub: true,` - App logic step.
+- Line 112: `hubCode: 'TKY',` - App logic step.
+- Line 113: `},` - Ends a logic block.
+- Line 114: `{` - Starts a logic block.
+- Line 115: `id: 'node-nanjing',` - App logic step.
+- Line 116: `name: 'nanjing',` - App logic step.
+- Line 117: `company: 'TAM',` - App logic step.
+- Line 118: `companyId: COMPANY_IDS.TAM,` - App logic step.
+- Line 119: `city: 'Nanjing, China',` - App logic step.
+- Line 120: `coordinates: { latitude: 32.0603, longitude: 118.7969 },` - App logic step.
+- Line 121: `type: 'Hub',` - App logic step.
+- Line 122: `status: 'OPTIMAL',` - App logic step.
+- Line 123: `isHub: true,` - App logic step.
+- Line 124: `hubCode: 'NJN',` - App logic step.
+- Line 125: `},` - Ends a logic block.
+- Line 126: `];` - App logic step.
+- Line 127: `` - Blank line for readability.
+- Line 128: `// Transit routes (connections between nodes)` - Developer comment or documentation.
+- Line 129: `export const mockTransitRoutes: TransitRoute[] = [` - App logic step.
+- Line 130: `{` - Starts a logic block.
+- Line 131: `id: 'route-1',` - App logic step.
+- Line 132: `from: 'winnipeg',` - App logic step.
+- Line 133: `to: 'indianapolis',` - App logic step.
+- Line 134: `fromCoordinates: { latitude: 49.8951, longitude: -97.1384 },` - App logic step.
+- Line 135: `toCoordinates: { latitude: 39.7684, longitude: -86.1581 },` - App logic step.
+- Line 136: `animated: true,` - App logic step.
+- Line 137: `strokeColor: '#00FF41',` - App logic step.
+- Line 138: `strokeWidth: 3,` - App logic step.
+- Line 139: `},` - Ends a logic block.
+- Line 140: `{` - Starts a logic block.
+- Line 141: `id: 'route-2',` - App logic step.
+- Line 142: `from: 'indianapolis',` - App logic step.
+- Line 143: `to: 'st-eustache',` - App logic step.
+- Line 144: `fromCoordinates: { latitude: 39.7684, longitude: -86.1581 },` - App logic step.
+- Line 145: `toCoordinates: { latitude: 45.5650, longitude: -73.9055 },` - App logic step.
+- Line 146: `animated: true,` - App logic step.
+- Line 147: `strokeColor: '#00FF41',` - App logic step.
+- Line 148: `strokeWidth: 3,` - App logic step.
+- Line 149: `},` - Ends a logic block.
+- Line 150: `{` - Starts a logic block.
+- Line 151: `id: 'route-3',` - App logic step.
+- Line 152: `from: 'st-eustache',` - App logic step.
+- Line 153: `to: 'paris-ontario',` - App logic step.
+- Line 154: `fromCoordinates: { latitude: 45.5650, longitude: -73.9055 },` - App logic step.
+- Line 155: `toCoordinates: { latitude: 43.1930, longitude: -80.3850 },` - App logic step.
+- Line 156: `animated: true,` - App logic step.
+- Line 157: `strokeColor: '#00FF41',` - App logic step.
+- Line 158: `strokeWidth: 3,` - App logic step.
+- Line 159: `},` - Ends a logic block.
+- Line 160: `{` - Starts a logic block.
+- Line 161: `id: 'route-4',` - App logic step.
+- Line 162: `from: 'paris-ontario',` - App logic step.
+- Line 163: `to: 'las-vegas',` - App logic step.
+- Line 164: `fromCoordinates: { latitude: 43.1930, longitude: -80.3850 },` - App logic step.
+- Line 165: `toCoordinates: { latitude: 36.1699, longitude: -115.1398 },` - App logic step.
+- Line 166: `animated: true,` - App logic step.
+- Line 167: `strokeColor: '#00FF41',` - App logic step.
+- Line 168: `strokeWidth: 3,` - App logic step.
+- Line 169: `},` - Ends a logic block.
+- Line 170: `{` - Starts a logic block.
+- Line 171: `id: 'route-5',` - App logic step.
+- Line 172: `from: 'las-vegas',` - App logic step.
+- Line 173: `to: 'turkey',` - App logic step.
+- Line 174: `fromCoordinates: { latitude: 36.1699, longitude: -115.1398 },` - App logic step.
+- Line 175: `toCoordinates: { latitude: 39.9208, longitude: 32.8541 },` - App logic step.
+- Line 176: `animated: true,` - App logic step.
+- Line 177: `strokeColor: '#00FF41',` - App logic step.
+- Line 178: `strokeWidth: 3,` - App logic step.
+- Line 179: `},` - Ends a logic block.
+- Line 180: `{` - Starts a logic block.
+- Line 181: `id: 'route-6',` - App logic step.
+- Line 182: `from: 'turkey',` - App logic step.
+- Line 183: `to: 'nanjing',` - App logic step.
+- Line 184: `fromCoordinates: { latitude: 39.9208, longitude: 32.8541 },` - App logic step.
+- Line 185: `toCoordinates: { latitude: 32.0603, longitude: 118.7969 },` - App logic step.
+- Line 186: `animated: true,` - App logic step.
+- Line 187: `strokeColor: '#00FF41',` - App logic step.
+- Line 188: `strokeWidth: 3,` - App logic step.
+- Line 189: `},` - Ends a logic block.
+- Line 190: `{` - Starts a logic block.
+- Line 191: `id: 'route-7',` - App logic step.
+- Line 192: `from: 'las-vegas',` - App logic step.
+- Line 193: `to: 'indianapolis',` - App logic step.
+- Line 194: `fromCoordinates: { latitude: 36.1699, longitude: -115.1398 },` - App logic step.
+- Line 195: `toCoordinates: { latitude: 39.7684, longitude: -86.1581 },` - App logic step.
+- Line 196: `animated: true,` - App logic step.
+- Line 197: `strokeColor: '#00FF41',` - App logic step.
+- Line 198: `strokeWidth: 3,` - App logic step.
+- Line 199: `},` - Ends a logic block.
+- Line 200: `];` - App logic step.
+- Line 201: `` - Blank line for readability.
+- Line 202: `// Activity logs` - Developer comment or documentation.
+- Line 203: `export const mockActivityLogs: ActivityLog[] = [` - App logic step.
+- Line 204: `{` - Starts a logic block.
+- Line 205: `id: 'log-1',` - App logic step.
+- Line 206: `timestamp: new Date('2026-01-22T14:28:11'),` - App logic step.
+- Line 207: `company: 'TAM',` - App logic step.
+- Line 208: `companyId: COMPANY_IDS.TAM,` - App logic step.
+- Line 209: `status: 'ACTIVE',` - App logic step.
+- Line 210: `title: 'TAM | NANJING, CHINA',` - App logic step.
+- Line 211: `description: 'PEAK EFFICIENCY // LOAD BALANCING COMPLETE',` - App logic step.
+- Line 212: `location: 'Nanjing, China',` - App logic step.
+- Line 213: `logo: COMPANY_LOGOS.TAM,` - App logic step.
+- Line 214: `},` - Ends a logic block.
+- Line 215: `{` - Starts a logic block.
+- Line 216: `id: 'log-2',` - App logic step.
+- Line 217: `timestamp: new Date('2026-01-22T14:22:05'),` - App logic step.
+- Line 218: `company: 'Creative Carriage',` - App logic step.
+- Line 219: `companyId: COMPANY_IDS.CREATIVE,` - App logic step.
+- Line 220: `status: 'INFO',` - App logic step.
+- Line 221: `title: 'CREATIVE CARRIAGE | PARIS, ONTARIO',` - App logic step.
+- Line 222: `description: 'SYNC SUCCESS // LATENCY REDUCED -24MS',` - App logic step.
+- Line 223: `location: 'Paris, Ontario',` - App logic step.
+- Line 224: `logo: COMPANY_LOGOS.CREATIVE,` - App logic step.
+- Line 225: `},` - Ends a logic block.
+- Line 226: `{` - Starts a logic block.
+- Line 227: `id: 'log-3',` - App logic step.
+- Line 228: `timestamp: new Date('2026-01-22T14:20:15'),` - App logic step.
+- Line 229: `company: 'ARBOC',` - App logic step.
+- Line 230: `companyId: COMPANY_IDS.ARBOC,` - App logic step.
+- Line 231: `status: 'INFO',` - App logic step.
+- Line 232: `title: 'ARBOC | INDIANAPOLIS',` - App logic step.
+- Line 233: `description: 'HUB SHIFT START',` - App logic step.
+- Line 234: `location: 'Indianapolis',` - App logic step.
+- Line 235: `logo: COMPANY_LOGOS.ARBOC,` - App logic step.
+- Line 236: `},` - Ends a logic block.
+- Line 237: `{` - Starts a logic block.
+- Line 238: `id: 'log-4',` - App logic step.
+- Line 239: `timestamp: new Date('2026-01-22T14:18:30'),` - App logic step.
+- Line 240: `company: 'NFL',` - App logic step.
+- Line 241: `companyId: COMPANY_IDS.NFL,` - App logic step.
+- Line 242: `status: 'INFO',` - App logic step.
+- Line 243: `title: 'NFL | WINNIPEG',` - App logic step.
+- Line 244: `description: 'SYSTEM OPTIMAL',` - App logic step.
+- Line 245: `location: 'Winnipeg',` - App logic step.
+- Line 246: `logo: COMPANY_LOGOS.NFL,` - App logic step.
+- Line 247: `},` - Ends a logic block.
+- Line 248: `{` - Starts a logic block.
+- Line 249: `id: 'log-5',` - App logic step.
+- Line 250: `timestamp: new Date('2026-01-22T14:15:40'),` - App logic step.
+- Line 251: `company: 'Nova',` - App logic step.
+- Line 252: `companyId: COMPANY_IDS.NOVA,` - App logic step.
+- Line 253: `status: 'INFO',` - App logic step.
+- Line 254: `title: 'NOVA | ST. EUSTACHE',` - App logic step.
+- Line 255: `description: 'SYNC ACTIVE',` - App logic step.
+- Line 256: `location: 'St. Eustache',` - App logic step.
+- Line 257: `logo: COMPANY_LOGOS.NOVA,` - App logic step.
+- Line 258: `},` - Ends a logic block.
+- Line 259: `{` - Starts a logic block.
+- Line 260: `id: 'log-6',` - App logic step.
+- Line 261: `timestamp: new Date('2026-01-22T14:12:20'),` - App logic step.
+- Line 262: `company: 'Alexander Dennis',` - App logic step.
+- Line 263: `companyId: COMPANY_IDS.ALEXANDER,` - App logic step.
+- Line 264: `status: 'INFO',` - App logic step.
+- Line 265: `title: 'ALEXANDER DENNIS | LAS VEGAS',` - App logic step.
+- Line 266: `description: 'OPERATIONAL',` - App logic step.
+- Line 267: `location: 'Las Vegas',` - App logic step.
+- Line 268: `logo: COMPANY_LOGOS.ALEXANDER,` - App logic step.
+- Line 269: `},` - Ends a logic block.
+- Line 270: `{` - Starts a logic block.
+- Line 271: `id: 'log-7',` - App logic step.
+- Line 272: `timestamp: new Date('2026-01-22T14:10:05'),` - App logic step.
+- Line 273: `company: 'Karsan',` - App logic step.
+- Line 274: `companyId: COMPANY_IDS.KARSAN,` - App logic step.
+- Line 275: `status: 'INFO',` - App logic step.
+- Line 276: `title: 'KARSAN | TURKEY',` - App logic step.
+- Line 277: `description: 'CONNECTED',` - App logic step.
+- Line 278: `location: 'Turkey',` - App logic step.
+- Line 279: `logo: COMPANY_LOGOS.KARSAN,` - App logic step.
+- Line 280: `},` - Ends a logic block.
+- Line 281: `];` - App logic step.
+- Line 282: `` - Blank line for readability.
+- Line 283: `// Network metrics` - Developer comment or documentation.
+- Line 284: `export const mockNetworkMetrics: NetworkMetrics = {` - Starts a logic block.
+- Line 285: `dataFlowIntegrity: 99.9,` - App logic step.
+- Line 286: `fleetSyncRate: 1402,` - App logic step.
+- Line 287: `networkLatency: 4,` - App logic step.
+- Line 288: `latencyChange: -12.4,` - App logic step.
+- Line 289: `nodeDensity: 98.8,` - App logic step.
+- Line 290: `encryptionProtocol: 'QUANTUM-X',` - App logic step.
+- Line 291: `encryptionStatus: 'ACTIVE',` - App logic step.
+- Line 292: `};` - Ends a logic block.
+- Line 293: `` - Blank line for readability.
+- Line 294: `// Network throughput` - Developer comment or documentation.
+- Line 295: `export const mockNetworkThroughput: NetworkThroughput = {` - Starts a logic block.
+- Line 296: `bars: [60, 80, 45, 90, 70, 100, 85],` - App logic step.
+- Line 297: `channelStatus: 'L-CHANNEL: ACTIVE',` - App logic step.
+- Line 298: `throughput: '4.8 GBPS',` - App logic step.
+- Line 299: `};` - Ends a logic block.
+- Line 300: `` - Blank line for readability.
+- Line 301: `// Geopolitical heatmap (4x3 grid)` - Developer comment or documentation.
+- Line 302: `export const mockGeopoliticalHeatmap: GeopoliticalHeatmap = {` - Starts a logic block.
+- Line 303: `grid: [` - App logic step.
+- Line 304: `[20, 10, 40, 10],` - App logic step.
+- Line 305: `[5, 30, 10, 20],` - App logic step.
+- Line 306: `[40, 10, 20, 50],` - App logic step.
+- Line 307: `],` - App logic step.
+- Line 308: `rows: 3,` - App logic step.
+- Line 309: `cols: 4,` - App logic step.
+- Line 310: `};` - Ends a logic block.
+- Line 311: `` - Blank line for readability.
+- Line 312: `// Satellite statuses` - Developer comment or documentation.
+- Line 313: `export const mockSatelliteStatuses: SatelliteStatus[] = [` - App logic step.
+- Line 314: `{` - Starts a logic block.
+- Line 315: `id: 'sat-01',` - App logic step.
+- Line 316: `name: 'SAT-01',` - App logic step.
+- Line 317: `type: 'GEO',` - App logic step.
+- Line 318: `status: 'LOCKED',` - App logic step.
+- Line 319: `},` - Ends a logic block.
+- Line 320: `{` - Starts a logic block.
+- Line 321: `id: 'sat-02',` - App logic step.
+- Line 322: `name: 'SAT-02',` - App logic step.
+- Line 323: `type: 'LEO',` - App logic step.
+- Line 324: `status: 'LOCKED',` - App logic step.
+- Line 325: `},` - Ends a logic block.
+- Line 326: `{` - Starts a logic block.
+- Line 327: `id: 'sat-03',` - App logic step.
+- Line 328: `name: 'SAT-03',` - App logic step.
+- Line 329: `type: 'MEO',` - App logic step.
+- Line 330: `status: 'ACQUIRING',` - App logic step.
+- Line 331: `},` - Ends a logic block.
+- Line 332: `];` - App logic step.
+- Line 333: `` - Blank line for readability.
+- Line 334: `// Company data with hubs and quantum charts` - Developer comment or documentation.
+- Line 335: `export const mockCompanies: CompanyData[] = [` - App logic step.
+- Line 336: `{` - Starts a logic block.
+- Line 337: `id: COMPANY_IDS.TAM,` - App logic step.
+- Line 338: `name: 'TAM',` - App logic step.
+- Line 339: `hubs: [` - App logic step.
+- Line 340: `{` - Starts a logic block.
+- Line 341: `id: 'hub-tam-njn',` - App logic step.
+- Line 342: `code: 'NJN',` - App logic step.
+- Line 343: `companyId: COMPANY_IDS.TAM,` - App logic step.
+- Line 344: `companyName: 'TAM',` - App logic step.
+- Line 345: `status: 'OPTIMAL',` - App logic step.
+- Line 346: `capacity: 'MAX FLOW',` - App logic step.
+- Line 347: `capacityPercentage: 100,` - App logic step.
+- Line 348: `statusColor: 'text-tactical-green',` - App logic step.
+- Line 349: `capColor: 'text-tactical-green',` - App logic step.
+- Line 350: `},` - Ends a logic block.
+- Line 351: `],` - App logic step.
+- Line 352: `quantumChart: {` - Starts a logic block.
+- Line 353: `dataPoints: [60, 75, 80, 95, 85, 90],` - App logic step.
+- Line 354: `highlightedIndex: 3,` - App logic step.
+- Line 355: `},` - Ends a logic block.
+- Line 356: `},` - Ends a logic block.
+- Line 357: `{` - Starts a logic block.
+- Line 358: `id: COMPANY_IDS.CREATIVE,` - App logic step.
+- Line 359: `name: 'Creative Carriage',` - App logic step.
+- Line 360: `hubs: [` - App logic step.
+- Line 361: `{` - Starts a logic block.
+- Line 362: `id: 'hub-creative-prm',` - App logic step.
+- Line 363: `code: 'PRM',` - App logic step.
+- Line 364: `companyId: COMPANY_IDS.CREATIVE,` - App logic step.
+- Line 365: `companyName: 'Creative Carriage',` - App logic step.
+- Line 366: `status: 'ONLINE',` - App logic step.
+- Line 367: `capacity: '78% CAP',` - App logic step.
+- Line 368: `capacityPercentage: 78,` - App logic step.
+- Line 369: `statusColor: 'text-tactical-green',` - App logic step.
+- Line 370: `capColor: 'text-tactical-green',` - App logic step.
+- Line 371: `},` - Ends a logic block.
+- Line 372: `],` - App logic step.
+- Line 373: `quantumChart: {` - Starts a logic block.
+- Line 374: `dataPoints: [55, 70, 75, 88, 80, 85],` - App logic step.
+- Line 375: `highlightedIndex: 3,` - App logic step.
+- Line 376: `},` - Ends a logic block.
+- Line 377: `},` - Ends a logic block.
+- Line 378: `{` - Starts a logic block.
+- Line 379: `id: COMPANY_IDS.ARBOC,` - App logic step.
+- Line 380: `name: 'ARBOC',` - App logic step.
+- Line 381: `hubs: [` - App logic step.
+- Line 382: `{` - Starts a logic block.
+- Line 383: `id: 'hub-arboc-ind',` - App logic step.
+- Line 384: `code: 'IND',` - App logic step.
+- Line 385: `companyId: COMPANY_IDS.ARBOC,` - App logic step.
+- Line 386: `companyName: 'ARBOC',` - App logic step.
+- Line 387: `status: 'ONLINE',` - App logic step.
+- Line 388: `capacity: '84% CAP',` - App logic step.
+- Line 389: `capacityPercentage: 84,` - App logic step.
+- Line 390: `statusColor: 'text-tactical-green',` - App logic step.
+- Line 391: `capColor: 'text-tactical-green',` - App logic step.
+- Line 392: `},` - Ends a logic block.
+- Line 393: `],` - App logic step.
+- Line 394: `quantumChart: {` - Starts a logic block.
+- Line 395: `dataPoints: [65, 78, 82, 92, 87, 88],` - App logic step.
+- Line 396: `highlightedIndex: 3,` - App logic step.
+- Line 397: `},` - Ends a logic block.
+- Line 398: `},` - Ends a logic block.
+- Line 399: `{` - Starts a logic block.
+- Line 400: `id: COMPANY_IDS.NFL,` - App logic step.
+- Line 401: `name: 'NFL',` - App logic step.
+- Line 402: `hubs: [` - App logic step.
+- Line 403: `{` - Starts a logic block.
+- Line 404: `id: 'hub-nfl-wpg',` - App logic step.
+- Line 405: `code: 'WPG',` - App logic step.
+- Line 406: `companyId: COMPANY_IDS.NFL,` - App logic step.
+- Line 407: `companyName: 'NFL',` - App logic step.
+- Line 408: `status: 'ONLINE',` - App logic step.
+- Line 409: `capacity: '92% CAP',` - App logic step.
+- Line 410: `capacityPercentage: 92,` - App logic step.
+- Line 411: `statusColor: 'text-tactical-green',` - App logic step.
+- Line 412: `capColor: 'text-tactical-green',` - App logic step.
+- Line 413: `},` - Ends a logic block.
+- Line 414: `],` - App logic step.
+- Line 415: `quantumChart: {` - Starts a logic block.
+- Line 416: `dataPoints: [70, 80, 85, 95, 88, 92],` - App logic step.
+- Line 417: `highlightedIndex: 3,` - App logic step.
+- Line 418: `},` - Ends a logic block.
+- Line 419: `},` - Ends a logic block.
+- Line 420: `{` - Starts a logic block.
+- Line 421: `id: COMPANY_IDS.NOVA,` - App logic step.
+- Line 422: `name: 'Nova',` - App logic step.
+- Line 423: `hubs: [` - App logic step.
+- Line 424: `{` - Starts a logic block.
+- Line 425: `id: 'hub-nova-prm',` - App logic step.
+- Line 426: `code: 'PRM-NVA',` - App logic step.
+- Line 427: `companyId: COMPANY_IDS.NOVA,` - App logic step.
+- Line 428: `companyName: 'Nova',` - App logic step.
+- Line 429: `status: 'ACTIVE',` - App logic step.
+- Line 430: `capacity: '65% CAP',` - App logic step.
+- Line 431: `capacityPercentage: 65,` - App logic step.
+- Line 432: `statusColor: 'text-zinc-800',` - App logic step.
+- Line 433: `capColor: 'text-zinc-700',` - App logic step.
+- Line 434: `},` - Ends a logic block.
+- Line 435: `],` - App logic step.
+- Line 436: `quantumChart: {` - Starts a logic block.
+- Line 437: `dataPoints: [50, 65, 70, 82, 75, 78],` - App logic step.
+- Line 438: `highlightedIndex: 3,` - App logic step.
+- Line 439: `},` - Ends a logic block.
+- Line 440: `},` - Ends a logic block.
+- Line 441: `{` - Starts a logic block.
+- Line 442: `id: COMPANY_IDS.ALEXANDER,` - App logic step.
+- Line 443: `name: 'Alexander Dennis',` - App logic step.
+- Line 444: `hubs: [` - App logic step.
+- Line 445: `{` - Starts a logic block.
+- Line 446: `id: 'hub-alexander-lvg',` - App logic step.
+- Line 447: `code: 'LVG',` - App logic step.
+- Line 448: `companyId: COMPANY_IDS.ALEXANDER,` - App logic step.
+- Line 449: `companyName: 'Alexander Dennis',` - App logic step.
+- Line 450: `status: 'ACTIVE',` - App logic step.
+- Line 451: `capacity: '45% CAP',` - App logic step.
+- Line 452: `capacityPercentage: 45,` - App logic step.
+- Line 453: `statusColor: 'text-zinc-800',` - App logic step.
+- Line 454: `capColor: 'text-zinc-700',` - App logic step.
+- Line 455: `},` - Ends a logic block.
+- Line 456: `],` - App logic step.
+- Line 457: `quantumChart: {` - Starts a logic block.
+- Line 458: `dataPoints: [40, 55, 60, 72, 65, 68],` - App logic step.
+- Line 459: `highlightedIndex: 3,` - App logic step.
+- Line 460: `},` - Ends a logic block.
+- Line 461: `},` - Ends a logic block.
+- Line 462: `{` - Starts a logic block.
+- Line 463: `id: COMPANY_IDS.KARSAN,` - App logic step.
+- Line 464: `name: 'Karsan',` - App logic step.
+- Line 465: `hubs: [` - App logic step.
+- Line 466: `{` - Starts a logic block.
+- Line 467: `id: 'hub-karsan-tky',` - App logic step.
+- Line 468: `code: 'TKY',` - App logic step.
+- Line 469: `companyId: COMPANY_IDS.KARSAN,` - App logic step.
+- Line 470: `companyName: 'Karsan',` - App logic step.
+- Line 471: `status: 'ONLINE',` - App logic step.
+- Line 472: `capacity: '71% CAP',` - App logic step.
+- Line 473: `capacityPercentage: 71,` - App logic step.
+- Line 474: `statusColor: 'text-tactical-green',` - App logic step.
+- Line 475: `capColor: 'text-tactical-green',` - App logic step.
+- Line 476: `},` - Ends a logic block.
+- Line 477: `],` - App logic step.
+- Line 478: `quantumChart: {` - Starts a logic block.
+- Line 479: `dataPoints: [58, 72, 77, 89, 82, 85],` - App logic step.
+- Line 480: `highlightedIndex: 3,` - App logic step.
+- Line 481: `},` - Ends a logic block.
+- Line 482: `},` - Ends a logic block.
+- Line 483: `];` - App logic step.
+- Line 484: `` - Blank line for readability.
+- Line 485: `// Complete mock war room state` - Developer comment or documentation.
+- Line 486: `export const mockWarRoomData: WarRoomState = {` - Starts a logic block.
+- Line 487: `nodes: mockNodes,` - App logic step.
+- Line 488: `transitRoutes: mockTransitRoutes,` - App logic step.
+- Line 489: `activityLogs: mockActivityLogs,` - App logic step.
+- Line 490: `networkMetrics: mockNetworkMetrics,` - App logic step.
+- Line 491: `networkThroughput: mockNetworkThroughput,` - App logic step.
+- Line 492: `geopoliticalHeatmap: mockGeopoliticalHeatmap,` - App logic step.
+- Line 493: `satelliteStatuses: mockSatelliteStatuses,` - App logic step.
+- Line 494: `companies: mockCompanies,` - App logic step.
+- Line 495: `selectedCompanyId: COMPANY_IDS.TAM,` - App logic step.
+- Line 496: `};` - Ends a logic block.
+
+## Spruha/src/app/shared/models/war-room.interface.ts
+- Line 1: `/**` - Developer comment or documentation.
+- Line 2: `* War Room Dashboard Interfaces` - Developer comment or documentation.
+- Line 3: `* Data models for the Tactical Green War Room Command Center` - Developer comment or documentation.
+- Line 4: `*/` - Developer comment or documentation.
+- Line 5: `` - Blank line for readability.
+- Line 6: `// Node Types` - Developer comment or documentation.
+- Line 7: `export type NodeType = 'Hub' | 'Facility' | 'Center' | 'Terminal';` - App logic step.
+- Line 8: `export type NodeStatus = 'OPTIMAL' | 'ONLINE' | 'ACTIVE' | 'OFFLINE';` - App logic step.
+- Line 9: `` - Blank line for readability.
+- Line 10: `// Hub Status Types` - Developer comment or documentation.
+- Line 11: `export type HubStatus = 'OPTIMAL' | 'ONLINE' | 'ACTIVE' | 'OFFLINE';` - App logic step.
+- Line 12: `` - Blank line for readability.
+- Line 13: `// Activity Log Status Types` - Developer comment or documentation.
+- Line 14: `export type ActivityStatus = 'ACTIVE' | 'INFO' | 'WARNING' | 'ERROR';` - App logic step.
+- Line 15: `` - Blank line for readability.
+- Line 16: `// Satellite Types` - Developer comment or documentation.
+- Line 17: `export type SatelliteType = 'GEO' | 'LEO' | 'MEO';` - App logic step.
+- Line 18: `export type SatelliteConnectionStatus = 'LOCKED' | 'ACQUIRING' | 'OFFLINE';` - App logic step.
+- Line 19: `` - Blank line for readability.
+- Line 20: `/**` - Developer comment or documentation.
+- Line 21: `* Geographic Node - Represents a location on the map` - Developer comment or documentation.
+- Line 22: `*/` - Developer comment or documentation.
+- Line 23: `export interface Node {` - Starts a logic block.
+- Line 24: `id: string;` - App logic step.
+- Line 25: `name: string;` - App logic step.
+- Line 26: `company: string;` - App logic step.
+- Line 27: `companyId: string;` - App logic step.
+- Line 28: `city: string;` - App logic step.
+- Line 29: `description?: string;` - App logic step.
+- Line 30: `logo?: string | ArrayBuffer;` - App logic step.
+- Line 31: `country?: string;` - App logic step.
+- Line 32: `coordinates: {` - Starts a logic block.
+- Line 33: `latitude: number;` - App logic step.
+- Line 34: `longitude: number;` - App logic step.
+- Line 35: `};` - Ends a logic block.
+- Line 36: `type: NodeType;` - App logic step.
+- Line 37: `status: NodeStatus;` - App logic step.
+- Line 38: `isHub?: boolean;` - App logic step.
+- Line 39: `hubCode?: string;` - App logic step.
+- Line 40: `}` - Ends a logic block.
+- Line 41: `` - Blank line for readability.
+- Line 42: `/**` - Developer comment or documentation.
+- Line 43: `* Hub - Operational hub with status and capacity` - Developer comment or documentation.
+- Line 44: `*/` - Developer comment or documentation.
+- Line 45: `export interface Hub {` - Starts a logic block.
+- Line 46: `id: string;` - App logic step.
+- Line 47: `code: string; // e.g., 'NJN', 'PRM', 'IND'` - App logic step.
+- Line 48: `companyId: string;` - App logic step.
+- Line 49: `companyName: string;` - App logic step.
+- Line 50: `status: HubStatus;` - App logic step.
+- Line 51: `capacity: string; // e.g., 'MAX FLOW', '78% CAP', '84% CAP'` - App logic step.
+- Line 52: `capacityPercentage?: number;` - App logic step.
+- Line 53: `statusColor: string; // CSS class or color value` - App logic step.
+- Line 54: `capColor: string; // CSS class or color value` - App logic step.
+- Line 55: `}` - Ends a logic block.
+- Line 56: `` - Blank line for readability.
+- Line 57: `/**` - Developer comment or documentation.
+- Line 58: `* Activity Log Entry - Operational event log` - Developer comment or documentation.
+- Line 59: `*/` - Developer comment or documentation.
+- Line 60: `export interface ActivityLog {` - Starts a logic block.
+- Line 61: `id: string;` - App logic step.
+- Line 62: `timestamp: Date | string;` - App logic step.
+- Line 63: `company: string;` - App logic step.
+- Line 64: `companyId: string;` - App logic step.
+- Line 65: `status: ActivityStatus;` - App logic step.
+- Line 66: `title: string; // e.g., "TAM | NANJING, CHINA"` - App logic step.
+- Line 67: `description: string; // e.g., "PEAK EFFICIENCY // LOAD BALANCING COMPLETE"` - App logic step.
+- Line 68: `location?: string;` - App logic step.
+- Line 69: `logo?: string | ArrayBuffer; // Company logo (base64 or data URL)` - App logic step.
+- Line 70: `}` - Ends a logic block.
+- Line 71: `` - Blank line for readability.
+- Line 72: `/**` - Developer comment or documentation.
+- Line 73: `* Network Metrics - Real-time network performance data` - Developer comment or documentation.
+- Line 74: `*/` - Developer comment or documentation.
+- Line 75: `export interface NetworkMetrics {` - Starts a logic block.
+- Line 76: `dataFlowIntegrity: number; // Percentage (0-100)` - App logic step.
+- Line 77: `fleetSyncRate: number; // Active units count` - App logic step.
+- Line 78: `networkLatency: number; // Milliseconds` - App logic step.
+- Line 79: `latencyChange?: number; // Change from previous measurement` - App logic step.
+- Line 80: `nodeDensity: number; // Percentage (0-100)` - App logic step.
+- Line 81: `encryptionProtocol: string; // e.g., "QUANTUM-X"` - App logic step.
+- Line 82: `encryptionStatus: string; // e.g., "ACTIVE"` - App logic step.
+- Line 83: `}` - Ends a logic block.
+- Line 84: `` - Blank line for readability.
+- Line 85: `/**` - Developer comment or documentation.
+- Line 86: `* Network Throughput - Bar chart data` - Developer comment or documentation.
+- Line 87: `*/` - Developer comment or documentation.
+- Line 88: `export interface NetworkThroughput {` - Starts a logic block.
+- Line 89: `bars: number[]; // Array of bar heights (0-100)` - App logic step.
+- Line 90: `channelStatus: string; // e.g., "L-CHANNEL: ACTIVE"` - App logic step.
+- Line 91: `throughput: string; // e.g., "4.8 GBPS"` - App logic step.
+- Line 92: `}` - Ends a logic block.
+- Line 93: `` - Blank line for readability.
+- Line 94: `/**` - Developer comment or documentation.
+- Line 95: `* Satellite Status - Connection status for satellite links` - Developer comment or documentation.
+- Line 96: `*/` - Developer comment or documentation.
+- Line 97: `export interface SatelliteStatus {` - Starts a logic block.
+- Line 98: `id: string;` - App logic step.
+- Line 99: `name: string; // e.g., "SAT-01"` - App logic step.
+- Line 100: `type: SatelliteType;` - App logic step.
+- Line 101: `status: SatelliteConnectionStatus;` - App logic step.
+- Line 102: `}` - Ends a logic block.
+- Line 103: `` - Blank line for readability.
+- Line 104: `/**` - Developer comment or documentation.
+- Line 105: `* Geopolitical Heatmap - Activity density grid` - Developer comment or documentation.
+- Line 106: `*/` - Developer comment or documentation.
+- Line 107: `export interface GeopoliticalHeatmap {` - Starts a logic block.
+- Line 108: `grid: number[][]; // 2D array of activity density values (0-100)` - App logic step.
+- Line 109: `rows: number;` - App logic step.
+- Line 110: `cols: number;` - App logic step.
+- Line 111: `}` - Ends a logic block.
+- Line 112: `` - Blank line for readability.
+- Line 113: `/**` - Developer comment or documentation.
+- Line 114: `* Quantum Chart Data - Historical stability data` - Developer comment or documentation.
+- Line 115: `*/` - Developer comment or documentation.
+- Line 116: `export interface QuantumChartData {` - Starts a logic block.
+- Line 117: `dataPoints: number[]; // Array of 6 values (0-100)` - App logic step.
+- Line 118: `highlightedIndex?: number; // Index of highlighted bar` - App logic step.
+- Line 119: `}` - Ends a logic block.
+- Line 120: `` - Blank line for readability.
+- Line 121: `/**` - Developer comment or documentation.
+- Line 122: `* Company Data - Company-specific information` - Developer comment or documentation.
+- Line 123: `*/` - Developer comment or documentation.
+- Line 124: `export interface CompanyData {` - Starts a logic block.
+- Line 125: `id: string;` - App logic step.
+- Line 126: `name: string;` - App logic step.
+- Line 127: `hubs: Hub[];` - App logic step.
+- Line 128: `quantumChart: QuantumChartData;` - App logic step.
+- Line 129: `}` - Ends a logic block.
+- Line 130: `` - Blank line for readability.
+- Line 131: `/**` - Developer comment or documentation.
+- Line 132: `* Transit Route - Connection path between nodes` - Developer comment or documentation.
+- Line 133: `*/` - Developer comment or documentation.
+- Line 134: `export interface TransitRoute {` - Starts a logic block.
+- Line 135: `id: string;` - App logic step.
+- Line 136: `from: string; // Node ID or name` - App logic step.
+- Line 137: `to: string; // Node ID or name` - App logic step.
+- Line 138: `fromCoordinates: {` - Starts a logic block.
+- Line 139: `latitude: number;` - App logic step.
+- Line 140: `longitude: number;` - App logic step.
+- Line 141: `};` - Ends a logic block.
+- Line 142: `toCoordinates: {` - Starts a logic block.
+- Line 143: `latitude: number;` - App logic step.
+- Line 144: `longitude: number;` - App logic step.
+- Line 145: `};` - Ends a logic block.
+- Line 146: `animated?: boolean; // Whether to show animated chevrons` - App logic step.
+- Line 147: `strokeColor?: string; // Line color` - App logic step.
+- Line 148: `strokeWidth?: number;` - App logic step.
+- Line 149: `}` - Ends a logic block.
+- Line 150: `` - Blank line for readability.
+- Line 151: `/**` - Developer comment or documentation.
+- Line 152: `* War Room Dashboard State - Complete dashboard state` - Developer comment or documentation.
+- Line 153: `*/` - Developer comment or documentation.
+- Line 154: `export interface WarRoomState {` - Starts a logic block.
+- Line 155: `nodes: Node[];` - App logic step.
+- Line 156: `transitRoutes: TransitRoute[];` - App logic step.
+- Line 157: `activityLogs: ActivityLog[];` - App logic step.
+- Line 158: `networkMetrics: NetworkMetrics;` - App logic step.
+- Line 159: `networkThroughput: NetworkThroughput;` - App logic step.
+- Line 160: `geopoliticalHeatmap: GeopoliticalHeatmap;` - App logic step.
+- Line 161: `satelliteStatuses: SatelliteStatus[];` - App logic step.
+- Line 162: `companies: CompanyData[];` - App logic step.
+- Line 163: `selectedCompanyId: string | null;` - App logic step.
+- Line 164: `}` - Ends a logic block.
+
+## Spruha/src/app/shared/services/app-state.service.ts
+- Line 1: `import { ElementRef, Injectable, Renderer2 } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { BehaviorSubject } from 'rxjs';` - Loads external tools or data types.
+- Line 3: `` - Blank line for readability.
+- Line 4: `interface StateType {` - Starts a logic block.
+- Line 5: `direction: string;` - App logic step.
+- Line 6: `theme: string;` - App logic step.
+- Line 7: `navigationStyles: string,   // vertical, horizontal` - App logic step.
+- Line 8: `menuStyles: string,                 // menu-click, menu-hover, icon-click, icon-hover` - App logic step.
+- Line 9: `layoutStyles: string,   // double-menu, detached, icon-overlay, icontext-menu, closed-menu, default-menu` - App logic step.
+- Line 10: `pageStyles: string,          // regular, classic, modern` - App logic step.
+- Line 11: `widthStyles: string,       // fullwidth, boxed` - App logic step.
+- Line 12: `menuPosition: string,          // fixed, scrollable` - App logic step.
+- Line 13: `headerPosition: string,        // fixed, scrollable` - App logic step.
+- Line 14: `menuColor: string,                  // light, dark, color, gradient, transparent` - App logic step.
+- Line 15: `headerColor: string,                // light, dark, color, gradient, transparent` - App logic step.
+- Line 16: `themePrimary: string,               // '58, 88, 146', '92, 144, 163', '161, 90, 223', '78, 172, 76', '223, 90, 90'` - App logic step.
+- Line 17: `themeBackground: string,` - App logic step.
+- Line 18: `backgroundImage: string,` - App logic step.
+- Line 19: `};` - Ends a logic block.
+- Line 20: `@Injectable({` - Starts a logic block.
+- Line 21: `providedIn: 'root'` - App logic step.
+- Line 22: `})` - Ends a logic block.
+- Line 23: `export class AppStateService {` - Starts the logic class for this component.
+- Line 24: `private readonly localStorageKey = 'rixzo-ng'; // Customize this key` - App logic step.
+- Line 25: `private initialState: StateType = {` - Starts a logic block.
+- Line 26: `theme: 'light',            // light, dark` - App logic step.
+- Line 27: `direction: 'ltr',               // ltr, rtl` - App logic step.
+- Line 28: `navigationStyles: 'vertical',   // vertical, horizontal` - App logic step.
+- Line 29: `menuStyles: '',                 // menu-click, menu-hover, icon-click, icon-hover` - App logic step.
+- Line 30: `layoutStyles: 'default',   // double-menu, detached, icon-overlay, icontext-menu, closed-menu, default-menu` - App logic step.
+- Line 31: `pageStyles: 'regular',          // regular, classic, modern` - App logic step.
+- Line 32: `widthStyles: 'fullwidth',       // fullwidth, boxed` - App logic step.
+- Line 33: `menuPosition: 'fixed',          // fixed, scrollable` - App logic step.
+- Line 34: `headerPosition: 'fixed',        // fixed, scrollable` - App logic step.
+- Line 35: `menuColor: 'dark',                  // light, dark, color, gradient, transparent` - App logic step.
+- Line 36: `headerColor: 'light',                // light, dark, color, gradient, transparent` - App logic step.
+- Line 37: `themePrimary: '',               // '58, 88, 146', '92, 144, 163', '161, 90, 223', '78, 172, 76', '223, 90, 90'` - App logic step.
+- Line 38: `themeBackground: '',` - App logic step.
+- Line 39: `backgroundImage: '',            // bgimg1, bgimg2, bgimg3, bgimg4, bgimg5` - App logic step.
+- Line 40: `} // Store initial state` - Ends a logic block.
+- Line 41: `private stateSubject = new BehaviorSubject<StateType>(this.initialState); // Use any for initial null value` - App logic step.
+- Line 42: `state$ = this.stateSubject.asObservable();` - App logic step.
+- Line 43: `` - Blank line for readability.
+- Line 44: `constructor() {` - Initializes the component.
+- Line 45: `const initialState: StateType = this.getInitialStateFromLocalStorage();` - App logic step.
+- Line 46: `this.initializeState();` - App logic step.
+- Line 47: `this.stateSubject.next(initialState);` - App logic step.
+- Line 48: `}` - Ends a logic block.
+- Line 49: `` - Blank line for readability.
+- Line 50: `` - Blank line for readability.
+- Line 51: `private getInitialStateFromLocalStorage(): StateType {` - Starts a logic block.
+- Line 52: `try {` - Starts a logic block.
+- Line 53: `const storedState = localStorage.getItem(this.localStorageKey);` - App logic step.
+- Line 54: `if (storedState) {` - Starts a logic block.
+- Line 55: `return JSON.parse(storedState);` - Returns a value.
+- Line 56: `}` - Ends a logic block.
+- Line 57: `} catch (error) {` - App logic step.
+- Line 58: `console.error('Error retrieving initial state from local storage:', error);` - App logic step.
+- Line 59: `}` - Ends a logic block.
+- Line 60: `` - Blank line for readability.
+- Line 61: `return this.initialState;` - Returns a value.
+- Line 62: `}` - Ends a logic block.
+- Line 63: `` - Blank line for readability.
+- Line 64: `private initializeState() {` - Starts a logic block.
+- Line 65: `const state = { ...this.initialState }; // Clone initial state to avoid mutation` - App logic step.
+- Line 66: `this.applyDirectionSpecificChanges(state.direction); // Apply initial changes` - App logic step.
+- Line 67: `this.stateSubject.next(state); // Emit initial state after changes` - App logic step.
+- Line 68: `}` - Ends a logic block.
+- Line 69: `` - Blank line for readability.
+- Line 70: `updateState(newState?: Partial<any>) { // Use any for partial updates` - Starts a logic block.
+- Line 71: `const currentState = this.stateSubject.getValue(); // Get current state` - App logic step.
+- Line 72: `` - Blank line for readability.
+- Line 73: `` - Blank line for readability.
+- Line 74: `` - Blank line for readability.
+- Line 75: `if (!currentState) {` - Starts a logic block.
+- Line 76: `// Handle initial update case (no state emitted yet)` - Developer comment or documentation.
+- Line 77: `this.updateStateAndEmit(newState);` - App logic step.
+- Line 78: `return;` - App logic step.
+- Line 79: `}` - Ends a logic block.
+- Line 80: `if (newState) {` - Starts a logic block.
+- Line 81: `const updatedState = { ...currentState, ...newState }; // Merge updates` - App logic step.
+- Line 82: `this.updateStateAndEmit(updatedState); // Update and emit combined state` - App logic step.
+- Line 83: `} else {` - App logic step.
+- Line 84: `this.updateStateAndEmit(currentState);` - App logic step.
+- Line 85: `return;` - App logic step.
+- Line 86: `}` - Ends a logic block.
+- Line 87: `` - Blank line for readability.
+- Line 88: `}` - Ends a logic block.
+- Line 89: `private state: { [key: string]: any } = {};` - App logic step.
+- Line 90: `getState(menuStyles: string): any {` - Starts a logic block.
+- Line 91: `return this.state[menuStyles];` - Returns a value.
+- Line 92: `}` - Ends a logic block.
+- Line 93: `private applyThemeBackgroundSpecificChanges(background: any) {` - Starts a logic block.
+- Line 94: `let html = document.querySelector('html');` - App logic step.
+- Line 95: `html?.style.setProperty( '--body-bg-rgb', background.main);` - App logic step.
+- Line 96: `html?.style.setProperty( '--body-bg-rgb2', background.secondary);` - App logic step.
+- Line 97: `html?.style.setProperty( '--light-rgb', background.accent );` - App logic step.
+- Line 98: `html?.style.setProperty( '--form-control-bg', 'rgb(${background.secondary})' );` - App logic step.
+- Line 99: `html?.style.setProperty( '--sidemenu-active-bgcolor', 'rgb(${background.secondary})' );` - App logic step.
+- Line 100: `html?.style.setProperty( '--input-border', background.overlay );` - App logic step.
+- Line 101: `` - Blank line for readability.
+- Line 102: `this.applythemeSpecificChanges(background.theme);` - App logic step.
+- Line 103: `` - Blank line for readability.
+- Line 104: `` - Blank line for readability.
+- Line 105: `}` - Ends a logic block.
+- Line 106: `private applyDirectionSpecificChanges(direction: string) {` - Starts a logic block.
+- Line 107: `let html = document.querySelector('html');` - App logic step.
+- Line 108: `html?.setAttribute('dir', direction);` - App logic step.
+- Line 109: `}` - Ends a logic block.
+- Line 110: `private applythemeSpecificChanges(theme: string) {` - Starts a logic block.
+- Line 111: `let html = document.querySelector('html');` - App logic step.
+- Line 112: `html?.setAttribute('data-theme-mode', theme);  //setting theme style` - App logic step.
+- Line 113: `html?.setAttribute('data-header-styles', theme); //setting header style` - App logic step.
+- Line 114: `html?.setAttribute('data-menu-styles', theme); //setting menu style` - App logic step.
+- Line 115: `}` - Ends a logic block.
+- Line 116: `private applyNavigationStylesSpecificChanges(navigationStyles: string) {` - Starts a logic block.
+- Line 117: `` - Blank line for readability.
+- Line 118: `let html = document.querySelector('html');` - App logic step.
+- Line 119: `html?.setAttribute('data-nav-layout', navigationStyles);` - App logic step.
+- Line 120: `if (navigationStyles == 'horizontal') {` - Starts a logic block.
+- Line 121: `html?.setAttribute('data-nav-style', 'menu-click');` - App logic step.
+- Line 122: `html?.removeAttribute('data-vertical-style');` - App logic step.
+- Line 123: `` - Blank line for readability.
+- Line 124: `}` - Ends a logic block.
+- Line 125: `}` - Ends a logic block.
+- Line 126: `private applyMenuStylesSpecificChanges(menuStyles: string) {` - Starts a logic block.
+- Line 127: `let html = document.querySelector('html');` - App logic step.
+- Line 128: `html?.setAttribute('data-nav-style', menuStyles);` - App logic step.
+- Line 129: `html?.setAttribute('data-toggled', menuStyles+'-closed');` - App logic step.
+- Line 130: `html?.removeAttribute('data-vertical-style');` - App logic step.
+- Line 131: `}` - Ends a logic block.
+- Line 132: `private applyLayoutStylesSpecificChanges(layoutStyles: string) {` - Starts a logic block.
+- Line 133: `let html = document.querySelector('html');` - App logic step.
+- Line 134: `html?.setAttribute('data-vertical-style', layoutStyles);` - App logic step.
+- Line 135: `html?.removeAttribute('data-nav-style');` - App logic step.
+- Line 136: `switch (layoutStyles) {` - Starts a logic block.
+- Line 137: `case 'default':` - App logic step.
+- Line 138: `html?.setAttribute('data-vertical-style', 'overlay');` - App logic step.
+- Line 139: `html?.setAttribute('data-toggled', '');` - App logic step.
+- Line 140: `// html?.setAttribute('data-toggled', window.innerWidth <= 992 ? 'close' : '');` - Developer comment or documentation.
+- Line 141: `` - Blank line for readability.
+- Line 142: `break;` - App logic step.
+- Line 143: `case 'closed':` - App logic step.
+- Line 144: `html?.setAttribute('data-toggled', 'close-menu-close');` - App logic step.
+- Line 145: `break;` - App logic step.
+- Line 146: `case 'icontext':` - App logic step.
+- Line 147: `html?.setAttribute('data-toggled', 'icon-text-close');` - App logic step.
+- Line 148: `break;` - App logic step.
+- Line 149: `case 'overlay':` - App logic step.
+- Line 150: `html?.setAttribute('data-toggled', 'icon-overlay-close');` - App logic step.
+- Line 151: `break;` - App logic step.
+- Line 152: `case 'detached':` - App logic step.
+- Line 153: `html?.setAttribute('data-toggled', 'detached-close');` - App logic step.
+- Line 154: `break;` - App logic step.
+- Line 155: `case 'doublemenu':` - App logic step.
+- Line 156: `html?.setAttribute('data-toggled', 'double-menu-open');` - App logic step.
+- Line 157: `setTimeout(() => {` - Starts a logic block.
+- Line 158: `if (!document.querySelector(".main-menu .slide.active ul"))  {` - Starts a logic block.
+- Line 159: `html?.setAttribute('data-toggled', 'double-menu-close');` - App logic step.
+- Line 160: `}` - Ends a logic block.
+- Line 161: `}, 100);` - Ends a logic block.
+- Line 162: `break;` - App logic step.
+- Line 163: `}` - Ends a logic block.
+- Line 164: `if (layoutStyles === 'icon-text') {` - Starts a logic block.
+- Line 165: `html?.setAttribute('icon-text', 'open');` - App logic step.
+- Line 166: `} else {` - App logic step.
+- Line 167: `// If not 'icon-text', remove the icon-text attribute` - Developer comment or documentation.
+- Line 168: `html?.removeAttribute('icon-text');` - App logic step.
+- Line 169: `}` - Ends a logic block.
+- Line 170: `}` - Ends a logic block.
+- Line 171: `private applypageStylesSpecificChanges(pageStyles: string) {` - Starts a logic block.
+- Line 172: `let html = document.querySelector('html');` - App logic step.
+- Line 173: `html?.setAttribute('data-page-style', pageStyles);` - App logic step.
+- Line 174: `}` - Ends a logic block.
+- Line 175: `private applywidthStylesSpecificChanges(widthStyles: string) {` - Starts a logic block.
+- Line 176: `let html = document.querySelector('html');` - App logic step.
+- Line 177: `html?.setAttribute('data-width', widthStyles);` - App logic step.
+- Line 178: `}` - Ends a logic block.
+- Line 179: `private applymenuPositionSpecificChanges(menuPosition: string) {` - Starts a logic block.
+- Line 180: `let html = document.querySelector('html');` - App logic step.
+- Line 181: `html?.setAttribute('data-menu-position', menuPosition);` - App logic step.
+- Line 182: `}` - Ends a logic block.
+- Line 183: `private applyheaderPositionSpecificChanges(headerPosition: string) {` - Starts a logic block.
+- Line 184: `let html = document.querySelector('html');` - App logic step.
+- Line 185: `html?.setAttribute('data-header-position', headerPosition);` - App logic step.
+- Line 186: `}` - Ends a logic block.
+- Line 187: `private applyheaderColorSpecificChanges(headerColor: string) {` - Starts a logic block.
+- Line 188: `let html = document.querySelector('html');` - App logic step.
+- Line 189: `html?.setAttribute('data-header-styles', headerColor);` - App logic step.
+- Line 190: `}` - Ends a logic block.
+- Line 191: `private applymenuColorSpecificChanges(menuColor: string) {` - Starts a logic block.
+- Line 192: `let html = document.querySelector('html');` - App logic step.
+- Line 193: `html?.setAttribute('data-menu-styles', menuColor);` - App logic step.
+- Line 194: `}` - Ends a logic block.
+- Line 195: `private applyPrimarySpecificChanges(primary: string) {` - Starts a logic block.
+- Line 196: `let html = document.querySelector('html');` - App logic step.
+- Line 197: `// html?.style.setProperty('--primary', primary);` - Developer comment or documentation.
+- Line 198: `html?.style.setProperty('--primary-rgb', primary);` - App logic step.
+- Line 199: `` - Blank line for readability.
+- Line 200: `` - Blank line for readability.
+- Line 201: `}` - Ends a logic block.
+- Line 202: `private applybackgroundImageSpecificChanges(backgroundImage: string) {` - Starts a logic block.
+- Line 203: `let html = document.querySelector('html');` - App logic step.
+- Line 204: `html?.setAttribute('data-bg-img', backgroundImage);` - App logic step.
+- Line 205: `}` - Ends a logic block.
+- Line 206: `` - Blank line for readability.
+- Line 207: `public applyReset() {` - Starts a logic block.
+- Line 208: `let html = document.querySelector('html');` - App logic step.
+- Line 209: `if(html){` - Starts a logic block.
+- Line 210: `html?.style.removeProperty( '--body-bg-rgb');` - App logic step.
+- Line 211: `html?.style.removeProperty( '--gray-3');` - App logic step.
+- Line 212: `html?.style.removeProperty( '--body-bg-rgb2');` - App logic step.
+- Line 213: `html?.style.removeProperty( '--light-rgb');` - App logic step.
+- Line 214: `html?.style.removeProperty( '--form-control-bg');` - App logic step.
+- Line 215: `html?.style.removeProperty( '--sidemenu-active-bgcolor');` - App logic step.
+- Line 216: `html?.style.removeProperty( '--input-border' );` - App logic step.
+- Line 217: `// html?.style.removeProperty('--primary');` - Developer comment or documentation.
+- Line 218: `html?.style.removeProperty('--primary-rgb');` - App logic step.
+- Line 219: `` - Blank line for readability.
+- Line 220: `}` - Ends a logic block.
+- Line 221: `html?.removeAttribute('data-bg-img');` - App logic step.
+- Line 222: `html?.setAttribute('data-vertical-style','overlay');` - App logic step.
+- Line 223: `this.stateSubject.next(this.initialState);` - App logic step.
+- Line 224: `this.updateStateAndEmit(this.initialState);` - App logic step.
+- Line 225: `localStorage.clear();` - App logic step.
+- Line 226: `}` - Ends a logic block.
+- Line 227: `` - Blank line for readability.
+- Line 228: `private updateStateAndEmit(state: any) {` - Starts a logic block.
+- Line 229: `` - Blank line for readability.
+- Line 230: `` - Blank line for readability.
+- Line 231: `` - Blank line for readability.
+- Line 232: `// Conditional logic based on direction changes` - Developer comment or documentation.
+- Line 233: `const currentState = this.stateSubject.getValue(); // Get current state` - App logic step.
+- Line 234: `// Conditional logic based on theme changes` - Developer comment or documentation.
+- Line 235: `if (state['theme']) {` - Starts a logic block.
+- Line 236: `this.applythemeSpecificChanges(state['theme']);` - App logic step.
+- Line 237: `}` - Ends a logic block.
+- Line 238: `if (state['direction']) {` - Starts a logic block.
+- Line 239: `this.applyDirectionSpecificChanges(state['direction']);` - App logic step.
+- Line 240: `}` - Ends a logic block.
+- Line 241: `// Conditional logic based on theme changes` - Developer comment or documentation.
+- Line 242: `if (state['navigationStyles']) {` - Starts a logic block.
+- Line 243: `this.applyNavigationStylesSpecificChanges(state['navigationStyles']);` - App logic step.
+- Line 244: `` - Blank line for readability.
+- Line 245: `}` - Ends a logic block.
+- Line 246: `// Conditional logic based on theme changes` - Developer comment or documentation.
+- Line 247: `if (state['menuStyles'] && !state['layoutStyles']) {` - Starts a logic block.
+- Line 248: `this.applyMenuStylesSpecificChanges(state['menuStyles']);` - App logic step.
+- Line 249: `}` - Ends a logic block.
+- Line 250: `if (state['layoutStyles'] && !state['menuStyles']) {` - Starts a logic block.
+- Line 251: `this.applyLayoutStylesSpecificChanges(state['layoutStyles']);` - App logic step.
+- Line 252: `}` - Ends a logic block.
+- Line 253: `if (state['pageStyles']) {` - Starts a logic block.
+- Line 254: `this.applypageStylesSpecificChanges(state['pageStyles']);` - App logic step.
+- Line 255: `}` - Ends a logic block.
+- Line 256: `if (state['widthStyles']) {` - Starts a logic block.
+- Line 257: `this.applywidthStylesSpecificChanges(state['widthStyles']);` - App logic step.
+- Line 258: `}` - Ends a logic block.
+- Line 259: `if (state['menuPosition']) {` - Starts a logic block.
+- Line 260: `this.applymenuPositionSpecificChanges(state['menuPosition']);` - App logic step.
+- Line 261: `}` - Ends a logic block.
+- Line 262: `if (state['headerPosition']) {` - Starts a logic block.
+- Line 263: `this.applyheaderPositionSpecificChanges(state['headerPosition']);` - App logic step.
+- Line 264: `}` - Ends a logic block.
+- Line 265: `if (state['themePrimary']) {` - Starts a logic block.
+- Line 266: `this.applyPrimarySpecificChanges(state['themePrimary']);` - App logic step.
+- Line 267: `}` - Ends a logic block.
+- Line 268: `if (state['themeBackground']) {` - Starts a logic block.
+- Line 269: `this.applyThemeBackgroundSpecificChanges(state['themeBackground']);` - App logic step.
+- Line 270: `}` - Ends a logic block.
+- Line 271: `if (state['headerColor']) {` - Starts a logic block.
+- Line 272: `this.applyheaderColorSpecificChanges(state['headerColor']);` - App logic step.
+- Line 273: `}` - Ends a logic block.
+- Line 274: `if (state['menuColor']) {` - Starts a logic block.
+- Line 275: `this.applymenuColorSpecificChanges(state['menuColor']);` - App logic step.
+- Line 276: `}` - Ends a logic block.
+- Line 277: `if (state['backgroundImage']) {` - Starts a logic block.
+- Line 278: `this.applybackgroundImageSpecificChanges(state['backgroundImage']);` - App logic step.
+- Line 279: `}` - Ends a logic block.
+- Line 280: `` - Blank line for readability.
+- Line 281: `` - Blank line for readability.
+- Line 282: `` - Blank line for readability.
+- Line 283: `this.stateSubject.next(state);` - App logic step.
+- Line 284: `this.updateLocalStorage(state);` - App logic step.
+- Line 285: `}` - Ends a logic block.
+- Line 286: `` - Blank line for readability.
+- Line 287: `private updateLocalStorage(state: any) {` - Starts a logic block.
+- Line 288: `try {` - Starts a logic block.
+- Line 289: `localStorage.setItem(this.localStorageKey, JSON.stringify(state));` - App logic step.
+- Line 290: `} catch (error) {` - App logic step.
+- Line 291: `console.error('Error saving state to local storage:', error);` - App logic step.
+- Line 292: `}` - Ends a logic block.
+- Line 293: `}` - Ends a logic block.
+- Line 294: `}` - Ends a logic block.
+
+## Spruha/src/app/components/apps/war-room/war-room.routes.ts
+- Line 1: `import { NgModule } from '@angular/core';` - Loads external tools or data types.
+- Line 2: `import { RouterModule, Routes } from '@angular/router';` - Loads external tools or data types.
+- Line 3: `` - Blank line for readability.
+- Line 4: `export const warRoomRoutes: Routes = [` - App logic step.
+- Line 5: `{` - Starts a logic block.
+- Line 6: `path: 'apps/war-room',` - App logic step.
+- Line 7: `children: [` - App logic step.
+- Line 8: `{` - Starts a logic block.
+- Line 9: `path: '',` - App logic step.
+- Line 10: `loadComponent: () =>` - App logic step.
+- Line 11: `import('./war-room.component').then((m) => m.WarRoomComponent),` - Loads external tools or data types.
+- Line 12: `},` - Ends a logic block.
+- Line 13: `],` - App logic step.
+- Line 14: `},` - Ends a logic block.
+- Line 15: `];` - App logic step.
+- Line 16: `` - Blank line for readability.
+- Line 17: `@NgModule({` - Starts a logic block.
+- Line 18: `imports: [RouterModule.forChild(warRoomRoutes)],` - Loads external tools or data types.
+- Line 19: `exports: [RouterModule],` - App logic step.
+- Line 20: `})` - Ends a logic block.
+- Line 21: `export class WarRoomRoutingModule {` - Starts the logic class for this component.
+- Line 22: `static routes = warRoomRoutes;` - App logic step.
+- Line 23: `}` - Ends a logic block.
+
+## Spruha/angular.json (only the jsVectorMap script section)
+- Line 1: `"public/assets/libs/jsvectormap/js/jsvectormap.min.js",` - Map library core.
+- Line 2: `"public/assets/libs/jsvectormap/maps/world.js"` - World map data.
+
+## Spruha/src/styles.scss (only the jsVectorMap import)
+- Line 1: `@import "../public/assets/libs/jsvectormap/css/jsvectormap.min.css";` - Map styles.
